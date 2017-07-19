@@ -1,0 +1,437 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model MultipleInvoicingModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+    ViewBag.ErrorMessage = "";
+
+    var action = "";
+
+    if (mode == UIMode.Create)
+    {
+        action = "CreateMultipleInvoicing";
+    }
+    else
+    {
+        action = "UpdateMultipleInvoicing";
+    }
+    
+    var statusList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)InvoiceStatus.New), Text ="New" },
+        new DropDownOption(){ Value = Convert.ToString((int)InvoiceStatus.Approved), Text = "Approved" },
+        new DropDownOption(){ Value = Convert.ToString((int)InvoiceStatus.Void), Text ="Void" },
+    };
+
+    var populateInvoice = "<a href='#' onclick='populateInvoices()' class='button'>Get Invoice</a>&nbsp;";
+    var populateItem = "<a href='#' id='populateItems' onclick='populateItems()' class='button'>Get Items</a><br/><br/>";
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.CustomerID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.DateFrom,"", delegate(FormField f){
+            f.CreateFieldType = f.DetailFieldType = FormFieldType.None;
+        }),
+        Html.HiddenFieldFieldObjFor(p=>p.DateTo,"", delegate(FormField f){
+            f.CreateFieldType = f.DetailFieldType = FormFieldType.None;
+        }),
+        Html.FullRowFormFieldObj("<br /><b>Main Information</b><br/>","<br /><b>Primary Information</b><br/>","<br /><b>Primary Information</b><br/>"),
+        Html.LabelFieldObjFor(p=>p.Code,"ID", delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.Label;
+            f.GenerateHiddenField = true;
+        }),
+        Html.TextBoxFieldObjFor(p=>p.CustomerName,"CUSTOMER", delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.Label;
+            f.Style = "width:400px";
+        }),
+        Html.TextAreaFieldObjFor(p=>p.BillingAddress1,"ADDRESSEE", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        Html.DateFieldObjFor(p=>p.Date,"DATE", delegate(FormField f){
+            f.DetailFormat = "MM/dd/yyyy";
+            f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+            f.Style = "width:300px";
+            //f.UpdateFieldType = FormFieldType.Label;
+        }),
+        Html.DateFieldObjFor(p=>p.DateFrom,"DATE FROM", delegate(FormField f){
+            f.DetailFormat = "MM/dd/yyyy";
+            f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+            f.Style = "width:300px";
+            f.UpdateFieldType = FormFieldType.Label;
+        }),
+        Html.DateFieldObjFor(p=>p.DateTo,"DATE TO", delegate(FormField f){
+            f.DetailFormat = "MM/dd/yyyy";
+            f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+            f.Style = "width:300px";
+            f.UpdateFieldType = FormFieldType.Label;
+        }),
+        Html.FullRowFormFieldObj(populateInvoice + populateItem,populateInvoice + populateItem,""),
+        
+        Html.TextBoxFieldObjFor(p=>p.Remarks,"MEMO", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        Html.LabelFieldObjFor(p=>p.SalesOrderCodeList, "Ref SO", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }), 
+        Html.LabelFieldObjFor(p=>p.DeliveryOrderCodeList, "Ref DO", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }), 
+        Html.DropDownFieldObjFor(p=>p.Status,"STATUS",statusList, delegate(FormField f){
+            f.Style = "width:300px";
+            f.CreateFieldType = f.DetailFieldType = FormFieldType.None;
+        }), 
+    };
+
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("InvoiceID"),
+        Html.HiddenFieldColumn("ItemNo"),
+        
+        Html.LabelColumn("InvoiceCode","NO TAGIHAN","115px",delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+        }),
+        Html.LabelColumn("Date", "DATE TRANSACTION", "50px",delegate(GridColumn col){
+            col.DetailFormat = "MM/dd/yyyy";
+            col.CreateFormat = col.UpdateFormat = "MM/dd/yyyy";
+        }),
+        Html.LabelColumn("CustomerCode","CUSTOMER","115px",delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+        }),
+        Html.LabelColumn("CustomerName", "NAME","250px",delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+        }),
+        Html.DecimalColumn("Amount", "AMOUNT", "100px", delegate(GridColumn col){
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            //col.UpdateColumnType = col.DetailColumnType = GridColumnType.None;
+            col.CreateFormat = col.UpdateFormat = "N0";
+            col.DetailFormat = "N0";
+        }),
+        Html.DecimalColumn("TaxAmount", "TAX AMOUNT", "100px", delegate(GridColumn col){
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            //col.UpdateColumnType = col.DetailColumnType = GridColumnType.None;
+            col.CreateFormat = col.UpdateFormat = "N0";
+            col.DetailFormat = "N0";
+        }),
+        Html.DecimalColumn("GrandTotal", "GROSS AMOUNT", "100px", delegate(GridColumn col){
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            //col.UpdateColumnType = col.DetailColumnType = GridColumnType.None;
+            col.CreateFormat = col.UpdateFormat = "N0";
+            col.DetailFormat = "N0";
+        }),
+    };
+
+    GridFooter.SetPropertyDelegate subTotalFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    GridFooter.SetPropertyDelegate taxFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    GridFooter.SetPropertyDelegate grandTotalFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    var footerColumnStart = 4;
+
+    var subTotal = new GridFooter[]{
+        Html.EmptyFooterColumn(footerColumnStart),
+        Html.LabelFooterColumn("", "JUMLAH HARGA:", true, subTotalFooterDel),
+        Html.DecimalFooterColumn("txtGridTotal", Convert.ToDecimal(Model.SubTotal), delegate(GridFooter f){
+            f.ItemFormat = "N0";
+        }),
+    };
+
+    var taxValue = new GridFooter[]{
+            Html.EmptyFooterColumn(footerColumnStart),
+            Html.LabelFooterColumn("", "PAJAK:", true, taxFooterDel),
+            Html.DecimalFooterColumn("txtGridPPN", Convert.ToDecimal(Model.TaxValue), delegate(GridFooter f){
+                f.ItemFormat = "N0";
+        })
+    };
+
+    var grandTotal = new GridFooter[]{
+            Html.EmptyFooterColumn(footerColumnStart),
+            Html.LabelFooterColumn("","TOTAL HARGA:", true, grandTotalFooterDel),
+            Html.DecimalFooterColumn("txtGridGrandTotal", Convert.ToDecimal(Model.GrandTotal), delegate(GridFooter f){
+                f.ItemFormat = "N0";
+        })
+    };
+
+    var gridFooters = new List<GridFooter[]>();
+    gridFooters.Add(subTotal);
+    gridFooters.Add(taxValue);
+    gridFooters.Add(grandTotal);
+
+    var addNewButton = new Button();
+    addNewButton.CssClass = "button";
+    addNewButton.Text = "Add";
+    addNewButton.OnClick = "addGrid1Row()";
+    addNewButton.ID = "btnAddNew";
+    addNewButton.Href = "#btnAddNew";
+    addNewButton.Visible = mode != UIMode.Detail;
+
+    var grid = new Grid();
+    grid.IncludeAddRowScript = true;
+    grid.IncludeDeleteRowButton = true;
+    grid.DefaultObject = new MultipleInvoicingDetailModel();
+    grid.Columns = gridColumns;
+    grid.ShowFooter = true;
+    grid.Footers = gridFooters;
+    grid.AllowSorting = false;
+    grid.BelowButtons.Add(addNewButton);
+    
+    var itemGridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("ItemNo"),
+        //Html.HiddenFieldColumn("LineSequenceNumber"),
+        Html.HiddenFieldColumn("InvoiceID"),
+        Html.HiddenFieldColumn("InvoiceDetailItemNo"),
+        Html.HiddenFieldColumn("ProductID"),
+        Html.HiddenFieldColumn("TaxType"),
+        
+        Html.LabelColumn("ProductName", "DISPLAY NAME", "220px"),
+        Html.IntegerColumn("Quantity", "QUANTITY", "",delegate(GridColumn col){
+            col.CreateColumnType = col.UpdateColumnType = GridColumnType.Label;
+            col.DetailFormat = "N0";
+            col.CreateFormat = col.UpdateFormat = "N0";
+        }),
+        Html.LabelColumn("ConversionName","UNIT",""),
+        Html.DecimalColumn("Price", "RATE", "", delegate(GridColumn col)
+        {
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            col.DetailFormat = "N2";
+            col.CreateFormat = col.UpdateFormat = "F2";
+        }),
+        Html.DecimalColumn("TotalAmount", "AMOUNT", "", delegate(GridColumn col)
+        {
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            col.DetailFormat = "N2";
+            col.CreateFormat = col.UpdateFormat = "F2";
+        }),
+        Html.DecimalColumn("TotalPPN", "TAX AMOUNT", "100px", delegate(GridColumn col)
+        {
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            col.DetailFormat = "N2";
+            col.CreateFormat = col.UpdateFormat = "F2";
+        }),
+    };
+
+    GridFooter.SetPropertyDelegate subTotalItemFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    GridFooter.SetPropertyDelegate taxItemFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    GridFooter.SetPropertyDelegate grandTotalItemFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+    
+    var footerItemColumnStart = 3;
+
+    var subTotalItem = new GridFooter[]{
+        Html.EmptyFooterColumn(footerItemColumnStart),
+        Html.LabelFooterColumn("", "JUMLAH HARGA:", true, subTotalItemFooterDel),
+        Html.DecimalFooterColumn("txtGridTotalItem", Convert.ToDecimal(Model.SubTotalItem), delegate(GridFooter f){
+            f.ItemFormat = "N0";
+        }),
+    };
+
+    var taxValueItem = new GridFooter[]{
+            Html.EmptyFooterColumn(footerItemColumnStart),
+            Html.LabelFooterColumn("", "PAJAK:", true, taxItemFooterDel),
+            Html.DecimalFooterColumn("txtGridPPNItem", Convert.ToDecimal(Model.TaxValueItem), delegate(GridFooter f){
+                f.ItemFormat = "N0";
+        })
+    };
+
+    var grandTotalItem = new GridFooter[]{
+            Html.EmptyFooterColumn(footerItemColumnStart),
+            Html.LabelFooterColumn("","TOTAL HARGA:", true, grandTotalItemFooterDel),
+            Html.DecimalFooterColumn("txtGridGrandTotalItem", Convert.ToDecimal(Model.GrandTotalItem), delegate(GridFooter f){
+                f.ItemFormat = "N0";
+        })
+    };
+
+    var gridFooterItems = new List<GridFooter[]>();
+    gridFooterItems.Add(subTotalItem);
+    gridFooterItems.Add(taxValueItem);
+    gridFooterItems.Add(grandTotalItem);
+
+    var itemAddNewButton = new Button();
+    itemAddNewButton.CssClass = "button";
+    itemAddNewButton.Text = "Add";
+    itemAddNewButton.OnClick = "addItemGridRow()";
+    itemAddNewButton.ID = "btnAddNewItem";
+    itemAddNewButton.Href = "#btnAddNew";
+    itemAddNewButton.Visible = mode != UIMode.Detail;
+
+    var itemGrid = new Grid();
+    itemGrid.ID = "ItemGrid";
+    itemGrid.DataContainerName = "ItemDetails";
+    itemGrid.IncludeAddRowScript = true;
+    itemGrid.IncludeDeleteRowButton = true;
+    itemGrid.DefaultObject = new MultipleInvoiceItemModel();
+    itemGrid.Columns = itemGridColumns;
+    itemGrid.ShowFooter = true;
+    itemGrid.Footers = gridFooterItems;
+    itemGrid.AllowSorting = false;
+    itemGrid.BelowButtons.Add(itemAddNewButton);
+    
+    var form = new Form();
+    form.Fields = formFields;
+
+    TabbedGrid tabbedGrid = new TabbedGrid();
+
+    tabbedGrid.AddGrid("Items", itemGrid, Model.ItemDetails);
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.initNumeric = function () {
+            $(".decimalNumeric").numeric({
+                decimal: "."
+            });
+            $(".decimalNumeric").focus(function () {
+                var temp = $(this);
+                setTimeout(function () {
+                    temp.select();
+                }, 100);
+            });
+            $(".integerNumeric").numeric(false, function () { this.value = ""; this.focus(); });
+        }
+
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+
+        $("#btnVoid").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                .addClass("dialog")
+                .attr("id", $(this).attr("data-dialog-id"))
+                .appendTo("body").dialog({
+                    title: "Void Remarks",
+                    close: function () {
+                        $(this).remove();
+                    },
+                    modal: true,
+                    height: 180,
+                    width: 700,
+                    left: 0
+                }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+
+        var action = $("#hdnAction").val();
+    });
+    $(function () {
+        var action = $("#hdnAction").val();
+        $("[id='btnAddNew']").hide();
+        $("[id='btnAddNewItem']").hide();
+
+        $("[name='lnkAddNewGrid1']").hide();
+        $("[name='lnkAddNewItemGrid']").hide();
+
+        $('#Form1').attr("action", "/MultipleInvoicing/" + action);
+
+        addSalesUrl();
+    });
+
+    function addSalesUrl() {
+        var mode = $("#hdnMode").val();
+
+        if (mode == "Detail") {
+            var soID = $("#hdnSalesOrderID").val();
+            var soCode = $("#lblSalesOrderCode").text();
+
+            var soLink = "/SalesOrder/Detail?key=" + soID;
+            $("#lblSalesOrderCode").replaceWith('<a href="' + soLink + '">' + soCode + '</a>');
+
+            var doID = $("#hdnDeliveryOrderID").val();
+            var doCode = $("#lblDeliveryOrderCode").text();
+
+            var doLink = "/DeliveryOrder/Detail?key=" + doID;
+            $("#lblDeliveryOrderCode").replaceWith('<a href="' + doLink + '">' + doCode + '</a>');
+
+        }
+    }
+
+    function onSelectCustomer(data) {
+        window.location.href = "/MultipleInvoicing/Create?customerID=" + data.ID;
+    }
+</script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/Transaction/MultipleInvoicing.js")"></script>
+<input type="hidden" id="hdnAction" value="@action" />
+<input type="hidden" id="hdnMode" value="@ViewBag.Mode" />
+@Html.AutoCompleteScript("initCustomerAutoComplete", "txtCustomerName", Url.Content("~/WebService.asmx/RetrieveCustomerByKey"), "",
+                Url.Content("~/WebService.asmx/RetrieveCustomer"), "customerName", "Code", "Name", "onSelectCustomer", 50, 500)
+@Html.MasterDetailForm(form, grid, Model, Model.Details, mode, "MultipleInvoicing", "ID", delegate(MasterDetailFormHelper helper)
+    {
+        helper.DetailGridTitle = "Invoices";
+        helper.TabbedGrid = tabbedGrid;
+        helper.CreateAnotherButton.Visible = false;
+        helper.EditButton.Visible = false;
+
+        //helper.VoidButton.Href = Url.Content("~/MultipleInvoicing/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+        //helper.VoidButton.OnClick = "";
+        //helper.VoidButton.ID = "btnVoid";
+        
+        if (mode == UIMode.Detail)
+        {
+            helper.VoidButton.Href = Url.Content("~/MultipleInvoicing/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+            helper.VoidButton.OnClick = "";
+            helper.VoidButton.ID = "btnVoid";
+            helper.BackToListButton.Href = Url.Content("~/MultipleInvoicing");
+
+            if (!Convert.ToBoolean(ViewBag.AllowCreate))
+            {
+                helper.CreateAnotherButton.Visible = false;
+            }
+
+            if (!Convert.ToBoolean(ViewBag.AllowEdit))
+            {
+                helper.EditButton.Visible = helper.CreateAnotherButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+            }
+            else
+            {
+                helper.EditButton.Visible = mode == UIMode.Detail && Model.Status != (int)MPL.DocumentStatus.Void;
+                helper.CreateAnotherButton.Href = Url.Content("~/UncreatedMultipleInvoicing");
+                helper.CreateAnotherButton.Text = "Create New";
+                //helper.VoidButton.Visible = mode == UIMode.Detail && Model.Status != (int)InvoiceStatus.Void;
+                helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+            }
+            
+            if (!Convert.ToBoolean(ViewBag.AllowVoid))
+            {
+                helper.VoidButton.Visible = false;
+            }
+            else
+            {
+                helper.VoidButton.Visible = mode == UIMode.Detail && Model.Status != (int)InvoiceStatus.Void;
+            }
+            
+            helper.CopyTransactionButton.Visible = false;
+        }
+    })
+@*@if (Model.TaxAmount > 0)
+{
+    <div class="error">
+        * Masukkan No Faktur untuk penjualan dengan PPN</div>
+}*@

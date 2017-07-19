@@ -1,0 +1,34 @@
+﻿<Report Title="Laporan Penjualan">
+  <Columns>
+    <Column Field="SalesOrderDate" HeaderText="Tgl SO" Width=".7" />
+    <Column Field="SalesOrderCode" HeaderText="No SO" Width=".6"/>
+    <!--<Column Field="DeliveryDate" HeaderText="Tgl DO (Tgl Kirim)" Width=".8"/>
+    <Column Field="DeliveryOrderCode" HeaderText="No DO" Width=".6"/>
+    <Column Field="InvoiceDate" HeaderText="Tgl Invoice" Width=".7"/>
+    <Column Field="InvoiceCode" HeaderText="No Invoice (SA)" Width=".65"/>-->
+    <Column Field="CustomerName" HeaderText="Nama Pelanggan" Width="1.7"/>
+    <Column Field="ProductName" HeaderText="Nama Barang" Width="2.6" />
+    <Column Field="Quantity" HeaderText="Jml Brg (Qty Kg)" Width=".6" />
+    <Column Field="PurchasePrice" HeaderText="Harga Beli" Width="1"/>
+    <Column Field="CostExpedition" HeaderText="Biaya Pengiriman" Width="1"/>
+    <Column Field="BuyingDiscount" HeaderText="Diskon Beli" Width=".6"/>
+    <Column Field="AssetTotalDesc" HeaderText="HPP" Width=".8"/>
+    <Column Field="DiscountDesc" HeaderText="Diskon Jual" Width=".8"/>
+    <Column Field="PriceTotalDesc" HeaderText="Harga Jual" Width="1.1"/>
+    <Column Field="TaxAmountTotalDesc" HeaderText="PPN" Width="1"/>
+    <Column Field="GrandTotalDesc" HeaderText="Jumlah" Width="1.1"/>
+  </Columns>
+  <Footers>
+    <Footer Label="Total" LabelSpan="4" 
+            Content="=SUM(Fields!Quantity.Value)"
+            Content2="=SUM(Fields!PurchasePrice.Value)"
+            Content3="=SUM(Fields!CostExpedition.Value)"
+            Content4="=SUM(Fields!BuyingDiscount.Value)"
+            Content5="=SUM(Fields!AssetTotal.Value)"
+            Content6="=SUM(Fields!Discount.Value * Fields!Quantity.Value)"
+            Content7="=SUM(Fields!PriceTotal.Value)"
+            Content8="=SUM(Fields!TaxAmountTotal.Value)"
+            Content9="=SUM(Fields!GrandTotal.Value)"
+            />
+  </Footers>
+</Report>

@@ -1,0 +1,169 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<PurchaseReturnModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("PurchaseOrderID","Purchase Order ID","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("PurchaseOrderTitle","Judul Purchase Order","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("Code","VENDOR RETURN NUMBER","100px"),
+        Html.DateColumn("Date","DATE"),
+        Html.LabelColumn("PurchaseOrderCode","PO NUMBER","100px"),
+        Html.LabelColumn("VendorName","VENDOR"),
+        // Html.DecimalColumn("Price","Jumlah", "",delegate(GridColumn col){
+       //     col.DetailFormat = "N0";
+        //}),
+        Html.LabelColumn("StatusDescription","STATUS", "100px",delegate(GridColumn col){
+            col.SortField = "Status";
+        })
+    };
+
+    var statusList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)MPL.DocumentStatus.New), Text = MPL.DocumentStatus.New.ToString() },
+        new DropDownOption(){ Value = Convert.ToString((int)MPL.DocumentStatus.Approved), Text = "Approved" },
+        new DropDownOption(){ Value = Convert.ToString((int)MPL.DocumentStatus.Void), Text = MPL.DocumentStatus.Void.ToString() },
+    };
+    
+    var positionList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)PurchaseReturnPosition.Returned), Text ="RETURNED" },
+        new DropDownOption(){ Value = Convert.ToString((int)PurchaseReturnPosition.Recycled), Text = "DEFECT" },
+    };
+    
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("TRANSACTION DATE","TransactionDate"),
+        Html.GenericFilterTextBoxField("VENDOR RETURN NUMBER","Code"),
+        Html.GenericFilterTextBoxField("PO NUMBER","PurchaseOrderCode"),
+        Html.GenericFilterTextBoxField("VENDOR","SupplierName"),
+        Html.GenericFilterDropDownField("STATUS", "StatusPositionDesc", positionList, typeof(int)),
+        //Html.GenericFilterDropDownField("Status","Status",statusList,typeof(int))
+        
+    };
+
+    var detailButton = new GridButtonColumn();
+    detailButton.CssClass = "iconContainer";
+    detailButton.ButtonCssClass = "details imageButton";
+    detailButton.Href = Url.Content("~/PurchaseReturn/Detail?key=@idPropertyValue");
+    detailButton.IDPropertyName = "ID";
+    detailButton.Text = "Detail";
+
+    var approveButton = new GridButtonColumn();
+    approveButton.CssClass = "iconContainer";
+    approveButton.ButtonCssClass = "approve imageButton";
+    approveButton.Href = Url.Content("~/PurchaseReturn/ApproveFromIndex?key=@idPropertyValue");
+    approveButton.OnClick = "return confirm('Are you sure to approve this document?');";
+    approveButton.IDPropertyName = "ID";
+    approveButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var purchaseReturn = obj as PurchaseReturnModel;
+
+        if (purchaseReturn.Status == (int)MPL.DocumentStatus.New && Convert.ToBoolean(ViewBag.AllowEdit))
+            return true;
+
+        return false;
+    };
+    approveButton.Text = "Approve";
+
+    var printButton = new GridButtonColumn();
+    printButton.CssClass = "iconContainer";
+    printButton.ButtonCssClass = "print imageButton";
+    printButton.OnClick = String.Format("window.open('{0}');", Url.Action("PopUp", "ReportViewer", new { type = ABCAPOS.Controllers.ReportViewerController.PrintOutType.PurchaseReturn, queryString = "deliveryOrderID=@idPropertyValue" }));
+    printButton.IDPropertyName = "ID";
+    printButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var purchaseReturn = obj as PurchaseReturnModel;
+
+        if (purchaseReturn.Status >= (int)PurchaseReturnStatus.Approved)
+            return true;
+
+        return false;
+    };
+    printButton.Text = "Cetak";
+
+    var voidButton = new GridButtonColumn();
+    voidButton.CssClass = "iconContainer";
+    voidButton.ButtonCssClass = "cancel imageButton";
+    voidButton.Href = Url.Content("~/PurchaseReturn/VoidFromIndex?key=@idPropertyValue");
+    voidButton.OnClick = "return confirm('Are you sure you want to cancel this document?');";
+    voidButton.IDPropertyName = "ID";
+    voidButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var purchaseReturn = obj as PurchaseReturnModel;
+
+        if (purchaseReturn.Status != (int)PurchaseReturnStatus.Void)
+            return true;
+
+        return false;
+    };
+    voidButton.Text = "Void";
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(detailButton);
+    grid.Buttons.Add(approveButton);
+
+    if (Convert.ToBoolean(ViewBag.AllowVoid))
+    {
+        grid.Buttons.Add(voidButton);
+    }
+}
+<script type="text/javascript">
+    $(function () {
+        addTooltip();
+        if ($.urlParam('filter.FilterFields%5B0%5D.Selected') == null) {
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+            var yyyy = today.getFullYear();
+
+            today = mm + '/' + dd + '/' + yyyy;
+            $("#filter_FilterFields_0_Value").val(today);
+        }
+    });
+    $(document).ready(function () {
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+    });
+    function addTooltip() {
+        var noOfRows = $("#Grid1 tbody tr").length;
+
+        for (x = 0; x < noOfRows; x++) {
+            var purchaseOrderID = $("#Details_" + x + "_PurchaseOrderID").val();
+            var purchaseOrderCode = $("#Details_" + x + "_PurchaseOrderCode").text();
+            var purchaseOrderTitle = $("#Details_" + x + "_PurchaseOrderTitle").val();
+
+            var purchaseOrderLink = "/PurchaseOrder/Detail?key=" + purchaseOrderID;
+
+            $("#Details_" + x + "_PurchaseOrderCode").replaceWith('<a href="' + purchaseOrderLink + '" title="' + purchaseOrderTitle + '">' + purchaseOrderCode + '</a>');
+        }
+    }
+</script>
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "PurchaseReturn", "ID", "Code", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+    {
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.AddNewButton.Visible = true;
+        }
+        else
+        {
+            helper.AddNewButton.Visible = false;
+        }
+
+        helper.AddNewButton.Href = Url.Content("~/PurchaseReturn/Create");
+    })

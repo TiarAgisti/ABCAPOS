@@ -1,0 +1,236 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model PurchaseReturnModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+    ViewBag.ErrorMessage = "";
+
+    //var conversionList = ViewBag.ConversionList as List<ConversionModel>;
+    //var ddlConversion = Util.GetDropDownOptions(conversionList, "Name", "ID");
+
+    var yesNoRadio = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = true,Text = "Ya", ReadOnly = true},
+        new RadioOption(){ Value = false,Text = "Tidak", ReadOnly = true},
+    };
+
+    var statusList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)PurchaseReturnStatus.New), Text ="New" },
+        new DropDownOption(){ Value = Convert.ToString((int)PurchaseReturnStatus.Approved), Text = "Disetujui" },
+        new DropDownOption(){ Value = Convert.ToString((int)PurchaseReturnStatus.Void), Text = "Void" },
+    };
+
+    var positionList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)PurchaseReturnPosition.Returned), Text ="Returned" },
+        new DropDownOption(){ Value = Convert.ToString((int)PurchaseReturnPosition.Recycled), Text = "Defect" },
+    };
+
+    var productDtList = new List<DropDownOption>() { ViewBag.ProductDateList } ;
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.Status,""),
+        Html.HiddenFieldFieldObjFor(p=>p.PurchaseOrderID, ""),
+        
+        Html.FullRowFormFieldObj("<br /><b>Primary Information</b><br/>","<br /><b>Primary Information</b><br/>","<br /><b>Primary Information</b><br/>"),
+        Html.LabelFieldObjFor(p=>p.Code,"VENDOR RETURN NUMBER", delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.Label;
+            f.GenerateHiddenField = true;
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.PurchaseOrderCode,"PO NUMBER", delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.Label;
+            f.Style = "width:300px";
+        }),
+
+        Html.DateFieldObjFor(p=>p.Date,"DATE", delegate(FormField f){
+            f.DetailFormat = "MM/dd/yyyy";
+            f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+        }),
+        Html.TextBoxFieldObjFor(p=>p.Remarks,"MEMO", delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        
+        Html.FullRowFormFieldObj("<br />","<br />","<br />"),
+        Html.FullRowFormFieldObj("<br /><b>Clasifications</b><br/>","<br /><b>Clasifications</b><br/>","<br /><b>Clasifications</b><br/>"),
+        Html.DualColumnFormFieldObj(
+            Html.LabelFieldObjFor(p=>p.DepartmentName,"DEPARTMENT"),
+            Html.LabelFieldObjFor(p=>p.POSupplierNo,"SUPPLIER REFERENCE NO"),20
+        ),
+        Html.DualColumnFormFieldObj(
+            Html.LabelFieldObjFor(p=>p.WarehouseName,"LOCATION"),
+            Html.LabelFieldObjFor(p=>p.SupplierFPNo, "SUPPLIER FP NO"),20
+        ),
+        Html.RadioButtonFieldObjFor(p=>p.PurchaseTax,"FAKTUR PAJAK PEMBELIAN", yesNoRadio),
+        
+        Html.LabelFieldObjFor(p=>p.VoidRemarks,"VOID REMARKS", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+            
+            if(string.IsNullOrEmpty(Model.VoidRemarks))
+            {
+                f.DetailFieldType = FormFieldType.None;
+            }
+        }),
+    };
+
+    var gridColumns = new List<GridColumn>()
+    {        
+        Html.HiddenFieldColumn("ProductID"),
+        Html.HiddenFieldColumn("PurchaseOrderItemNo"),
+        Html.HiddenFieldColumn("ConversionID"),
+        Html.LabelColumn("ProductCode","ITEM","110px"),
+        Html.LabelColumn("ProductName", "NAMA BARANG","",delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+        }),
+        //Html.DropDownColumn("ConversionID", "UNITS", ddlConversion,"70px", delegate(GridColumn col){
+        //    col.ItemAttributes = " onchange=\"onSelectConversion($(this).parent().parent().index())\" ";
+        //    col.DetailColumnType = GridColumnType.None;
+        //}),
+        Html.LabelColumn("ConversionName", "UNITS", "110px", delegate(GridColumn gc){
+            //gc.CreateColumnType = gc.UpdateColumnType = GridColumnType.None;
+        }),
+        Html.DecimalColumn("POQuantity", "QTY PO", "110px",delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+            col.DetailFormat = "N2";
+            col.CreateColumnType = col.UpdateColumnType = GridColumnType.Label;
+        }),
+        Html.DecimalColumn("Quantity", "QTY", "110px",delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+            col.DetailFormat = "N2";
+            col.CreateFormat = col.UpdateFormat = "F2";
+        }),
+        
+        Html.DecimalColumn("Price", "HARGA/UNIT", "110px",delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+            col.DetailFormat = "N2";
+            col.CreateFormat = col.UpdateFormat = "F2";
+        }),
+        Html.TextBoxColumn("Remarks", "KETERANGAN",""),
+    };
+   
+    GridFooter.SetPropertyDelegate grandTotalFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+  
+
+    var grandTotal = new GridFooter[]{
+        Html.EmptyFooterColumn(9),
+        Html.LabelFooterColumn("","JMLH HARGA:", true, grandTotalFooterDel),
+        Html.DecimalFooterColumn("txtGridGrandTotal", Convert.ToDecimal(Model.GrandTotal), delegate(GridFooter f){
+            f.ItemFormat = "N0";
+    })
+    };
+
+    var gridFooters = new List<GridFooter[]>()
+    {
+    };
+
+    var grid = new Grid();
+    grid.IncludeAddRowScript = false;
+    grid.IncludeDeleteRowButton = true;
+    grid.DefaultObject = new PurchaseReturnDetailModel();
+    grid.Columns = gridColumns;
+    grid.ShowFooter = false;
+    grid.AllowSorting = false;
+
+    var form = new Form();
+    form.Fields = formFields;
+}
+<script type="text/javascript">
+    $(function () {
+        $("#btnVoid").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                .addClass("dialog")
+                .attr("id", $(this).attr("data-dialog-id"))
+                .appendTo("body").dialog({
+                    title: "Alasan Void",
+                    close: function () {
+                        $(this).remove();
+                    },
+                    modal: true,
+                    height: 180,
+                    width: 700,
+                    left: 0
+                }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+
+        if ($("#txtPurchaseOrderCode").val() != "") {
+            $("#txtTitle").focus();
+            
+        }
+        else {
+            $("#txtPurchaseOrderCode").focus();
+        }
+    });
+
+    function onSelectPO(data) {
+        window.location.href = "/PurchaseReturn/Create?purchaseOrderID=" + data.ID;
+    }
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+    });
+</script>
+@Html.AutoCompleteScript("initAutoComplete", "txtPurchaseOrderCode", Url.Content("~/WebService.asmx/RetrievePurchaseOrderByKey"), "",
+                Url.Content("~/WebService.asmx/RetrievePurchaseOrder"), "poCode", "Code", "VendorName", "onSelectPO", 50, 500)
+
+@Html.MasterDetailForm(form, grid, Model, Model.Details, mode, "PurchaseReturn", "ID", delegate(MasterDetailFormHelper helper)
+{
+    if (mode == UIMode.Detail)
+    {
+        helper.VoidButton.Href = Url.Content("~/PurchaseReturn/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+        helper.VoidButton.OnClick = "";
+        helper.VoidButton.ID = "btnVoid";
+
+        if (!Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.CreateAnotherButton.Visible = false;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = helper.VoidButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+        }
+        else
+        {
+            helper.CreateAnotherButton.Text = "Create New";
+            helper.EditButton.Visible = mode == UIMode.Detail && Model.Status == (int)MPL.DocumentStatus.New;
+            helper.ApproveButton.Visible = mode == UIMode.Detail && Model.Status == (int)PurchaseReturnStatus.New;
+            //helper.VoidButton.Visible = mode == UIMode.Detail && Model.Status != (int)PurchaseReturnStatus.Void;
+            helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = false;
+        }
+        if (!Convert.ToBoolean(ViewBag.AllowVoid))
+        {
+            helper.VoidButton.Visible = false;
+        }
+        else
+        {
+            helper.VoidButton.Visible = mode == UIMode.Detail && Model.Status != (int)MPL.DocumentStatus.Void;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowApprove))
+        {
+            helper.ApproveButton.Visible = false;
+        }
+    }
+})

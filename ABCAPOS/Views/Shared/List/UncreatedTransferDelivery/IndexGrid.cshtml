@@ -1,0 +1,53 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<TransferOrderModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","TRANSFER NO","100px"),
+        Html.DateColumn("Date","DATE"),
+        Html.LabelColumn("ToWarehouseName","TO LOCATION"),
+        Html.LabelColumn("StatusDescription","STATUS")
+        //Html.LabelColumn("StatusDescription","Status", "",delegate(GridColumn col){
+        //    col.SortField = "Status";
+        //})
+    };
+
+    var statusList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)TransferOrderStatus.New), Text = TransferOrderStatus.New.ToString() },
+        new DropDownOption(){ Value = Convert.ToString((int)TransferOrderStatus.PendingFulfillment), Text = "Pending Fulfillment" },
+        new DropDownOption(){ Value = Convert.ToString((int)TransferOrderStatus.PendingReceipt), Text = "Shipped" },
+        new DropDownOption(){ Value = Convert.ToString((int)TransferOrderStatus.Received), Text = "Received" },
+        new DropDownOption(){ Value = Convert.ToString((int)TransferOrderStatus.Void), Text = TransferOrderStatus.Void.ToString() },
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("TRANSACTION DATE","TransactionDate"),
+        Html.GenericFilterTextBoxField("TRANSFER NO","Code"),
+        Html.GenericFilterTextBoxField("TO LOCATION","ToWarehouseName"),
+        //Html.GenericFilterDropDownField("Status","Status",statusList,typeof(int))
+        
+    };
+
+    var createButton = new GridButtonColumn();
+    createButton.CssClass = "iconContainer";
+    createButton.ButtonCssClass = "add imageButton";
+    createButton.Href = Url.Content("~/TransferDelivery/Create?transferOrderID=@idPropertyValue");
+    createButton.IDPropertyName = "ID";
+    createButton.Text = "Detail";
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(createButton);
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "UncreatedTransferDelivery", "ID", "Code", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+    {
+        helper.AddNewButton.Visible = false;
+    })

@@ -1,0 +1,56 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util
+@using ABCAPOS.Models;
+@model List<AccountingModel>
+@{    
+    var dataCount = (int)ViewBag.DataCount;
+    var pageSize = (int)ViewBag.PageSize;
+    var startIndex = (int)ViewBag.StartIndex;
+    var selectedPage = startIndex / pageSize + 1;
+    var pageAmount = (dataCount / 20);
+
+    if (dataCount % 20 != 0)
+    {
+        pageAmount += 1;
+    }
+
+    var statement = string.Format("Page: {0} of {1}", selectedPage, pageAmount);
+
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","Kode Pembukuan","100px"),
+        Html.LabelColumn("Description","Keterangan"),
+        Html.DateColumn("DateDescription","Tanggal", "100px",delegate(GridColumn col){
+            col.SortField = "Date";
+        }),
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("Kode Pembukuan","Code"),
+        Html.GenericFilterTextBoxField("Keterangan", "Description")
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    //grid.Buttons.Add(detailButton);
+    //grid.Buttons.Add(readButton);
+    //grid.Buttons.Add(printButton);
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "Accounting", "ID", "Name", null, delegate(object obj, UIMode mode)
+    {
+        return false;
+    }, delegate(IndexGridHelper helper)
+    {
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.AddNewButton.Visible = true;
+        }
+        else
+        {
+            helper.AddNewButton.Visible = false;
+        }
+    })
+<br />
+@statement

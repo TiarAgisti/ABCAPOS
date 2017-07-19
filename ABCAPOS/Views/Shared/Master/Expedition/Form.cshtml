@@ -1,0 +1,148 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@using ABCAPOS;
+@model ExpeditionModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+    ViewBag.ErrorMessage = "";
+
+    var action = "";
+
+    /* Declarasi variable */
+    var radioList = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = true,Text = "YES", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = false,Text = "NO", ReadOnly = mode == UIMode.Detail},
+    };
+    /* end Declarasi variable */
+
+
+    /* form inputan */
+    var formFields = new List<IFormField>()
+   {
+       Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+       
+       /* Primary information */
+       Html.FullRowFormFieldObj("<br/><b>Primary Information</b><br/>","<br/><b>Primary Information</b><br/>","<br/><b>Primary Information</b><br/>"),
+       
+       Html.LabelFieldObjFor(p=>p.Code,"EXPEDITION CODE",delegate(FormField F){
+           //F.UpdateFieldType = FormFieldType.Label;
+           F.GenerateHiddenField = true;
+           F.Style = "width:400px";
+       }),
+       
+       Html.TextBoxFieldObjFor(p=>p.Name,"EXPEDITION NAME",delegate(FormField F){
+           F.Style = "width:400px";
+       }),
+       
+       Html.TextBoxFieldObjFor(p=>p.CompanyName,"COMPANY NAME",delegate(FormField F){
+           F.Style = "width:400px";
+       }),
+        
+       Html.TextAreaFieldObjFor(p=>p.Address,"ADDRESS",delegate(FormField F){
+           F.Style = "width:400px";
+       }),
+       /* end primary information */
+       
+       /* Clasifications */
+       Html.FullRowFormFieldObj("<br/>","<br/>","<br/>"),
+       Html.FullRowFormFieldObj("<br/><b>Clasifications</b><br/>","<br/><b>Clasifications</b><br/>","<br/><b>Clasifications</b><br/>"),
+       Html.TextAreaFieldObjFor(p=>p.Notes,"NOTES", delegate(FormField f){
+           f.Style = "width:400px";
+       }),
+       Html.RadioButtonFieldObjFor(p=>p.IsActive, "IS ACTIVE", radioList), 
+       /* end Clasifications */
+   };
+    /* end form inputan */
+    
+    /*subtab item*/
+   var gridColumns = new List<GridColumn>()
+   {
+       Html.HiddenFieldColumn("ItemNo"),
+      
+       Html.TextBoxColumn("UnitName","UNIT","",delegate(GridColumn col){
+           col.Style = "width:400px";
+       }),
+        
+       Html.DecimalColumn("Price","PRICE","",delegate(GridColumn col){
+           col.GenerateHiddenField = true;
+       }),
+   };
+    /*end subtab*/
+
+
+   var addNewButton = new Button();
+   addNewButton.CssClass = "button";
+   addNewButton.Text = "Add";
+   addNewButton.OnClick = "addGrid1Row()";
+   addNewButton.ID = "btnAddNew";
+   addNewButton.Href = "#btnAddNew";
+   addNewButton.Visible = mode != UIMode.Detail;
+   
+   
+    var Grid = new Grid();
+    Grid.IncludeAddRowScript = true;
+    Grid.IncludeDeleteRowButton = true;
+    Grid.DefaultObject = new ExpeditionDetailModel();
+    Grid.Columns = gridColumns;
+    Grid.ShowFooter = false;
+    Grid.AllowSorting = false;
+    Grid.BelowButtons.Add(addNewButton);
+
+    TabbedGrid tabbedGrid = new TabbedGrid();
+
+    var form = new Form();
+    form.Fields = formFields;
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.initNumeric = function () {
+            $(".decimalNumeric").numeric({
+                decimal: "."
+            });
+            $(".decimalNumeric").focus(function () {
+                var temp = $(this);
+                setTimeout(function () {
+                    temp.select();
+                }, 100);
+            });
+            $(".integerNumeric").numeric(false, function () { this.value = ""; this.focus(); });
+        }
+
+        var action = $("#hdnAction").val();
+        $("[name='lnkAddNewGrid1']").hide();
+       
+    });
+</script>
+<input type="hidden" id="hdnAction" value="@action" />
+<input type="hidden" id="hdnMode" value="@ViewBag.Mode" />
+@Html.MasterDetailForm(form, Grid, Model, Model.Details, mode, "Expedition", "ID", delegate(MasterDetailFormHelper helper)
+{
+    helper.DetailGridTitle = "Item";
+    helper.TabbedGrid = tabbedGrid;
+
+    helper.CreateAnotherButton.Visible = false;
+    helper.CopyTransactionButton.Visible = false;
+
+    if (mode == UIMode.Detail)
+    {
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.CreateAnotherButton.Visible = false;
+            helper.CopyTransactionButton.Visible = false;
+            helper.SubmitButton.Visible = false;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+        }
+        else
+        {
+            helper.EditButton.Visible = mode == UIMode.Detail;
+            helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = false;   
+        }
+    }
+    
+})

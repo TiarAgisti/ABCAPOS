@@ -1,0 +1,102 @@
+﻿@using ABCAPOS.Models
+@using MPL.MVC;
+@model CompanySettingModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    var uploadForm = "<tr><td>Logo Perusahaan</td><td>:</td><td><input type=\"file\" name=\"file\" id=\"file\"</td></tr>";
+    var uploadedFile = "<tr><td style='vertical-align:top'>Logo Perusahaan</td><td style='vertical-align:top'>:</td><td><img src=\"" + Url.Content("~/Uploads/Logo/" + Model.ImageName) + "\" style='height:100px' /></td></tr>";
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,"ID"),
+        
+        Html.TextBoxFieldObjFor(p=>p.Name,"Nama Perusahaan", delegate(FormField f){
+            f.Style = "width:250px";
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.OwnerName,"Nama Owner", delegate(FormField f){
+            f.Style = "width:250px";
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.OwnerEmail,"Email Owner", delegate(FormField f){
+            f.Style = "width:250px";
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.TaxFileNumber,"No Pajak", delegate(FormField f){
+            f.Style = "width:200px";
+        }),
+        
+        Html.TextAreaFieldObjFor(p=>p.Address,"Alamat", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+        Html.DualColumnFormFieldObj(
+        Html.TextBoxFieldObjFor(p=>p.Regency,"Kabupaten"),
+        Html.TextBoxFieldObjFor(p=>p.City,"Kota"),
+        100),
+        
+        Html.DualColumnFormFieldObj(
+        Html.TextBoxFieldObjFor(p=>p.State,"Provinsi"),
+        Html.TextBoxFieldObjFor(p=>p.PostCode,"Kode Pos"),
+        100),
+        
+        Html.DualColumnFormFieldObj(
+        Html.TextBoxFieldObjFor(p=>p.Phone1,"Telepon 1"),
+        Html.TextBoxFieldObjFor(p=>p.Fax,"Fax"),
+        100),
+        
+        Html.TextBoxFieldObjFor(p=>p.Phone2,"Telepon 2"),
+        Html.TextBoxFieldObjFor(p=>p.Website,"Website"),
+        Html.TextBoxFieldObjFor(p=>p.Email,"Email"),
+        
+        Html.FullRowFormFieldObj("<br/><b>Info Rekening</b>","<br/><b>Info Rekening</b>","<br/><b>Info Rekening</b>"),
+                
+        Html.DualColumnFormFieldObj(
+        Html.TextBoxFieldObjFor(p=>p.BankName1,"Nama Bank 1"),
+        Html.TextBoxFieldObjFor(p=>p.BankName2,"Nama Bank 2"),
+        100),
+        
+        Html.DualColumnFormFieldObj(
+        Html.TextAreaFieldObjFor(p=>p.BankAddress1,"Alamat Bank 1", delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        Html.TextAreaFieldObjFor(p=>p.BankAddress2,"Alamat Bank 2", delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        100),
+        
+        Html.DualColumnFormFieldObj(
+        Html.TextBoxFieldObjFor(p=>p.BranchAccount1,"Cabang Bank 1"),
+        Html.TextBoxFieldObjFor(p=>p.BranchAccount2,"Cabang Bank 2"),
+        100),
+        
+        Html.DualColumnFormFieldObj(
+        Html.TextBoxFieldObjFor(p=>p.AccountNumber1,"Nomor Rekening 1"),
+        Html.TextBoxFieldObjFor(p=>p.AccountNumber2,"Nomor Rekening 2"),
+        100),
+        
+        Html.DualColumnFormFieldObj(
+        Html.TextBoxFieldObjFor(p=>p.AccountName1,"Pemilik Rekening 1"),
+        Html.TextBoxFieldObjFor(p=>p.AccountName2,"Pemilik Rekening 2"),
+        100),
+        
+        Html.FullRowFormFieldObj(uploadForm,uploadForm,uploadedFile),
+    };
+
+    var form = new Form();
+    form.Fields = formFields;
+}
+<script type="text/javascript">
+    $(function () {
+        var action = $("#hdnAction").val();
+
+        $('#Form1').attr("enctype", "multipart/form-data");
+        $('#Form1').attr("action", "/CompanySetting/UpdateSetting");
+    });
+</script>
+@Html.MasterForm(form, Model, mode, "CompanySetting", "ID", delegate(MasterFormHelper<CompanySettingModel> helper)
+    {
+        helper.CreateAnotherButton.Visible = helper.DeleteButton.Visible = false;
+        helper.BackToListButton.Href = Url.Content("~");
+    })

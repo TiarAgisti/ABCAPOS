@@ -1,0 +1,127 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<InvoiceModel>
+@{
+    var dataCount = (int)ViewBag.DataCount;
+    var pageSize = (int)ViewBag.PageSize;
+    var startIndex = (int)ViewBag.StartIndex;
+    var selectedPage = startIndex / pageSize + 1;
+    var pageAmount = (dataCount / 20);
+
+    if (dataCount % 20 != 0)
+    {
+        pageAmount += 1;
+    }
+
+    var statement = string.Format("Page: {0} of {1}", selectedPage, pageAmount);
+  
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","NO TAGIHAN","180px"),
+        Html.DateColumn("Date","TANGGAL"),
+        Html.DateColumn("DueDate","JATUH TEMPO"),
+        Html.LabelColumn("SalesOrderCode","REF SO","120px"),
+        Html.LabelColumn("DeliveryOrderCodeList","REF DO","150px"),
+        Html.LabelColumn("CustomerName","CUSTOMER"),
+        Html.DecimalColumn("GrandTotal","JUMLAH", "",delegate(GridColumn col){
+            col.DetailFormat = "N0";
+        }),
+        Html.DecimalColumn("OutstandingAmount","SISA PEMBAYARAN", "",delegate(GridColumn col){
+            col.DetailFormat = "N0";
+        }),
+        Html.LabelColumn("DayOverDue","Day Over Due","",delegate(GridColumn col){
+            //col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("StatusDesc","STATUS", "",delegate(GridColumn col){
+            col.SortField = "Status";
+        })
+    };
+
+    var statusList = new List<DropDownOption>()
+    {   
+        new DropDownOption(){ Value = InvoiceStatus.New.ToString(), Text = InvoiceStatus.New.ToString() },
+        new DropDownOption(){ Value = "Unpaid", Text = "Unpaid" },
+        new DropDownOption(){ Value = "Lunas / Paid In Full", Text = "Lunas / Paid In Full" },
+        new DropDownOption(){ Value =  InvoiceStatus.Void.ToString(), Text = InvoiceStatus.Void.ToString() },
+    };
+
+    var warehouseList = ViewBag.WarehouseList as List<WarehouseModel>;
+    var ddlWarehouse = Util.GetDropDownOptions(warehouseList, "Name", "Name");
+    
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("TRANSACTION DATE","Date"),
+        Html.GenericFilterTextBoxField("NO TAGIHAN","Code"),
+        Html.GenericFilterTextBoxField("REF DO","DeliveryOrderCodeList"),
+        Html.GenericFilterTextBoxField("REF SO","SalesOrderCode"),
+        Html.GenericFilterTextBoxField("CUSTOMER","CustomerName"),
+        Html.GenericFilterDropDownField("LOCATION","WarehouseName", ddlWarehouse, typeof(string)),
+        Html.GenericFilterDropDownField("STATUS", "StatusDesc",statusList,typeof(string))
+    };
+
+    var detailButton = new GridButtonColumn();
+    detailButton.CssClass = "iconContainer";
+    detailButton.ButtonCssClass = "details imageButton";
+    detailButton.Href = Url.Content("~/Invoice/Detail?key=@idPropertyValue");
+    detailButton.IDPropertyName = "ID";
+    detailButton.Text = "Detail";
+    
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(detailButton);
+  
+    
+    
+}
+<script type="text/javascript">
+    $(function () {
+        addTooltip();
+        if ($.urlParam('filter.FilterFields%5B0%5D.Selected') == null) {
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+            var yyyy = today.getFullYear();
+
+            today = mm + '/' + dd + '/' + yyyy;
+            $("#filter_FilterFields_0_Value").val(today);
+        }
+    });
+    $(document).ready(function () {
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+    });
+    function addTooltip() {
+        var noOfRows = $("#Grid1 tbody tr").length;
+
+        for (x = 0; x < noOfRows; x++) {
+            var salesOrderID = $("#Details_" + x + "_SalesOrderID").val();
+            var salesOrderCode = $("#Details_" + x + "_SalesOrderCode").text();
+            var salesOrderTitle = $("#Details_" + x + "_SalesOrderTitle").val();
+
+            var deliveryOrderID = $("#Details_" + x + "_DeliveryOrderID").val();
+            var deliveryOrderCode = $("#Details_" + x + "_DeliveryOrderCode").text();
+
+            var salesOrderLink = "/SalesOrder/Detail?key=" + salesOrderID;
+            var deliveryOrderLink = "/DeliveryOrder/Detail?key=" + deliveryOrderID;
+
+            $("#Details_" + x + "_SalesOrderCode").replaceWith('<a href="' + salesOrderLink + '" title="' + salesOrderTitle + '">' + salesOrderCode + '</a>');
+            $("#Details_" + x + "_DeliveryOrderCode").replaceWith('<a href="' + deliveryOrderLink + '">' + deliveryOrderCode + '</a>');
+        }
+    }
+</script>
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "Invoice", "ID", "Code", null, delegate(object obj, UIMode mode)
+    {
+        return false;
+    }, delegate(IndexGridHelper helper)
+    {
+        helper.AddNewButton.Visible = false;
+    })
+<br />
+@statement

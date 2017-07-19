@@ -1,0 +1,46 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<PurchaseBillModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","Bill Number"),
+        Html.LabelColumn("PurchaseOrderCode","PO Number"),
+        Html.DateColumn("Date","Tanggal"),
+        Html.LabelColumn("VendorName","Nama Vendor"),
+        Html.DecimalColumn("GrandTotal","Jumlah", "",delegate(GridColumn col)
+        {
+            col.DetailFormat = "N0";
+        }),
+        Html.DecimalColumn("OutstandingAmount","Sisa Tagihan", "",delegate(GridColumn col)
+        {
+            col.DetailFormat = "N0";
+        })
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("Tanggal Transaksi","Date"),
+        Html.GenericFilterTextBoxField("PO Number","Code"),
+        Html.GenericFilterTextBoxField("Nama Vendor","VendorName"),
+    };
+
+    var createButton = new GridButtonColumn();
+    createButton.CssClass = "iconContainer";
+    createButton.ButtonCssClass = "add imageButton";
+    createButton.Href = Url.Content("~/PurchasePayment/Create?purchaseBillID=@idPropertyValue");
+    createButton.IDPropertyName = "ID";
+    createButton.Text = "Buat Pembayaran";
+    
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(createButton);
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "UncreatedPurchasePayment", "ID", "Code", null, delegate(object obj, UIMode mode)
+    {
+        return false;
+    }, delegate(IndexGridHelper helper)
+    {
+        helper.AddNewButton.Visible = false;
+    })

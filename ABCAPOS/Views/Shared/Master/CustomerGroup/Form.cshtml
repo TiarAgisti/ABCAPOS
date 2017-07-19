@@ -1,0 +1,36 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model CustomerGroupModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.TextBoxFieldObjFor(p=>p.Name,"Nama", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+    };
+
+    var form = new Form();
+    form.Fields = formFields;
+
+}
+@Html.MasterForm(form, Model, mode, "CustomerGroup", "ID", delegate(MasterFormHelper<CustomerGroupModel> helper)
+{
+    if (mode == UIMode.Detail)
+    {
+        if (!Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.CreateAnotherButton.Visible = false;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = false;
+        }
+
+        helper.DeleteButton.Visible = false;
+    }
+})

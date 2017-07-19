@@ -1,0 +1,36 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<DepartmentModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("IsInactiveDescription", "INACTIVE","",delegate(GridColumn col){
+            col.SortField = "IsActive";
+        }),
+        Html.LabelColumn("ID", "INTERNAL ID"),
+        Html.LabelColumn("DepartmentDesc","NAME"),
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("NAME","DepartmentDesc")
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "Department", "ID", "Name", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    if (Convert.ToBoolean(ViewBag.AllowCreate))
+    {
+        helper.AddNewButton.Visible = true;
+    }
+    else
+    {
+        helper.AddNewButton.Visible = false;
+    }
+})

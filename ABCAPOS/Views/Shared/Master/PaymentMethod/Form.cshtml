@@ -1,0 +1,77 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model PaymentMethodModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    List<SelectListItem> typeList = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = Convert.ToString((int)PaymentMethodType.Cash), Text = "Cash" },
+        new SelectListItem() { Value = Convert.ToString((int)PaymentMethodType.Credit), Text = "Credit" },
+    };
+
+    var ddlType = Util.GetDropDownOptions(typeList, "Text", "Value");
+
+    var ddlAccount = Util.GetDropDownOptions(ViewBag.AccountList as List<AccountModel>, "Name", "ID");
+
+    var activeRadio = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = true,Text = "Aktif", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = false,Text = "Tidak Aktif", ReadOnly = mode == UIMode.Detail},
+    };
+
+    var yesNoRadio = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = true,Text = "Ya", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = false,Text = "Tidak", ReadOnly = mode == UIMode.Detail},
+    };
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.IsActive,""),
+        
+        Html.TextBoxFieldObjFor(p=>p.Name,"Metode Pembayaran", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+        Html.DropDownFieldObjFor(p=>p.Type,"Tipe", ddlType),
+        Html.LabelFieldObjFor(p=>p.TypeDescription,"Tipe",delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+        Html.DropDownFieldObjFor(p=>p.AccountID,"Akun", ddlAccount),
+        Html.LabelFieldObjFor(p=>p.AccountName,"Akun",delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+        Html.TextAreaFieldObjFor(p=>p.Description,"Keterangan", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+        Html.RadioButtonFieldObjFor(p=>p.IsAccountBank,"Bank Akun", yesNoRadio),
+        
+        //Html.RadioButtonFieldObjFor(p=>p.IsActive,"Status", activeRadio),
+    };
+
+    var form = new Form();
+    form.Fields = formFields;
+}
+@Html.MasterForm(form, Model, mode, "PaymentMethod", "ID", delegate(MasterFormHelper<PaymentMethodModel> helper)
+{
+    if (mode == UIMode.Detail)
+    {
+        if (!Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.CreateAnotherButton.Visible = false;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = false;
+        }
+
+        helper.DeleteButton.Visible = false;
+    }
+})

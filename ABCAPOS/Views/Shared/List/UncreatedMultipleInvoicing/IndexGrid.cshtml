@@ -1,0 +1,42 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<InvoiceModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("CustomerCode","ID"),
+        Html.LabelColumn("CustomerName","CUSTOMER"),
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("ID","CustomerCode"),
+        Html.GenericFilterTextBoxField("CUSTOMER","CustomerName")
+    };
+
+    var createButton = new GridButtonColumn();
+    createButton.CssClass = "iconContainer";
+    createButton.ButtonCssClass = "add imageButton";
+    createButton.Href = Url.Content("~/MultipleInvoicing/Create?customerID=@idPropertyValue");
+    createButton.IDPropertyName = "ID";
+    createButton.Text = "Create";
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(createButton);
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "UncreatedMultipleInvoicing", "ID", "CustomerName", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    if (Convert.ToBoolean(ViewBag.AllowCreate))
+    {
+        helper.AddNewButton.Visible = true;
+    }
+    else
+    {
+        helper.AddNewButton.Visible = false;
+    }
+})

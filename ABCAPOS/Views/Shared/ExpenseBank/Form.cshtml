@@ -1,0 +1,199 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model IncomeExpenseModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+    ViewBag.ErrorMessage = "";
+
+    var statusList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)IncomeExpenseStatus.New), Text = IncomeExpenseStatus.New.ToString() },
+        new DropDownOption(){ Value = Convert.ToString((int)IncomeExpenseStatus.Approved), Text = "Disetujui" },
+        new DropDownOption(){ Value = Convert.ToString((int)IncomeExpenseStatus.Void), Text = IncomeExpenseStatus.Void.ToString() },
+    };
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.Status,""),
+        
+        Html.LabelFieldObjFor(p=>p.Code,"Kode", delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.Label;
+            f.GenerateHiddenField = true;
+        }),
+
+        Html.TextBoxFieldObjFor(p=>p.Title,"Judul Pengeluaran", delegate(FormField f){
+            f.Style = "wdith:400px";
+        }),
+        
+        Html.DateFieldObjFor(p=>p.Date,"Tanggal"),
+        Html.FullRowFormFieldObj("<br />","<br />","<br />"),
+        
+        Html.TextAreaFieldObjFor(p=>p.Remarks,"Keterangan", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.StatusDescription,"Status", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.VoidRemarks,"Alasan Void", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+            
+            if(string.IsNullOrEmpty(Model.VoidRemarks))
+            {
+                f.DetailFieldType = FormFieldType.None;
+            }
+        }),
+    };
+
+
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.TextBoxColumn("Remarks", "Keterangan","", delegate(GridColumn col)
+        {
+        }),
+        Html.DecimalColumn("Price", "Jumlah", "150px", delegate(GridColumn col)
+        {
+            col.ItemAttributes = " onblur=\"calc($(this).parent().parent().index())\" ";
+            col.DetailFormat = "N2";
+            col.CreateFormat = col.UpdateFormat = "F2";
+            
+        }),
+    };
+
+    GridFooter.SetPropertyDelegate grandTotalFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    var grandTotal = new GridFooter[]{
+                Html.EmptyFooterColumn(4),
+                Html.LabelFooterColumn("","Grand Total:", true, grandTotalFooterDel),
+                Html.DecimalFooterColumn("txtGridGrandTotal", Convert.ToDecimal(Model.GrandTotal), delegate(GridFooter f){
+                    f.ItemFormat = "N0";
+            })
+            };
+
+    var gridFooters = new List<GridFooter[]>()
+    {
+
+    };
+
+    if (mode == UIMode.Detail)
+    {
+        if (Model.GrandTotal != 0)
+        {
+            gridFooters.Add(grandTotal);
+        }
+    }
+
+    var addNewButton = new Button();
+    addNewButton.CssClass = "button";
+    addNewButton.Text = "Buat Baru";
+    addNewButton.OnClick = "addGrid1Row()";
+    addNewButton.ID = "btnAddNew";
+    addNewButton.Href = "#btnAddNew";
+    addNewButton.Visible = mode != UIMode.Detail;
+
+    var grid = new Grid();
+    grid.IncludeAddRowScript = true;
+    grid.IncludeDeleteRowButton = true;
+    grid.DefaultObject = new IncomeExpenseDetailModel();
+    grid.Columns = gridColumns;
+    grid.ShowFooter = true;
+    grid.Footers = gridFooters;
+    grid.AllowSorting = false;
+    grid.BelowButtons.Add(addNewButton);
+
+    var form = new Form();
+    form.Fields = formFields;
+
+    var reviseButton = new Button();
+    reviseButton.CssClass = "button";
+    reviseButton.Text = "Buat Baru";
+    reviseButton.Href = Url.Content("~/ExpenseBank/Create?incomeExpenseID=" + Model.ID);
+    reviseButton.Visible = mode == UIMode.Detail;
+}
+<script type="text/javascript">
+    $(function () {
+        $("[id='lnkAddNewGrid1']").hide();
+
+        $("#btnVoid").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                    .addClass("dialog")
+                    .attr("id", $(this).attr("data-dialog-id"))
+                    .appendTo("body").dialog({
+                        title: "Alasan Void",
+                        close: function () {
+                            $(this).remove();
+                        },
+                        modal: true,
+                        height: 180,
+                        width: 700,
+                        left: 0
+                    }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+    });
+
+    function calc(index) {
+        var price = 0;
+
+        var price = parseFloat($("#Details_" + index + "_Price").val().replaceAll('.', '').replaceAll(',', '.'));
+        console.log("price= " + price);
+
+        if (isNaN(price))
+            price = 0;
+
+        var rowCount = $('#Grid1 tbody tr').length;
+
+        var total = 0;
+        for (x = 0; x < rowCount; x++) {
+            var st = parseFloat($("#Details_" + x + "_Price").text().replaceAll('.', '').replaceAll(',', '.'));
+            total += st;
+        }
+
+        var strTotal = total.toFixed(0).replace('.', ',');
+        $('#txtGridTotal').text(strTotal);
+    }
+</script>
+<input type="hidden" id="hdnMode" value="@mode" />
+@Html.MasterDetailForm(form, grid, Model, Model.Details, mode, "ExpenseBank", "ID", delegate(MasterDetailFormHelper helper)
+{
+    if (mode == UIMode.Detail)
+    {
+        helper.VoidButton.Href = Url.Content("~/Expensebank/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+        helper.VoidButton.OnClick = "";
+        helper.VoidButton.ID = "btnVoid";
+
+        helper.CreateAnotherButton.Visible = false;
+        helper.CopyTransactionButton.Visible = false;
+
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.Buttons.Add(reviseButton);
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = helper.VoidButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+        }
+        else
+        {
+            //helper.Buttons.Add(reviseButton);
+            helper.EditButton.Visible = mode == UIMode.Detail && Model.Status != (int)IncomeExpenseStatus.Void;
+            helper.ApproveButton.Visible = mode == UIMode.Detail && Model.Status == (int)IncomeExpenseStatus.New;
+            helper.VoidButton.Visible = mode == UIMode.Detail && Model.Status != (int)IncomeExpenseStatus.Void; 
+            helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = false;
+        }
+    }
+})

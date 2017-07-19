@@ -1,0 +1,50 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<WorkOrderModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.DateColumn("Date","Date"),
+        Html.LabelColumn("Code","WO NUMBER"),
+        Html.LabelColumn("ProductCode","PRODUCT CODE"),
+        Html.LabelColumn("ProductName","PRODUCT NAME"),
+        Html.DecimalColumn("QtyWO","QTY WO"),
+        Html.DecimalColumn("QtyBuilt","QTY BUILT"),
+        Html.LabelColumn("ConversionName","UNIT"),
+        Html.LabelColumn("WarehouseName","LOCATION"),
+        Html.LabelColumn("StatusDescription","STATUS", "",delegate(GridColumn col){
+            col.SortField = "Status";
+        }),
+        Html.LabelColumn("Notes","NOTES"),
+    };
+
+
+    var warehouseList = ViewBag.WarehouseList as List<WarehouseModel>;
+    var ddlWarehouse = Util.GetDropDownOptions(warehouseList, "Name", "ID");
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("WO NUMBER","Code"),
+        Html.GenericFilterDropDownField("LOCATION","WarehouseName", ddlWarehouse, typeof(string)),
+    };
+
+    var createButton = new GridButtonColumn();
+    createButton.CssClass = "iconContainer";
+    createButton.ButtonCssClass = "add imageButton";
+    createButton.Href = Url.Content("~/AssemblyBuild/Create?workOrderID=@idPropertyValue");
+    createButton.IDPropertyName = "ID";
+    createButton.Text = "Detail";
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(createButton);
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "UncreatedBuild", "ID", "Code", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+    {
+        helper.AddNewButton.Visible = false;
+    })

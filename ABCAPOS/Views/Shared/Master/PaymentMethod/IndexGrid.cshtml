@@ -1,0 +1,39 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<PaymentMethodModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Name","Nama"),
+        Html.LabelColumn("TypeDescription","Tipe","", delegate(GridColumn col){
+            col.SortField = "Type";
+        }),
+        //Html.LabelColumn("IsActiveDescription","Status", "",delegate(GridColumn col){
+        //    col.SortField = "IsActive";
+        //})
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("Nama","Name")
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.DefaultObject = new CustomerModel();
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "PaymentMethod", "ID", "Name", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    if (Convert.ToBoolean(ViewBag.AllowCreate))
+    {
+        helper.AddNewButton.Visible = true;
+    }
+    else
+    {
+        helper.AddNewButton.Visible = false;
+    }
+})

@@ -1,0 +1,166 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model PaymentModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    var paymentMethodList = ViewBag.PaymentMethodList as IEnumerable<PaymentMethodModel>;
+    var ddlPaymentMethod = Util.GetDropDownOptions(paymentMethodList, "Name", "ID");
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.Status,""),
+        Html.HiddenFieldFieldObjFor(p=>p.PaymentMethodID, ""),
+        
+        Html.LabelFieldObjFor(p=>p.InvoiceID,"", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = f.DetailFieldType = FormFieldType.HiddenField;
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.DeliveryOrderID,"", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = f.DetailFieldType = FormFieldType.HiddenField;
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.Code,"PAYMENT NUMBER", delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.Label;
+            f.GenerateHiddenField = true;
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.InvoiceCode,"NO TAGIHAN"),
+        //Html.LabelFieldObjFor(p=>p.DeliveryOrderCode,"# Delivery Order"),
+        
+        Html.LabelFieldObjFor(p=>p.CustomerName,"CUSTOMER"),
+        
+         Html.DateFieldObjFor(p=>p.Date,"DATE"),
+         
+         Html.DecimalFieldObjFor(p=>p.InvoiceAmount,"ORIGINAL AMOUNT", delegate(FormField f){
+             f.CreateFieldType = f.UpdateFieldType = FormFieldType.Label;
+             f.CreateFormat = f.UpdateFormat = f.DetailFormat = "N2";
+         }),
+         Html.DecimalFieldObjFor(p=>p.SisaAmount,"AMOUNT DUE", delegate(FormField f){
+             f.CreateFieldType = FormFieldType.Label;
+             //f.DetailFieldType = FormFieldType.None;
+             f.CreateFormat = f.UpdateFormat = f.DetailFormat = "N2";
+         }),
+        Html.DecimalFieldObjFor(p=>p.OutstandingAmount,"AMOUNT DUE", delegate(FormField f){
+             f.UpdateFieldType = FormFieldType.Label;
+             f.CreateFieldType = f.DetailFieldType = FormFieldType.None;
+             f.CreateFormat = f.UpdateFormat = f.DetailFormat = "N2";
+         }),
+         Html.DecimalFieldObjFor(p=>p.Amount,"PAYMENT AMOUNT", delegate(FormField f){
+             f.CreateFormat = f.UpdateFormat = "F2";
+            f.DetailFormat = "N2";
+         }),
+         
+        Html.TextAreaFieldObjFor(p=>p.Remarks,"MEMO", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+        //Html.LabelFieldObjFor(p=>p.StatusDescription,"Status"),
+        
+        Html.LabelFieldObjFor(p=>p.VoidRemarks,"Alasan Void", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+            
+            if(string.IsNullOrEmpty(Model.VoidRemarks))
+            {
+                f.DetailFieldType = FormFieldType.None;
+            }
+        }),
+    };
+
+    var form = new Form();
+    form.Fields = formFields;
+
+    //var approveButton = new Button();
+    //approveButton.Text = "Setujui";
+    //approveButton.CssClass = "button";
+    //approveButton.Href = Url.Content("~/Payment/Approve?key=" + Model.ID);
+    //approveButton.Visible = mode == UIMode.Detail && Model.Status == (int)MPL.DocumentStatus.New;
+    //approveButton.OnClick = "return confirm('Apakah Anda yakin ingin menyetujui dokumen ini?');";
+
+    var voidButton = new Button();
+    voidButton.Text = "Void";
+    voidButton.ID = "btnVoid";
+    voidButton.CssClass = "button";
+    voidButton.Href = Url.Content("~/Payment/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+    voidButton.Visible = mode == UIMode.Detail && Model.Status != (int)MPL.DocumentStatus.Void;
+}
+<script type="text/javascript">
+    $(function () {
+        $("#btnVoid").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                .addClass("dialog")
+                .attr("id", $(this).attr("data-dialog-id"))
+                .appendTo("body").dialog({
+                    title: $(this).attr("Alasan Void"),
+                    close: function () {
+                        $(this).remove();
+                    },
+                    modal: true,
+                    height: 180,
+                    width: 700,
+                    left: 0
+                }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+
+        addInvoiceUrl();
+    });
+
+    function addInvoiceUrl() {
+        var mode = $("#hdnMode").val();
+
+        if (mode == "Detail") {
+            var invID = $("#hdnInvoiceID").val();
+            var invCode = $("#lblInvoiceCode").text();
+
+            var invLink = "/Invoice/Detail?key=" + invID;
+            $("#lblInvoiceCode").replaceWith('<a href="' + invLink + '">' + invCode + '</a>');
+
+            var doID = $("#hdnDeliveryOrderID").val();
+            var doCode = $("#lblDeliveryOrderCode").text();
+
+            var doLink = "/DeliveryOrder/Detail?key=" + doID;
+            $("#lblDeliveryOrderCode").replaceWith('<a href="' + doLink + '">' + doCode + '</a>');
+
+        }
+    }
+</script>
+<input type="hidden" id="hdnMode" value="@ViewBag.Mode" />
+@Html.MasterForm(form, Model, mode, "Payment", "ID", delegate(MasterFormHelper<PaymentModel> helper)
+    {
+        if (mode == UIMode.Detail)
+        {
+            if (!Convert.ToBoolean(ViewBag.AllowCreate))
+            {
+                helper.CreateAnotherButton.Visible = false;
+            }
+
+            if (!Convert.ToBoolean(ViewBag.AllowEdit))
+            {
+                //helper.CreateAnotherButton.Visible = false;
+                helper.EditButton.Visible = false;
+            }
+            else
+            {
+                helper.EditButton.Visible = mode == UIMode.Detail && Model.Status == (int)MPL.DocumentStatus.New;
+                //helper.Buttons.Add(approveButton);
+                //helper.Buttons.Add(voidButton);
+            }
+
+            if (Convert.ToBoolean(ViewBag.AllowVoid))
+            {
+                helper.Buttons.Add(voidButton);
+            }
+        }
+
+        helper.CreateAnotherButton.Href = Url.Content("~/UncreatedPayment");
+        helper.DeleteButton.Visible = false;
+    })

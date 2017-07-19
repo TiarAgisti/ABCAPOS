@@ -1,0 +1,740 @@
+﻿@using ABCAPOS.Helpers
+@using ABCAPOS.Models
+@using MPL.MVC;
+@{
+    ViewBag.Title = "Home Page";
+
+    var notifications = ViewBag.NotificationList as List<HomeNotificationModel>;
+
+    var customerGroupList = ViewBag.CustomerGroupList as List<CustomerGroupModel>;
+
+    var menu = MenuHelper.GetMenuList();
+    
+}
+<style type="text/css">
+    .blackTextOdd
+    {
+        color:white;
+        font-weight:700;
+        font-size:1.5em;
+        background-color:#837e7c;
+    }
+    .bigTextOdd
+    {
+        color: white;
+        font-size:1.5em;
+    }
+    .blackTextEven
+    {
+        color:#696969;
+        font-weight:700;
+        font-size:1.5em;
+        background-color:#dbdbdb;
+    }
+    .bigTextEven
+    {
+        color: #696969;
+        font-size:1.5em;
+    }
+    table td {
+        border: 1px solid #e8eef4;
+        padding: 0px;
+    }
+    
+    .genericFilter {
+        width:98%;
+    }
+    .psi-diagram {
+        width: 49%;
+        border:2px solid #dbdbdb;
+        margin:2px;
+        padding:0px; 
+    }
+
+    .PSI-HalfColumn {
+        width:48%;
+        display:inline-block;
+        vertical-align:top;
+    }
+
+    .PSI-Container {
+        text-align:center;
+    }
+</style>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.js")" type="text/javascript"></script>
+<link rel="stylesheet" href="@Url.Content("~/Scripts/amcharts/style.css")" type="text/css">
+<link rel="stylesheet" href="@Url.Content("~/Content/jquery.dataTables.min.css")" type="text/css">
+<script src="@Url.Content("~/Scripts/amcharts/amcharts.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/amcharts/serial.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.dataTables.min.js")" type="text/javascript"></script>
+
+<input type="hidden" id="hdnChart1" value="@ViewBag.MonthlyInvoice" />
+<input type="hidden" id="hdnChart2" value="@ViewBag.MonthlyPO" />
+<input type="hidden" id="hdnChart3" value="@ViewBag.MonthlyInvoicePaymemt" />
+<input type="hidden" id="hdnChart4" value="@ViewBag.MonthlyBilling" />
+<script type="text/javascript">
+    var chart;
+    
+    var chartData = JSON.parse($('#hdnChart1').val());
+    var chartData2 = JSON.parse($('#hdnChart2').val());
+    var chartData3 = JSON.parse($('#hdnChart3').val());
+    var chartData4 = JSON.parse($('#hdnChart4').val());
+
+    AmCharts.ready(function () {
+        // SERIAL CHART
+        chart = new AmCharts.AmSerialChart();
+        chart.dataProvider = chartData;
+        chart.categoryField = "Month";
+        // the following two lines makes chart 3D
+        chart.depth3D = 20;
+        chart.angle = 30;
+        
+
+        // AXES
+        // category
+        var categoryAxis = chart.categoryAxis;
+        categoryAxis.labelRotation = 90;
+        categoryAxis.dashLength = 4;
+        categoryAxis.gridPosition = "start";
+        
+        // value
+        var valueAxis = new AmCharts.ValueAxis();
+        valueAxis.title = "Total";
+        valueAxis.dashLength = 5;
+        chart.addValueAxis(valueAxis);
+
+        // GRAPH
+        var graph = new AmCharts.AmGraph();
+        graph.valueField = "Amount";
+        graph.colorField = "color";
+        graph.balloonText = "<span style='font-size:14px'>[[category]]: <b>[[value]]</b></span>";
+        graph.type = "column";
+        graph.lineAlpha = 0;
+        graph.fillAlphas = 1;
+        chart.addGraph(graph);
+
+        // CURSOR
+        var chartCursor = new AmCharts.ChartCursor();
+        chartCursor.cursorAlpha = 0;
+        chartCursor.zoomable = false;
+        chartCursor.categoryBalloonEnabled = false;
+        chart.addChartCursor(chartCursor);
+        
+        // WRITE
+        chart.write("chartdiv1");
+
+        // SERIAL CHART
+        chart2 = new AmCharts.AmSerialChart();
+        chart2.dataProvider = chartData2;
+        chart2.categoryField = "Month";
+        // the following two lines makes chart 3D
+        chart2.depth3D = 20;
+        chart2.angle = 30;
+
+        // AXES
+        // category
+        var categoryAxis2 = chart2.categoryAxis;
+        categoryAxis2.labelRotation = 90;
+        categoryAxis2.dashLength = 5;
+        categoryAxis2.gridPosition = "start";
+        
+        // value
+        var valueAxis2 = new AmCharts.ValueAxis();
+        valueAxis2.title = "Total";
+        valueAxis2.dashLength = 5;
+        chart2.addValueAxis(valueAxis2);
+
+        // GRAPH
+        var graph2 = new AmCharts.AmGraph();
+        graph2.valueField = "Amount";
+        graph2.colorField = "color";
+        graph2.balloonText = "<span style='font-size:14px'>[[category]]: <b>[[value]]</b></span>";
+        graph2.type = "column";
+        graph2.lineAlpha = 0;
+        graph2.fillAlphas = 1;
+        chart2.addGraph(graph2);
+
+        // CURSOR
+        var chartCursor2 = new AmCharts.ChartCursor();
+        chartCursor2.cursorAlpha = 0;
+        chartCursor2.zoomable = false;
+        chartCursor2.categoryBalloonEnabled = false;
+        chart2.addChartCursor(chartCursor2);
+
+        chart2.creditsPosition = "top-right";
+
+        // WRITE
+        chart2.write("chartdiv2");
+
+        // SERIAL CHART
+        chart3 = new AmCharts.AmSerialChart();
+        chart3.dataProvider = chartData3;
+        chart3.categoryField = "Month";
+        // the following two lines makes chart 3D
+        chart3.depth3D = 20;
+        chart3.angle = 30;
+
+        // AXES
+        // category
+        var categoryAxis3 = chart3.categoryAxis;
+        categoryAxis3.labelRotation = 90;
+        categoryAxis3.dashLength = 5;
+        categoryAxis3.gridPosition = "start";
+
+        // value
+        var valueAxis3 = new AmCharts.ValueAxis();
+        valueAxis3.title = "Total";
+        valueAxis3.dashLength = 5;
+        chart3.addValueAxis(valueAxis3);
+
+        // GRAPH
+        var graph3 = new AmCharts.AmGraph();
+        graph3.valueField = "Amount";
+        graph3.colorField = "color";
+        graph3.balloonText = "<span style='font-size:14px'>[[category]]: <b>[[value]]</b></span>";
+        graph3.type = "column";
+        graph3.lineAlpha = 0;
+        graph3.fillAlphas = 1;
+        chart3.addGraph(graph3);
+
+        // CURSOR
+        var chartCursor3 = new AmCharts.ChartCursor();
+        chartCursor3.cursorAlpha = 0;
+        chartCursor3.zoomable = false;
+        chartCursor3.categoryBalloonEnabled = false;
+        chart3.addChartCursor(chartCursor3);
+
+        chart3.creditsPosition = "top-right";
+
+        // WRITE
+        chart3.write("chartdiv3");
+
+
+        // SERIAL CHART
+        chart4 = new AmCharts.AmSerialChart();
+        chart4.dataProvider = chartData4;
+        chart4.categoryField = "Month";
+        // the following two lines makes chart 3D
+        chart4.depth3D = 20;
+        chart4.angle = 30;
+
+        // AXES
+        // category
+        var categoryAxis4 = chart4.categoryAxis;
+        categoryAxis4.labelRotation = 90;
+        categoryAxis4.dashLength = 5;
+        categoryAxis4.gridPosition = "start";
+
+        // value
+        var valueAxis4 = new AmCharts.ValueAxis();
+        valueAxis4.title = "Total";
+        valueAxis4.dashLength = 5;
+        chart4.addValueAxis(valueAxis4);
+
+        // GRAPH
+        var graph4 = new AmCharts.AmGraph();
+        graph4.valueField = "Amount";
+        graph4.colorField = "color";
+        graph4.balloonText = "<span style='font-size:14px'>[[category]]: <b>[[value]]</b></span>";
+        graph4.type = "column";
+        graph4.lineAlpha = 0;
+        graph4.fillAlphas = 1;
+        chart4.addGraph(graph4);
+
+
+        // CURSOR
+        var chartCursor4 = new AmCharts.ChartCursor();
+        chartCursor4.cursorAlpha = 0;
+        chartCursor4.zoomable = false;
+        chartCursor4.categoryBalloonEnabled = false;
+        chart4.addChartCursor(chartCursor4);
+
+        chart4.creditsPosition = "top-right";
+
+        // WRITE
+        chart4.write("chartdiv4");
+
+    });
+
+    function initCustomerAutoComplete(textBoxID) {
+        $("#" + textBoxID).autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/WebService.asmx/RetrieveCustomerByKey",
+                    data: "{ 'q': '" + request.term + "', 'limit': '50' }",
+                    dataType: "json",
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    dataFilter: function (data) { return data; },
+                    success: function (data) {
+                        response($.map(data.d, function (item) {
+                            var labelText = item.Code + ' - ' + item.Name;
+                            return {
+                                label: labelText,
+                                value: item.Code
+                            }
+                        }))
+                    }
+                });
+            },
+            minLength: 1,
+            open: function (event, ui) {
+                $(this).autocomplete("widget").css({
+                    "width": 500
+                });
+            },
+            select: function (event, ui) {
+                $.ajax({
+                    url: '/WebService.asmx/RetrieveCustomer',
+                    data: "{ 'customerName' : '" + ui.item.value + "' }",
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (msg) {
+                        onSelectCustomer(msg.d);
+                    }
+                });
+            }
+        });
+    }
+
+    function retrieveCustomer(cust) {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: "/Webservice.asmx/RetrieveThisMonthSalesOrderCount",
+            data: "{customerID: " + cust + "}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                $("#spnThisMonthSalesOrderCount").text(data.d);
+            }
+        });
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: "/Webservice.asmx/RetrieveLastMonthSalesOrderCount",
+            data: "{customerID: " + cust + "}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                $("#spnLastMonthSalesOrderCount").text(data.d);
+            }
+        });
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: "/Webservice.asmx/RetrieveThisYearSalesOrderCount",
+            data: "{customerID: " + cust + "}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                $("#spnThisYearSalesOrderCount").text(data.d);
+            }
+        });
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: "/Webservice.asmx/RetrieveLastYearSalesOrderCount",
+            data: "{customerID: " + cust + "}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                $("#spnLastYearSalesOrderCount").text(data.d);
+            }
+        });
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: "/Webservice.asmx/RetrieveAveragePaymentDays",
+            data: "{customerID: " + cust + "}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                $("#spnAveragePaymentDays").text(data.d);
+            }
+        });
+
+    }
+
+    function onSelectCustomer(data) {
+        var customer = data.ID;
+        $("#hdnCustomerID").val(customer);
+        $("#txtCustomerName").val(data.Name);
+
+        retrieveCustomer(customer);
+    }
+
+    function resetCustomer() {
+        $("#hdnCustomerID").val('');
+        $("#txtCustomerName").val('');
+
+        retrieveCustomer(0);
+    }
+    function initDatePicker() {
+        $("input.datepicker").datepicker({
+            dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+            buttonImageOnly: true
+        });
+        $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+    }
+    $(document).ready(function () {
+        resetCustomer();
+        initCustomerAutoComplete("txtCustomerName");
+        //initCustomerSoldAutoComplete("txtCustomerSoldName");
+
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+        initDatePicker();
+        $(".genericFilterHeader").text('  Goods Sold - ' + $('#hdnYear').val());
+
+        $('#tblTopGoodSold').DataTable({
+            "sDom": 'rtip'
+        });
+        
+    });
+</script>   
+
+@{
+    var floatLeft = "";
+
+    if (menu.Contains("Dashboard"))
+    {
+        floatLeft = "float:left;";
+    }
+}
+@if (menu.Contains("DashboardNotification"))
+{
+<table class="basic" style="width: 64%;border:2px solid #dbdbdb;margin:2px;@floatLeft">
+    <tr  class="blackTextOdd" style="height:20px;">
+            <td colspan="4">
+                <span style="padding-left:5px;color:white;font-size:1em;font-weight:500;">Notifications</span>
+            </td>
+        </tr>
+    <tr>
+        <td colspan="4">
+            &nbsp;
+        </td>
+    </tr>
+    @foreach (var customerGroup in customerGroupList)
+    {
+
+        var notificationList = (from i in notifications
+                                where i.CustomerGroupID == customerGroup.ID
+                                select i).ToList();
+
+        foreach (var notification in notificationList)
+        {            
+        <tr>
+            <td style="padding-left: 5px;width: 120px">
+                <b>@notification.Module</b>
+            </td>
+            <td class="separatorColumn">
+                :
+            </td>
+            <td>
+                <table class="basic" style="width: 100%">
+                    @foreach (var detail in notification.Details)
+                    {
+                        <tr>
+                            <td>
+                                <span class="plainLink"><a href=@detail.Url>@detail.Text</a></span>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </td>
+            <td style="width: 20px">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                &nbsp;
+            </td>
+        </tr>
+        }
+        <tr>
+            <td colspan="4">
+                &nbsp;
+            </td>
+        </tr>
+    }
+    <tr>
+        <td colspan="4">
+            &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            &nbsp;
+        </td>
+    </tr>
+</table>
+}
+@if (menu.Contains("Dashboard"))
+{
+    <input type="hidden" id="hdnYear" value="@ViewBag.Year" />
+<table class="basic" style="width: 34%;">
+    <tr>
+        <td style="padding: 5px 0px 5px 5px; width: 60px;">
+            <b>Customer</b>
+        </td>
+        <td style="padding: 5px 0px 5px 5px; ">&nbsp;
+            <input id="hdnCustomerID" name="CustomerID" type="hidden" value="">
+            <input id="txtCustomerName" name="CustomerName" type="textbox" value="" data-val="true" class="ui-autocomplete-input" autocomplete="off" role="textbox" style="width:90%;" aria-autocomplete="list" aria-haspopup="true">
+        </td>
+            
+        <td style="width: 20px">
+            <a id="" href="#" class="button" onclick="resetCustomer();" style="color: #ffffff;">Reset</a>
+        </td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+<table style="width:34%;margin-top:2px;">
+    <tr >
+        <td style="padding-left:5px;" class="blackTextOdd">Penjualan Bulan ini<br />
+            <span id="spnThisMonthSalesOrderCount" class="bigTextOdd"></span>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:5px;" class="blackTextEven">Penjualan Bulan lalu<br />
+            <span id="spnLastMonthSalesOrderCount" class="bigTextEven"></span>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:5px;" class="blackTextOdd">Penjualan Tahun ini<br />
+            <span id="spnThisYearSalesOrderCount" class="bigTextOdd"></span>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:5px;" class="blackTextEven">Penjualan Tahun lalu<br />
+            <span id="spnLastYearSalesOrderCount" class="bigTextEven"></span>
+        </td>
+    </tr>
+    <tr>
+        <td  style="padding-left:5px;" class="blackTextOdd">Average Payment Overdue<br />
+            <span id="spnAveragePaymentDays" class="bigTextOdd"></span>
+        </td>
+    </tr>
+</table>
+<br />
+    <table id="tblDashboard" class="psi-diagram" style="float:left">
+            <tr class="blackTextOdd">
+                <td>
+                    <span style="padding-left: 5px;color:white;font-size:1em;font-weight:500;">Sales</span>
+                </td>
+            </tr>
+            <tr style="border-radius: 25px;border-right:3px solid #dbdbdb;">
+                <td align="center" style="border-radius: 25px;border-right:2px solid #dbdbdb;height:300px;">
+                    <div id="chartdiv1" style="text-align:center;width:400px; height:300px;"></div>
+                </td>
+        
+            </tr>
+
+    </table>
+    <table id="tblDashboard2" class="psi-diagram">
+        <tr class="blackTextOdd">
+                <td>
+                    <span style="padding-left: 5px;color:white;font-size:1em;font-weight:500;">Purchases</span>
+                </td>
+        </tr>
+        <tr>
+                <td align="center" style="border-radius: 25px;border-right:2px solid #dbdbdb;height:300px;margin:2px;">
+                    <div id="chartdiv2" style="text-align:center;width:400px; height:300px;"></div>
+                </td>
+        </tr>
+    </table>
+<table id="tblDashboard3" class="psi-diagram" style="float:left">
+    <tr class="blackTextOdd">
+        <td>
+            <span style="padding-left: 5px;color:white;font-size:1em;font-weight:500;">Invoice</span>
+        </td>
+    </tr>
+    <tr>
+        <td align="center" style="border-radius: 25px;border-right:2px solid #dbdbdb;height:300px;margin:2px;">
+            <div id="chartdiv3" style="text-align:center;width:400px; height:300px;"></div>
+        </td>
+    </tr>
+</table>
+ <table id="tblDashboard4" class="psi-diagram">
+    <tr class="blackTextOdd">
+        <td>
+            <span style="padding-left: 5px;color:white;font-size:1em;font-weight:500;">Billing</span>
+        </td>
+    </tr>
+    <tr>
+        <td align="center" style="border-radius: 25px;border-right:2px solid #dbdbdb;height:300px;margin:2px;">
+            <div id="chartdiv4" style="text-align:center;width:400px; height:300px;"></div>
+        </td>
+    </tr>
+</table>
+    //ini
+<br />
+@*<table class="tblTopSales displayGrid" style="width: 49%;float:left;border:2px solid #dbdbdb;margin:2px;">
+    <thead>
+     <tr class="blackTextOdd">
+        <td colspan="4" style="text-align:left;">
+            <span style="padding-left: 5px;color:white;font-size:1em;font-weight:500;">Top 10 Sales - @ViewBag.Year</span>
+        </td>
+    </tr>
+    <tr>
+        <td>No.</td>
+        <td>Sales</td>
+        <td>Customer</td>
+        <td>Total (Rp)</td>
+    </tr> 
+    </thead> 
+   <tbody>
+       @foreach (SalesOrderModel so in ViewBag.InvoiceTopList)
+       {
+            <tr>
+                <td style="text-align:center;">@so.No</td>
+                <td style="text-align:center;">@so.Code</td>
+                <td>@so.CustomerName</td>
+                <td style="text-align:right;">@so.SubTotal.ToString("N0")</td>
+            </tr>           
+       }
+    </tbody> 
+</table>*@
+
+@*<table class="tblTopCustomer displayGrid" style="width:49%; border:2px solid #dbdbdb; margin:2px;padding:0px;">
+    <thead>
+    <tr class="blackTextOdd">
+        <td colspan="3" style="text-align:left;">
+            <span style="padding-left: 5px;color:white;font-size:1em;font-weight:500;">Top 10 Marketing - @ViewBag.Year</span>
+        </td>
+    </tr>
+    
+   <tr>
+        <td >No.</td>
+        <td>Marketing</td>
+        <td>Total (Rp)</td>
+    </tr>   
+    </thead>
+    <tbody>
+          @foreach (SalesOrderModel inv in ViewBag.InvoiceMarketingList)
+          {
+            <tr>
+                <td style="text-align:center;">@inv.No</td>
+                <td>@inv.SalesReference</td>
+                <td style="text-align:right;">@inv.SubTotal.ToString("N0")</td>
+            </tr>           
+                                
+          }
+
+    </tbody>
+
+</table>*@
+    <div class="PSI-Container">
+        <div class="PSI-HalfColumn">
+            <table class="displayGrid">
+                <thead>
+                 <tr class="blackTextOdd">
+                    <td colspan="4" style="text-align:left;">
+                        <span style="padding-left: 5px;color:white;font-size:1em;font-weight:500;">Top 10 Sales - @ViewBag.Year</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>No.</td>
+                    <td>Sales</td>
+                    <td>Customer</td>
+                    <td>Total (Rp)</td>
+                </tr> 
+                </thead> 
+               <tbody>
+                   @foreach (SalesOrderModel so in ViewBag.InvoiceTopList)
+                   {
+                        <tr>
+                            <td style="text-align:center;">@so.No</td>
+                            <td style="text-align:center;">@so.Code</td>
+                            <td style="text-align:left;">@so.CustomerName</td>
+                            <td style="text-align:right;">@so.SubTotal.ToString("N0")</td>
+                        </tr>           
+                   }
+                </tbody> 
+            </table>
+        </div>
+
+        
+        <div class="PSI-HalfColumn">
+            <table class="displayGrid">
+                <thead>
+                <tr class="blackTextOdd">
+                    <td colspan="3" style="text-align:left;">
+                        <span style="padding-left: 5px;color:white;font-size:1em;font-weight:500;">Top 10 Marketing - @ViewBag.Year</span>
+                    </td>
+                </tr>
+    
+               <tr>
+                    <td>No.</td>
+                    <td>Marketing</td>
+                    <td>Total (Rp)</td>
+                </tr>   
+                </thead>
+                <tbody>
+                      @foreach (SalesOrderModel inv in ViewBag.InvoiceMarketingList)
+                      {
+                        <tr>
+                            <td style="text-align:center;">@inv.No</td>
+                            <td style="text-align:left;">@inv.SalesReference</td>
+                            <td style="text-align:right;">@inv.SubTotal.ToString("N0")</td>
+                        </tr>           
+                                
+                      }
+
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    
+    
+    <div style=""></div>
+<br />@*
+    
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("Tanggal","Date"),
+        Html.GenericFilterTextBoxField("Customer","CustomerName"),
+        Html.GenericFilterTextBoxField("Product","ProductCode"),
+        
+    };
+
+   @Html.GenericFilter(filterList)
+<table id="tblTopGoodSold" class="tblTopGoodSold displayGrid" style="width: 98%;border:2px solid #dbdbdb;margin:2px;clear:both;">
+    <thead>
+     
+    <tr>
+        <td>Customer</td>
+        <td>Product Code</td>
+        <td>Product Name</td>
+        <td>Quantity</td>
+    </tr> 
+    </thead> 
+   <tbody>
+       @foreach (ProductModel prod in ViewBag.SalesOrderItemSold)
+       {
+          <tr>
+            <td style="text-align:center;">@prod.CustomerName</td>
+            <td style="text-align:center;">@prod.ProductCode</td>
+            <td>@prod.ProductName</td>
+            <td style="text-align:right;">@Convert.ToDecimal(@prod.QtySold).ToString("N0")</td>
+        </tr>           
+       }
+    </tbody> 
+    
+
+</table>*@
+
+}
+@*Html.Partial("Master/Product/IndexGrid")
+@Html.Partial("SortingPagingInfo", ViewBag.SalesOrderItemSold as List<ProductModel>)*@

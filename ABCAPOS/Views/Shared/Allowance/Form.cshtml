@@ -1,0 +1,89 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model AllowanceModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    string dateEditor = Convert.ToString(ViewBag.DateList);
+
+    var yesNoRadio = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = true,Text = "Ya", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = false,Text = "Tidak", ReadOnly = mode == UIMode.Detail},
+    };
+    
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.Status,"Status"),
+        
+        Html.LabelFieldObjFor(p=>p.Code,"Kode", delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.Label;
+            f.GenerateHiddenField = true;
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.Description,"Keterangan", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+        Html.RadioButtonFieldObjFor(p=>p.isTHRPaid,"THR", yesNoRadio),
+        
+        Html.FullRowFormFieldObj(dateEditor,dateEditor,""),
+        Html.LabelFieldObjFor(p=>p.DateDescription,"Tanggal",delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+    };
+
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("StaffID"),
+        Html.LabelColumn("StaffName","Nama Staf"),
+        Html.CheckBoxColumn("isPaidLoan","Potongan Pinjaman",true, delegate(GridColumn g){
+            g.DetailColumnType = GridColumnType.HiddenField;
+            g.CreateColumnType = g.UpdateColumnType = GridColumnType.CheckBox;
+        }),
+    };
+
+    var addNewButton = new Button();
+    addNewButton.CssClass = "button";
+    addNewButton.Text = "Buat Baru";
+    addNewButton.OnClick = "addGrid1Row()";
+    addNewButton.ID = "btnAddNew";
+    addNewButton.Href = "#btnAddNew";
+    addNewButton.Visible = mode != UIMode.Detail;
+
+    var grid = new Grid();
+    grid.IncludeAddRowScript = false;
+    grid.IncludeDeleteRowButton = true;
+    grid.DefaultObject = new AllowanceDetailModel();
+    grid.Columns = gridColumns;
+    grid.ShowFooter = true;
+    grid.AllowSorting = false;
+    //grid.BelowButtons.Add(addNewButton);
+
+    var form = new Form();
+    form.Fields = formFields;
+
+}
+@Html.MasterDetailForm(form, grid, Model, Model.Details, mode, "Allowance", "ID", delegate(MasterDetailFormHelper helper)
+    {
+        if (mode == UIMode.Detail)
+        {
+            helper.VoidButton.Href = Url.Content("~/Allowance/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+            helper.VoidButton.OnClick = "";
+            helper.VoidButton.ID = "btnVoid";
+
+            if (!Convert.ToBoolean(ViewBag.AllowCreate))
+            {
+                helper.CreateAnotherButton.Visible = false;
+            }
+
+            helper.VoidButton.Visible = helper.CreateAnotherButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = false;
+            
+            if (!Convert.ToBoolean(ViewBag.AllowEdit))
+            {
+                helper.EditButton.Visible = false;
+            }
+        }
+    })

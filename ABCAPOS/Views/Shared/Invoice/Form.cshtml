@@ -1,0 +1,632 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model InvoiceModel
+@{ 
+    var mode = (UIMode)ViewBag.Mode;
+    ViewBag.ErrorMessage = "";
+
+    var action = "";
+
+    if (mode == UIMode.Create)
+    {
+        action = "CreateInvoice";
+    }
+    else if(mode == UIMode.Update)
+    {
+        action = "UpdateInvoice";
+    }
+    
+    var ownerList = ViewBag.OwnerList as IEnumerable<StaffModel>;
+    var ddlOwner = new List<DropDownOption>();
+    ddlOwner.AddRange(Util.GetDropDownOptions(ownerList, "Name", "ID"));
+    
+    var statusList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)InvoiceStatus.New), Text ="New" },
+        new DropDownOption(){ Value = Convert.ToString((int)InvoiceStatus.Approved), Text = "Invoice" },
+        new DropDownOption(){ Value = Convert.ToString((int)InvoiceStatus.Paid), Text = "Lunas" },
+    };
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.WarehouseID, ""),
+        
+        Html.LabelFieldObjFor(p=>p.SalesOrderID,"", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = f.DetailFieldType = FormFieldType.HiddenField;
+        }),
+
+        Html.FullRowFormFieldObj("<br /><b>Primary Information</b><br/>","<br /><b>Primary Information</b><br/>","<br /><b>Primary Information</b><br/>"),
+        Html.DualColumnFormFieldObj(
+            Html.LabelFieldObjFor(p=>p.Code,"NO TAGIHAN", delegate(FormField f){
+                f.UpdateFieldType = FormFieldType.Label;
+                f.GenerateHiddenField = true;
+            }),
+            Html.TextBoxFieldObjFor(p=>p.POCustomerNo, "PO CUSTOMER", delegate(FormField f){
+                f.Style = "width:400px";
+            }), 20
+        ),
+        
+        Html.DualColumnFormFieldObj(
+            Html.LabelFieldObjFor(p=>p.CustomerName,"CUSTOMER"),
+            Html.TextBoxFieldObjFor(p=>p.Remarks,"MEMO", delegate(FormField f){
+                f.Style = "width:400px";
+            }), 20
+        ),
+        
+        Html.DualColumnFormFieldObj(
+            Html.DateFieldObjFor(p=>p.Date,"TANGGAL", delegate(FormField f){
+                f.DetailFormat = "MM/dd/yyyy";
+                f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+                f.Style = "width:300px";
+                //f.UpdateFieldType = FormFieldType.Label;
+            }),
+            Html.LabelFieldObjFor(p=>p.SalesOrderCode,"REF SO"), 20
+        ),
+        Html.TextBoxFieldObjFor(p=>p.DueDate,"JATUH TEMPO", delegate(FormField f){
+            f.DetailFormat = "MM/dd/yyyy";
+            f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+            f.Style = "width:300px";
+            f.Attributes = " readonly";
+        }),
+        //Html.DateFieldObjFor(p=>p.DueDate,"JATUH TEMPO", delegate(FormField f){
+        //    f.DetailFormat = "MM/dd/yyyy";
+        //    f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+        //    f.Style = "width:300px";
+        //}),
+        Html.TextBoxFieldObjFor(p=>p.ReceiptNo,"NOMOR SERI FAKTUR PAJAK", delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        //Html.TextBoxFieldObjFor(p=>p.EmployeeNameAsDireksi,"DIREKTUR", delegate(FormField f){
+        //    f.Style = "width:300px";
+        //}),
+        Html.DropDownFieldObjFor(p=>p.EmployeeIDAsDireksi,"DIREKTUR", ddlOwner, delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        Html.LabelFieldObjFor(p=>p.EmployeeNameAsDireksi,"DIREKTUR", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        //Html.DualColumnFormFieldObj(
+        //    Html.DateFieldObjFor(p=>p.DueDate,"JATUH TEMPO", delegate(FormField f){
+        //        f.DetailFormat = "MM/dd/yyyy";
+        //        f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+        //        f.Style = "width:300px";
+        //    }),
+        //    Html.TextAreaFieldObjFor(p=>p.DeliveryOrderCodeList,"REF DO"), 20
+        //),
+        
+        Html.FullRowFormFieldObj("<br />","<br />","<br />"),
+        
+        Html.FullRowFormFieldObj("<br /><b>Clasifications</b><br/>","<br /><b>Clasifications</b><br/>","<br /><b>Clasifications</b><br/>"),
+        
+        Html.DualColumnFormFieldObj(
+            Html.LabelFieldObjFor(p=>p.DepartmentName,"DEPARTMENT"),
+            Html.TextAreaFieldObjFor(p=>p.DeliveryOrderCodeList,"REF DO"), 20
+        ),
+        Html.LabelFieldObjFor(p=>p.WarehouseName,"LOCATION"),
+        
+        Html.TextAreaFieldObjFor(p=>p.ResiCodeList,"REF RESI"),
+        
+        Html.LabelFieldObjFor(p=>p.Flaging,"FLAGING", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+        //Html.DropDownFieldObjFor(p=>p.Status,"STATUS",statusList),
+        Html.LabelFieldObjFor(p=>p.StatusDescription,"STATUS", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.OutstandingAmount,"SISA PEMBAYARAN",delegate(FormField f){
+            f.DetailFormat = "N0";
+        }),
+    };
+
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("ProductID"),
+        Html.HiddenFieldColumn("ItemNo"),
+        Html.HiddenFieldColumn("LineSequenceNumber"),
+        Html.HiddenFieldColumn("SalesOrderItemNo"),
+        Html.HiddenFieldColumn("TaxType"),
+        Html.HiddenFieldColumn("Price"),
+        Html.LabelColumn("ProductCode","ITEM","115px",delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+        }),
+        Html.LabelColumn("ProductName", "NAMA BARANG","250px",delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+        }),
+        Html.LabelColumn("StockQty", "ON HAND", "50px",delegate(GridColumn col){
+        }),
+        Html.DecimalColumn("QtySO", "QTY SO", "50px", delegate(GridColumn col){
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            col.CreateFormat = col.UpdateFormat = "F0";
+            col.DetailFormat = "N0";
+        }),
+        Html.DecimalColumn("CreatedDOQuantity", "QTY FULFILLED", "70px", delegate(GridColumn col){
+            col.CreateFormat = col.UpdateFormat = "F0";
+            col.DetailFormat = "N0";
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+        }),
+        Html.DecimalColumn("CreatedInvQuantity", "QTY INVOICED", "70px", delegate(GridColumn col){
+            col.CreateFormat = col.UpdateFormat = "F0";
+            col.DetailFormat = "N0";
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+        }),
+        Html.DecimalColumn("StrQuantity", "QTY", "50px", delegate(GridColumn col){
+            col.ItemAttributes = " onblur=\"calc($(this).parent().parent().index())\" ";
+            col.CreateFormat = col.UpdateFormat = "F0";
+            col.DetailFormat = "N0";
+        }),
+        Html.LabelColumn("ConversionName", "UNIT", "50px", delegate(GridColumn col)
+        {
+            col.GenerateHiddenField = true;
+            //col.CreateFormat = col.UpdateFormat = col.DetailFormat = "N0";
+        }),
+        Html.LabelColumn("PriceLevelName", "PRICE LEVEL", "100px", delegate(GridColumn gc){
+            gc.CreateColumnType = gc.UpdateColumnType = gc.DetailColumnType = GridColumnType.Label;
+        }),
+        Html.LabelColumn("TaxTypeName", "TAX CODE", "40px", delegate(GridColumn col)
+        {
+            col.GenerateHiddenField = true;
+            //col.CreateFormat = col.UpdateFormat = col.DetailFormat = "N0";
+        }),
+        Html.DecimalColumn("Price", "HARGA/UNIT", "60px", delegate(GridColumn col)
+        {
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            //col.ItemAttributes = " readonly";
+            //col.ItemAttributes = " onchange=\"calc($(this).parent().parent().index())\" ";
+            col.GenerateHiddenField = true;
+            col.DetailFormat = "N2";
+            col.CreateFormat = col.UpdateFormat = "G";
+        }),
+        Html.DecimalColumn("TotalAmount", "JMLH HARGA", "50px", delegate(GridColumn col)
+        {
+            col.CreateFormat = col.UpdateFormat = "N2";
+            col.DetailFormat = "N2";
+            col.GenerateHiddenField = true;
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+
+        }),
+        Html.DecimalColumn("TotalPPN", "JMLH PAJAK", "50px", delegate(GridColumn col)
+        {
+            col.CreateFormat = col.UpdateFormat = "N2";
+            col.DetailFormat = "N2";
+            col.GenerateHiddenField = true;
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+
+        }),
+        
+        Html.DecimalColumn("GrossAmount", "TOTAL HARGA", "100px", delegate(GridColumn col)
+        {
+            col.ItemAttributes = " onblur=\"reversecalc($(this).parent().parent().index())\" ";
+            col.CreateFormat = col.UpdateFormat = "F0";
+            col.DetailFormat = "N2";
+            col.GenerateHiddenField = true;
+            //col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+
+        }),
+    };
+
+    if (mode == UIMode.Detail)
+    {
+        gridColumns = new List<GridColumn>()
+        {
+            Html.HiddenFieldColumn("ProductID"),
+            Html.HiddenFieldColumn("SalesOrderItemNo"),
+            Html.LabelColumn("ProductCode","ITEM","115px",delegate(GridColumn col){
+                col.GenerateHiddenField = true;
+            }),
+            Html.LabelColumn("ProductName", "NAMA BARANG","",delegate(GridColumn col){
+                col.GenerateHiddenField = true;
+            }),
+            Html.LabelColumn("StockQty", "ON HAND", "50px",delegate(GridColumn col){
+            }),
+            Html.DecimalColumn("QtySO", "QTY SO", "80px", delegate(GridColumn col){
+                col.CreateFormat = col.UpdateFormat = "F0";
+                col.DetailFormat = "N0";
+                col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            }),
+            Html.DecimalColumn("CreatedDOQuantity", "QTY FULFILLED", "100px", delegate(GridColumn col){
+                col.CreateFormat = col.UpdateFormat = "F0";
+                col.DetailFormat = "N0";
+                col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            }),
+            Html.DecimalColumn("CreatedInvQuantity", "QTY INVOICED", "100px", delegate(GridColumn col){
+                col.CreateFormat = col.UpdateFormat = "F0";
+                col.DetailFormat = "N0";
+                col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            }),
+            Html.DecimalColumn("Quantity", "QTY", "100px", delegate(GridColumn col){
+                col.CreateFormat = col.UpdateFormat = "F0";
+                col.DetailFormat = "N0";
+            }),
+            Html.LabelColumn("ConversionName", "UNIT", "50px", delegate(GridColumn col)
+            {
+                col.GenerateHiddenField = true;
+                //col.CreateFormat = col.UpdateFormat = col.DetailFormat = "N0";
+            }),
+            Html.LabelColumn("PriceLevelName", "PRICE LEVEL", "100px", delegate(GridColumn gc){
+                gc.CreateColumnType = gc.UpdateColumnType = gc.DetailColumnType = GridColumnType.Label;
+            }),
+            Html.LabelColumn("TaxTypeName", "TAX CODE", "70px", delegate(GridColumn gc){
+                gc.CreateColumnType = gc.UpdateColumnType = GridColumnType.None;
+            }),
+            Html.DecimalColumn("Price", "HARGA/UNIT", "70px", delegate(GridColumn col)
+            {
+                //col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+                //col.ItemAttributes = " readonly";
+                //col.ItemAttributes = " onchange=\"calc($(this).parent().parent().index())\" ";
+                col.DetailFormat = "N2";
+                col.CreateFormat = col.UpdateFormat = "F2";
+            }),
+            Html.DecimalColumn("TotalAmount", "JMLH HARGA", "60px", delegate(GridColumn col)
+            {
+                col.CreateFormat = col.UpdateFormat = "N2";
+                col.DetailFormat = "N2";
+                col.GenerateHiddenField = true;
+                col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+
+            }),
+            Html.DecimalColumn("TotalPPN", "JMLH PAJAK", "50px", delegate(GridColumn col)
+            {
+                col.CreateFormat = col.UpdateFormat = "N2";
+                col.DetailFormat = "N2";
+                col.GenerateHiddenField = true;
+                col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+
+            }),
+        
+            Html.DecimalColumn("GrossAmount", "TOTAL HARGA", "100px", delegate(GridColumn col)
+            {
+                col.CreateFormat = col.UpdateFormat = "F2";
+                col.DetailFormat = "N2";
+                col.GenerateHiddenField = true;
+                //col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+
+            }),
+        };
+
+    }
+
+    GridFooter.SetPropertyDelegate subTotalFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    GridFooter.SetPropertyDelegate discountFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    GridFooter.SetPropertyDelegate taxFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    GridFooter.SetPropertyDelegate grandTotalFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    var subTotal = new GridFooter[]{
+            Html.EmptyFooterColumn(11),
+            Html.LabelFooterColumn("", "JUMLAH HARGA:", true, subTotalFooterDel),
+            Html.DecimalFooterColumn("txtGridTotal", Convert.ToDecimal(Model.Amount), delegate(GridFooter f){
+                f.ItemFormat = "N2";
+            }),
+        };
+
+    var taxValue = new GridFooter[]{
+                Html.EmptyFooterColumn(11),
+                Html.LabelFooterColumn("", "PAJAK:", true, taxFooterDel),
+                Html.DecimalFooterColumn("txtGridPPN", Convert.ToDecimal(Model.TaxAmount), delegate(GridFooter f){
+                    f.ItemFormat = "N2";
+            })
+            };
+
+    var shippingTotal = new GridFooter[]{
+            Html.EmptyFooterColumn(11),
+            Html.LabelFooterColumn("", "SHIPPING:", true, taxFooterDel),
+            Html.DecimalFooterColumn("txtGridShipping", Convert.ToDecimal(Model.ShippingAmount), delegate(GridFooter f){
+                f.ItemFormat = "N2";
+        })
+    };
+
+
+    var grandTotal = new GridFooter[]{
+                Html.EmptyFooterColumn(11),
+                Html.LabelFooterColumn("","TOTAL HARGA:", true, grandTotalFooterDel),
+                Html.DecimalFooterColumn("txtGridGrandTotal", Convert.ToDecimal(Model.GrandTotal), delegate(GridFooter f){
+                    f.ItemFormat = "N2";
+            })
+            };
+
+    var gridFooters = new List<GridFooter[]>()
+    {
+
+    };
+    gridFooters.Add(subTotal);
+    gridFooters.Add(taxValue);
+    gridFooters.Add(shippingTotal);
+    gridFooters.Add(grandTotal);
+    
+    var ResiGridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("ItemNo","ItemNo","",delegate(GridColumn col){
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        
+        Html.LabelColumn("ResiID","Resi ID","",delegate(GridColumn col){
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        
+        Html.LabelColumn("ResiDate", "DATE", "200px",delegate(GridColumn col){
+            col.CreateFormat = col.UpdateFormat = col.DetailFormat = "MM/dd/yyyy";
+        }),
+        Html.LabelColumn("ResiCode", "RESI", "200px"),
+        Html.LabelColumn("ExpeditionName", "EXPEDITION", "200px"),
+        Html.LabelColumn("Amount", "AMOUNT", "200px", delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+            col.CreateFormat = col.UpdateFormat = col.DetailFormat = "N2";
+        })
+    };
+    var resiGrid = new Grid();
+    resiGrid.ID = "resiGrid";
+    resiGrid.DataContainerName = "ResiDetails";
+    resiGrid.IncludeAddRowScript = false;
+    resiGrid.IncludeDeleteRowButton = false;
+    resiGrid.Columns = ResiGridColumns;
+    resiGrid.ShowFooter = false;
+    resiGrid.AllowSorting = false;
+
+    var paymentGridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("MakeMultiPaySalesID","PAYMENT ID","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("PaymentCode", "PAYMENT NUMBER", "200px"),
+        Html.DateColumn("PaymentDate", "DATE", "200px"),
+        Html.DateColumn("PaymentEventDate", "PAYMENT EVENT DATE", "200px"),
+        Html.LabelColumn("DiscountTaken", "DISCOUNT TAKEN", "200px", delegate(GridColumn col){
+            col.DetailFormat = "N2";
+        }),
+        Html.LabelColumn("Amount", "AMOUNT", "200px", delegate(GridColumn col){
+            col.DetailFormat = "N2";
+        })
+    };
+
+    var paymentGrid = new Grid();
+    paymentGrid.ID = "paymentGrid";
+    paymentGrid.DataContainerName = "paymentDetails";
+    paymentGrid.IncludeAddRowScript = false;
+    paymentGrid.IncludeDeleteRowButton = false;
+    paymentGrid.Columns = paymentGridColumns;
+    paymentGrid.ShowFooter = false;
+    paymentGrid.AllowSorting = false;
+
+    var applyCreditGridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("ApplyCreditMemoID","APPLICATION ID","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("ApplyCode", "APPLICATION NUMBER", "200px"),
+        Html.LabelColumn("CreditMemoCode", "REF CREDIT MEMO", "200px"),
+        Html.DateColumn("ApplyDate", "DATE", "200px"),
+        Html.LabelColumn("Amount", "AMOUNT", "200px", delegate(GridColumn col){
+            col.DetailFormat = "N2";        
+        })
+    };
+
+    var applyCreditGrid = new Grid();
+    applyCreditGrid.ID = "applyCreditGrid";
+    applyCreditGrid.DataContainerName = "applyCreditDetails";
+    applyCreditGrid.IncludeAddRowScript = false;
+    applyCreditGrid.IncludeDeleteRowButton = false;
+    applyCreditGrid.Columns = applyCreditGridColumns;
+    applyCreditGrid.ShowFooter = false;
+    applyCreditGrid.AllowSorting = false;
+    
+    var grid = new Grid();
+    grid.IncludeAddRowScript = true;
+    grid.IncludeDeleteRowButton = true;
+    grid.DefaultObject = new PurchaseDeliveryDetailModel();
+    grid.Columns = gridColumns;
+    grid.ShowFooter = true;
+    grid.Footers = gridFooters;
+    grid.AllowSorting = false;
+
+    var payButton = new Button();
+    payButton.CssClass = "button";
+    payButton.Text = "Accept Payment";
+    payButton.Href = Url.Content("~/MakeMultiPaySales/Create?invoiceID=" + Model.ID);
+    payButton.Visible = mode == UIMode.Detail
+        && (Model.OutstandingAmount > 0) && Model.Status != (int) MPL.DocumentStatus.Void;
+
+    var creditButton = new Button();
+    creditButton.CssClass = "button";
+    creditButton.Text = "Credit";
+    creditButton.Href = Url.Content("~/CreditMemo/Create");
+    creditButton.Visible = mode == UIMode.Detail
+        && Model.Status != (int)MPL.DocumentStatus.Void;
+    
+    var returnButton = new Button();
+    returnButton.CssClass = "button";
+    returnButton.Text = "Return";
+    returnButton.Href = Url.Content("~/CustomerReturn/Create");
+    returnButton.Visible = mode == UIMode.Detail
+        && Model.Status != (int)MPL.DocumentStatus.Void;
+        
+    var form = new Form();
+    form.Fields = formFields;
+
+    TabbedGrid tabbedGrid = new TabbedGrid();
+    if (mode == UIMode.Detail)
+    {
+        tabbedGrid.AddGrid("Shipping", resiGrid, Model.ResiDetails);
+        tabbedGrid.AddGrid("Payments", paymentGrid, ViewBag.PaymentList);
+        tabbedGrid.AddGrid("Credit Applications", applyCreditGrid, ViewBag.ApplyCreditList);
+    }
+    else
+    {
+        tabbedGrid.AddGrid("Shipping", resiGrid, Model.ResiDetails);
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.initNumeric = function () {
+            $(".decimalNumeric").numeric({
+                decimal: "."
+            });
+            $(".decimalNumeric").focus(function () {
+                var temp = $(this);
+                setTimeout(function () {
+                    temp.select();
+                }, 100);
+            });
+            $(".integerNumeric").numeric(false, function () { this.value = ""; this.focus(); });
+        }
+
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+
+        var noOfRows = $("#paymentGrid tbody tr").length;
+
+        for (x = 0; x < noOfRows; x++) {
+            var doID = $("#paymentDetails_" + x + "_MakeMultiPaySalesID").val();
+            var doCode = $("#paymentDetails_" + x + "_PaymentCode").text();
+            var doLink = "/MakeMultiPaySales/Detail?key=" + doID;
+
+            $("#paymentDetails_" + x + "_PaymentCode").replaceWith('<a href="' + doLink + '" style="color: #505abc;">' + doCode + '</a>');
+        }
+
+        var noOfRows = $("#applyCreditGrid tbody tr").length;
+
+        for (x = 0; x < noOfRows; x++) {
+            var applyCreditID = $("#applyCreditDetails_" + x + "_ApplyCreditMemoID").val();
+            var applyCreditCode = $("#applyCreditDetails_" + x + "_ApplyCode").text();
+            var applyCreditLink = "/ApplyCreditMemo/Detail?key=" + applyCreditID;
+
+            $("#applyCreditDetails_" + x + "_ApplyCode").replaceWith('<a href="' + applyCreditLink + '" style="color: #505abc;">' + applyCreditCode + '</a>');
+        }
+
+        AddUrlResi();
+
+    });
+    $(function () {
+        var action = $("#hdnAction").val();
+        $("[name='lnkAddNewGrid1']").hide();
+        $('#Form1').attr("action", "/Invoice/" + action);
+
+        $("#btnVoid").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                    .addClass("dialog")
+                    .attr("id", $(this).attr("data-dialog-id"))
+                    .appendTo("body").dialog({
+                        title: "Void Remarks",
+                        close: function () {
+                            $(this).remove();
+                        },
+                        modal: true,
+                        height: 180,
+                        width: 700,
+                        left: 0
+                    }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+
+        addSalesUrl();
+    });
+
+    function addSalesUrl() {
+        var mode = $("#hdnMode").val();
+
+        if (mode == "Detail") {
+            var soID = $("#hdnSalesOrderID").val();
+            var soCode = $("#lblSalesOrderCode").text();
+
+            var soLink = "/SalesOrder/Detail?key=" + soID;
+            $("#lblSalesOrderCode").replaceWith('<a href="' + soLink + '">' + soCode + '</a>');
+
+            // TODO: link delivery codes one by one
+            //var doID = $("#hdnDeliveryOrderID").val();
+            //var doCode = $("#lblDeliveryOrderCode").text();
+
+            //var doLink = "/DeliveryOrder/Detail?key=" + doID;
+            //$("#lblDeliveryOrderCode").replaceWith('<a href="' + doLink + '">' + doCode + '</a>');
+
+        }
+    }
+</script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/Transaction/SalesInvoice.js")"></script>
+<input type="hidden" id="hdnAction" value="@action" />
+<input type="hidden" id="hdnMode" value="@ViewBag.Mode" />
+@*@Html.AutoCompleteScript("initEmployeeAutoComplete", "txtEmployeeNameAsDireksi", Url.Content("~/WebService.asmx/RetrieveEmployeeByKeyAndJobTitle"),  ",'jobTitle':'Owner'",
+                Url.Content("~/WebService.asmx/RetrieveEmployee"), "employeeName", "Name", "RoleDescription", "onSelectEmployee", 50, 500)*@
+@Html.MasterDetailForm(form, grid, Model, Model.Details.OrderBy(p=>p.SalesOrderItemNo), mode, "Invoice", "ID", delegate(MasterDetailFormHelper helper)
+    {
+        helper.DetailGridTitle = "Item";
+        helper.TabbedGrid = tabbedGrid;
+        helper.CreateAnotherButton.Visible = false;
+        helper.EditButton.Visible = false;
+        if (mode == UIMode.Detail)
+        {
+            helper.VoidButton.Href = Url.Content("~/Invoice/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+            helper.VoidButton.OnClick = "";
+            helper.VoidButton.ID = "btnVoid";
+            helper.BackToListButton.Href = Url.Content("~/Invoice");
+
+            if (!Convert.ToBoolean(ViewBag.AllowCreate))
+            {
+                helper.CreateAnotherButton.Visible = false;
+            }
+
+            if (Convert.ToBoolean(ViewBag.AllowCreate))
+            {
+                helper.Buttons.Add(payButton);
+                helper.Buttons.Add(creditButton);
+                helper.Buttons.Add(returnButton);
+            }
+
+            if (!Convert.ToBoolean(ViewBag.AllowEdit))
+            {
+                helper.EditButton.Visible = helper.CreateAnotherButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+            }
+            else
+            {
+                helper.EditButton.Visible = mode == UIMode.Detail && Model.Status != (int)MPL.DocumentStatus.Void;
+                helper.CreateAnotherButton.Href = Url.Content("~/UncreatedInvoice");
+                helper.CreateAnotherButton.Text = "Create New";
+                //helper.VoidButton.Visible = mode == UIMode.Detail && Model.Status != (int)InvoiceStatus.Void;
+                helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+            }
+            
+            if (!Convert.ToBoolean(ViewBag.AllowVoid))
+            {
+                helper.VoidButton.Visible = false;
+            }
+            else
+            {
+                helper.VoidButton.Visible = mode == UIMode.Detail && Model.Status != (int)InvoiceStatus.Void;
+            }
+            
+            helper.CopyTransactionButton.Visible = false;
+        }
+    })
+@*@if (Model.TaxAmount > 0)
+{
+    <div class="error">
+        * Masukkan No Faktur untuk penjualan dengan PPN</div>
+}*@

@@ -1,0 +1,525 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model CustomerReturnModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+    ViewBag.ErrorMessage = "";
+
+    var action = "";
+    if (mode == UIMode.Create)
+    {
+        action = "Create";
+    }
+    else
+    {
+        action = "UpdateCustomerReturn";
+    }
+
+    string CommisionEditor = Convert.ToString(ViewBag.CommisionCheckboxList);
+
+    var statusList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)TransferOrderStatus.New), Text = "Pending Approval" },
+        new DropDownOption(){ Value = Convert.ToString((int)TransferOrderStatus.PendingFulfillment), Text = "Pending Fulfillment" },
+    };
+
+    var departmentList = ViewBag.DepartmentList as IEnumerable<DepartmentModel>;
+    var ddlDepartment = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)0), Text ="" }
+    };
+    ddlDepartment.AddRange(Util.GetDropDownOptions(departmentList, "DepartmentDesc", "ID"));
+
+    var taxRadio = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = (int)TaxType.NonTax,Text = "Non Pajak", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = (int)TaxType.PPN,Text = "PPN", ReadOnly = mode == UIMode.Detail},
+    };
+
+    var termsList = ViewBag.TermsList as IEnumerable<TermsOfPaymentModel>;
+    var ddlTerms = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)0), Text ="" }
+    };
+    ddlTerms.AddRange(Util.GetDropDownOptions(termsList, "Name", "ID"));
+
+    var expedisiList = ViewBag.ExpedisiList as IEnumerable<ExpedisiModel>;
+    var ddlExpedisi = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)0), Text ="" }
+    };
+    ddlExpedisi.AddRange(Util.GetDropDownOptions(expedisiList, "Name", "ID"));
+
+    var conversionList = ViewBag.ConversionList as IEnumerable<UnitDetailModel>;
+    var ddlConversion = Util.GetDropDownOptions(conversionList, "Name", "ID");
+
+    var ddlTax = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)TaxType.NonTax), Text ="Non-PPN" },
+        new DropDownOption(){ Value = Convert.ToString((int)TaxType.PPN), Text = "PPN" }
+    };
+
+    var priceLevelList = ViewBag.PriceLevelList as IEnumerable<PriceLevelModel>;
+    var ddlPriceLevel = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)0), Text ="" }
+    };
+    ddlPriceLevel.AddRange(Util.GetDropDownOptions(priceLevelList, "Description", "ID"));
+
+    var warehouseList = ViewBag.WarehouseList as IEnumerable<WarehouseModel>;
+    var ddlWarehouse = Util.GetDropDownOptions(warehouseList, "Name", "ID");
+
+
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.CustomerID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.EmployeeID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.SalesOrderID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.PriceLevelID,""),
+        
+        Html.FullRowFormFieldObj("<br /><b>Primary Information</b><br/>","<br /><b>Primary Information</b><br/>","<br /><b>Primary Information</b><br/>"),
+        
+            Html.LabelFieldObjFor(p=>p.Code,"RTN. AUTH.#", delegate(FormField f){
+                f.UpdateFieldType = FormFieldType.Label;
+                f.GenerateHiddenField = true;
+            }),
+            Html.TextBoxFieldObjFor(p=>p.CustomerName,"CUSTOMER", delegate(FormField f){
+                f.Style = "width:300px";
+            }), 
+        
+            Html.DateFieldObjFor(p=>p.Date,"DATE", delegate(FormField f){
+                f.DetailFormat = "MM/dd/yyyy";
+                f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+                f.Style = "width:300px";
+            }),
+            
+        Html.DropDownFieldObjFor(p=>p.Status,"STATUS",statusList, delegate(FormField f){
+            f.Style = "width:300px";
+            f.DetailFieldType = FormFieldType.None;
+        }),
+        Html.LabelFieldObjFor(p=>p.StatusDescription,"STATUS", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.RefPO,"PO #", delegate(FormField f){
+                f.Style = "width:300px";
+            }), 
+            
+            
+            
+        Html.TextBoxFieldObjFor(p=>p.Title,"MEMO", delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        Html.TextBoxFieldObjFor(p=>p.RefSO,"REF SO", delegate(FormField f){
+                f.Style = "width:300px";
+        }), 
+        Html.TextBoxFieldObjFor(p=>p.RefDO,"REF DO", delegate(FormField f){
+                f.Style = "width:300px";
+        }), 
+        
+
+        Html.FullRowFormFieldObj("<br />","<br />","<br />"),
+        Html.FullRowFormFieldObj("<br /><b>Sales Information</b><br/>","<br /><b>Sales Information</b><br/>","<br /><b>Sales Information</b><br/>"),
+        
+        Html.DateFieldObjFor(p=>p.SalesEffectiveDate,"SALES EFFECTIVE DATE", delegate(FormField f){
+            f.DetailFormat = "MM/dd/yyyy";
+            f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+            f.Style = "width:300px";
+        }),
+        
+        //Html.DropDownFieldObjFor(p=>p.LeadSourceID,"LEAD SOURCE",ddlDepartment, delegate(FormField f){
+        //    f.Style = "width:300px";
+        //}),
+        //Html.LabelFieldObjFor(p=>p.LeadSourceID,"LEAD SOURCE", delegate(FormField f){
+        //    f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        //}),
+        
+        //Html.DropDownFieldObjFor(p=>p.PartnerID,"PARTNER",ddlDepartment, delegate(FormField f){
+        //    f.Style = "width:300px";
+        //}),
+        //Html.LabelFieldObjFor(p=>p.PartnerID,"PARTNER", delegate(FormField f){
+        //    f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        //}),
+        
+        Html.FullRowFormFieldObj(CommisionEditor,CommisionEditor,CommisionEditor),
+        
+        Html.LabelFieldObjFor(p=>p.SalesOrderCode,"CREATED FROM", delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        
+        
+        Html.FullRowFormFieldObj("<br />","<br />","<br />"),
+        
+        Html.FullRowFormFieldObj("<br /><b>Clasifications</b><br/>","<br /><b>Clasifications</b><br/>","<br /><b>Clasifications</b><br/>"),
+
+        
+        Html.DropDownFieldObjFor(p=>p.DepartmentID,"DEPARTMENT",ddlDepartment, delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        Html.LabelFieldObjFor(p=>p.DepartmentName,"DEPARTMENT", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+        Html.DropDownFieldObjFor(p=>p.WarehouseID,"LOCATION",ddlWarehouse, delegate(FormField f){
+            f.Style = "width:300px";
+            f.DetailFieldType = FormFieldType.None;
+        }),
+        Html.LabelFieldObjFor(p=>p.WarehouseName,"LOCATION", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+            Html.TextBoxFieldObjFor(p=>p.SalesReference,"SALES REP"),
+            Html.TextBoxFieldObjFor(p=>p.EmployeeName,"EMPLOYEE", delegate(FormField f){
+                f.Style = "width:300px";
+            }),
+        
+        Html.LabelFieldObjFor(p=>p.VoidRemarks,"VOID REMARKS", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+            
+            if(string.IsNullOrEmpty(Model.VoidRemarks))
+            {
+                f.DetailFieldType = FormFieldType.None;
+            }
+        }),
+    };
+
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("ItemNo"),
+        Html.HiddenFieldColumn("LineSequenceNumber"),
+        Html.HiddenFieldColumn("ProductID"),
+        Html.HiddenFieldColumn("AssetPrice"),
+        Html.HiddenFieldColumn("StockQtyHidden"),
+        Html.HiddenFieldColumn("StockAvailableHidden"),
+        Html.HiddenFieldColumn("PriceHidden"),
+        Html.HiddenFieldColumn("SaleUnitRateHidden"),
+        Html.TextBoxColumn("ProductCode","ITEM*","110px",delegate(GridColumn col){
+            col.InitAutoCompleteFunctionName = "initProductAutoComplete";
+        }),
+        Html.LabelColumn("ProductName", "NAMA BARANG","",delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+        }),
+        Html.LabelColumn("StockQty", "ON HAND", "80px",delegate(GridColumn col){
+        }),
+        Html.LabelColumn("StockAvailable", "AVAIL", "70px",delegate(GridColumn col){
+        }),
+        Html.DecimalColumn("Quantity", "JUMLAH", "100px",delegate(GridColumn col){
+            col.ItemAttributes = " onblur=\"calc($(this).parent().parent().index())\" ";
+            col.GenerateHiddenField = true;
+            col.DetailFormat = "N0";
+            col.CreateFormat = col.UpdateFormat = "F0";
+        }),
+        
+        //Html.LabelColumn("QtyShipped", "SHIPPED", "100px",delegate(GridColumn col){
+        //    col.DetailFormat = "N0";
+        //    col.CreateColumnType = col.UpdateColumnType = GridColumnType.None;
+        //}),
+        //Html.LabelColumn("CreatedInvQuantity", "INVOICED", "100px",delegate(GridColumn col){
+        //    col.DetailFormat = "N0";
+        //    col.CreateColumnType = col.UpdateColumnType = GridColumnType.None;
+        //}),
+        Html.DropDownColumn("ConversionID", "UNITS", ddlConversion,"100px", delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.None;
+            col.ItemAttributes = " onchange=\"unitChange($(this).parent().parent().index())\"";
+            col.ItemAttributes += " onmouseover=\"trimUnitOption($(this).parent().parent().index())\" ";
+        }),
+        Html.LabelColumn("ConversionName", "UNITS", "100px", delegate(GridColumn gc){
+            gc.CreateColumnType = gc.UpdateColumnType = GridColumnType.None;
+        }),
+        Html.DropDownColumn("PriceLevelID", "PRICE LEVEL", ddlPriceLevel, "100px", delegate(GridColumn gc){
+            gc.DetailColumnType = GridColumnType.None;
+            gc.ItemAttributes = " onchange=\"priceLevelChange($(this).parent().parent().index())\"";
+            //gc.CreateColumnType = gc.UpdateColumnType = gc.DetailColumnType = GridColumnType.Label;
+        }),
+        Html.LabelColumn("PriceLevelName", "PRICE LEVEL", "100px", delegate(GridColumn gc){
+            gc.CreateColumnType = gc.UpdateColumnType = GridColumnType.None;
+        }),
+        Html.DropDownColumn("TaxType", "TAX CODE", ddlTax,"110px", delegate(GridColumn col){
+            col.ItemAttributes = " onchange=\"calc($(this).parent().parent().index())\" ";
+            col.DetailColumnType = GridColumnType.None;
+        }),
+        Html.LabelColumn("TaxTypeName", "TAX CODE", "70px", delegate(GridColumn gc){
+            gc.CreateColumnType = gc.UpdateColumnType = GridColumnType.None;
+        }),
+        Html.DecimalColumn("Price", "HARGA/UNIT", "100px", delegate(GridColumn col)
+        {
+            //col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            //col.ItemAttributes = " readonly";
+            col.ItemAttributes = " onchange=\"calc($(this).parent().parent().index())\" ";
+            col.DetailFormat = "N2";
+            col.CreateFormat = col.UpdateFormat = "G";
+        }),
+        Html.DecimalColumn("TotalAmount", "HARGA", "100px", delegate(GridColumn col)
+        {
+            col.GenerateHiddenField = true;
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            col.DetailFormat = "N0";
+            col.CreateFormat = col.UpdateFormat = "F0";
+        }),
+        Html.DecimalColumn("TotalPPN", "TAX AMT", "100px", delegate(GridColumn col)
+        {
+            col.GenerateHiddenField = true;
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            col.DetailFormat = "N0";
+            col.CreateFormat = col.UpdateFormat = "F0";
+        }),
+        
+        Html.DecimalColumn("Total", "GROSS AMT", "100px", delegate(GridColumn col)
+        {
+            col.ItemAttributes = " onchange=\"reversecalc($(this).parent().parent().index())\" ";
+            col.GenerateHiddenField = true;
+            col.DetailColumnType = GridColumnType.Label;
+            col.DetailFormat = "N0";
+        }),
+    };
+
+    GridFooter.SetPropertyDelegate subTotalFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    GridFooter.SetPropertyDelegate discountFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    GridFooter.SetPropertyDelegate taxFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    GridFooter.SetPropertyDelegate grandTotalFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    var footerColumnStart = 9;
+    if (mode == UIMode.Detail)
+    {
+        footerColumnStart = 9;
+    }
+
+    var subTotal = new GridFooter[]{
+        Html.EmptyFooterColumn(footerColumnStart),
+        Html.LabelFooterColumn("", "SUBTOTAL HARGA:", true, subTotalFooterDel),
+        Html.DecimalFooterColumn("txtGridTotal", Convert.ToDecimal(Model.SubTotal), delegate(GridFooter f){
+            f.ItemFormat = "N0";
+        }),
+    };
+
+    var taxValue = new GridFooter[]{
+            Html.EmptyFooterColumn(footerColumnStart),
+            Html.LabelFooterColumn("", "PAJAK:", true, taxFooterDel),
+            Html.DecimalFooterColumn("txtGridPPN", Convert.ToDecimal(Model.TaxValue), delegate(GridFooter f){
+                f.ItemFormat = "N0";
+        })
+    };
+
+    var grandTotal = new GridFooter[]{
+            Html.EmptyFooterColumn(footerColumnStart),
+            Html.LabelFooterColumn("","TOTAL:", true, grandTotalFooterDel),
+            Html.DecimalFooterColumn("txtGridGrandTotal", Convert.ToDecimal(Model.GrandTotal), delegate(GridFooter f){
+                f.ItemFormat = "N0";
+        })
+    };
+
+    var gridFooters = new List<GridFooter[]>()
+    {
+
+    };
+    gridFooters.Add(subTotal);
+    gridFooters.Add(taxValue);
+    gridFooters.Add(grandTotal);
+
+
+    var addNewButton = new Button();
+    addNewButton.CssClass = "button";
+    addNewButton.Text = "Add";
+    addNewButton.OnClick = "addGrid1Row()";
+    addNewButton.ID = "btnAddNew";
+    addNewButton.Href = "#btnAddNew";
+    addNewButton.Visible = mode != UIMode.Detail;
+
+    var grid = new Grid();
+    grid.IncludeAddRowScript = true;
+    grid.IncludeDeleteRowButton = true;
+    grid.DefaultObject = new CustomerReturnDetailModel();
+    grid.Columns = gridColumns;
+    grid.ShowFooter = true;
+    grid.Footers = gridFooters;
+    grid.AllowSorting = false;
+    grid.BelowButtons.Add(addNewButton);
+
+    var returnReceiptColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("ID","RECEIPT ID","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("Code", "RECEIPT CODE"),
+        Html.LabelColumn("Date", "DATE", "",delegate(GridColumn col){
+            col.DetailFormat = "MM/dd/yyyy";
+        }),
+    };
+    var receiptGrid = new Grid();
+    receiptGrid.ID = "receiptGrid";
+    receiptGrid.DataContainerName = "receiptDetails";
+    receiptGrid.IncludeAddRowScript = false;
+    receiptGrid.IncludeDeleteRowButton = false;
+    receiptGrid.Columns = returnReceiptColumns;
+    receiptGrid.ShowFooter = false;
+    receiptGrid.AllowSorting = false;
+
+    var creditGridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("ID","CREDIT ID","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("Code","CREDIT CODE"),
+        Html.LabelColumn("Date", "DATE", "",delegate(GridColumn col){
+            col.DetailFormat = "MM/dd/yyyy";
+        }),
+        Html.LabelColumn("Total", "TOTAL AMOUNT","",delegate(GridColumn col){
+            col.DetailFormat = "N0";
+        }),
+    };
+
+    var creditGrid = new Grid();
+    creditGrid.ID = "creditGrid";
+    creditGrid.DataContainerName = "creditDetails";
+    creditGrid.IncludeAddRowScript = false;
+    creditGrid.IncludeDeleteRowButton = false;
+    creditGrid.Columns = creditGridColumns;
+    creditGrid.ShowFooter = false;
+    creditGrid.AllowSorting = false;
+
+    var form = new Form();
+    form.Fields = formFields;
+
+    var textBoxName = "Details_@index_ProductCode";
+    var serviceUrl = Url.Content("~/WebService.asmx/RetrieveProductByKeyOnSalesOrder");
+    var retrieveSingleUrl = Url.Content("~/WebService.asmx/RetrieveProductOnSalesOrder");
+
+    TabbedGrid tabbedGrid = new TabbedGrid();
+    if (mode == UIMode.Detail)
+    {
+        tabbedGrid.AddGrid("Item Fulfillment", receiptGrid, ViewBag.DOList);
+        tabbedGrid.AddGrid("Credit", creditGrid, ViewBag.InvoiceList);
+    }
+
+    var reviseButton = new Button();
+    reviseButton.CssClass = "button";
+    reviseButton.Text = "Create New";
+    reviseButton.Href = Url.Content("~/CustomerReturn/Create?customerReturnID=" + Model.ID);
+    reviseButton.Visible = mode == UIMode.Detail;
+
+    var deliveryButton = new Button();
+    deliveryButton.CssClass = "button";
+    deliveryButton.Text = "Receive";
+    deliveryButton.Href = Url.Content("~/ReturnReceipt/Create?customerReturnID=" + Model.ID);
+    deliveryButton.Visible = mode == UIMode.Detail
+        && Model.Status == (int)MPL.DocumentStatus.Approved
+        && Model.IsReceivable;
+
+    var invoiceButton = new Button();
+    invoiceButton.CssClass = "button";
+    invoiceButton.Text = "Issue Credit";
+    invoiceButton.Href = Url.Content("~/CreditMemo/Create?customerReturnID=" + Model.ID);
+    invoiceButton.Visible = mode == UIMode.Detail
+        && Model.Status == (int)MPL.DocumentStatus.Approved
+        && Model.IsCreditable;
+    
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.initNumeric = function () {
+            $(".decimalNumeric").numeric({
+                decimal: "."
+            });
+            $(".decimalNumeric").focus(function () {
+                var temp = $(this);
+                setTimeout(function () {
+                    temp.select();
+                }, 100);
+            });
+            $(".integerNumeric").numeric(false, function () { this.value = ""; this.focus(); });
+        }
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+    });
+    $(function () {
+        var action = $("#hdnAction").val();
+        $('#Form1').attr("action", "/CustomerReturn/" + action);
+    });
+</script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/Transaction/CustomerReturn.js")"></script>
+<input type="hidden" id ="hdnAction" value ="@action" />
+<input type="hidden" id="hdnMode" value="@mode" />
+@*<input type="hidden" id="hdnHasDO" value="@Model.HasDO" />*@
+@Html.AutoCompleteScript("initCustomerAutoComplete", "txtCustomerName", Url.Content("~/WebService.asmx/RetrieveCustomerByKey"), "",
+                Url.Content("~/WebService.asmx/RetrieveCustomer"), "customerName", "Code", "Name", "onSelectCustomer", 50, 500)
+@Html.AutoCompleteScript("initEmployeeAutoComplete", "txtEmployeeName", Url.Content("~/WebService.asmx/RetrieveEmployeeByKey"), "",
+                Url.Content("~/WebService.asmx/RetrieveEmployee"), "employeeName", "Name", "RoleDescription", "onSelectEmployee", 50, 500)
+@Html.GridAutoCompleteScript("initProductAutoComplete", "Grid1", textBoxName, serviceUrl, "", retrieveSingleUrl,
+                "productCode", ",'customerID':'\"+getCustomerID()+\"', 'warehouseID':'\"+getWarehouseID()+\"'", "Code", "ProductName", "onSelectProduct", 50, 500)
+@Html.MasterDetailForm(form, grid, Model, Model.Details, mode, "CustomerReturn", "ID", delegate(MasterDetailFormHelper helper)
+{
+    helper.DetailGridTitle = "Item";
+    helper.TabbedGrid = tabbedGrid;
+
+    if (mode == UIMode.Detail)
+    {
+        helper.DetailGridTitle = "Item";
+
+        helper.TabbedGrid = tabbedGrid;
+
+        helper.VoidButton.Href = Url.Content("~/CustomerReturn/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+        helper.VoidButton.OnClick = "";
+        helper.VoidButton.ID = "btnVoid";
+
+        helper.CreateAnotherButton.Visible = false;
+        helper.CopyTransactionButton.Visible = false;
+
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.Buttons.Add(deliveryButton);
+            helper.Buttons.Add(invoiceButton);
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = helper.VoidButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+        }
+        else
+        {
+            //helper.Buttons.Add(reviseButton);
+            helper.EditButton.Visible = 
+                mode == UIMode.Detail 
+                && Model.Status != (int)MPL.DocumentStatus.Void;
+            helper.ApproveButton.Visible = mode == UIMode.Detail && Model.Status == (int)MPL.DocumentStatus.New;
+            helper.VoidButton.Visible =
+                mode == UIMode.Detail
+                && Model.Status != (int)MPL.DocumentStatus.Void
+                && !Model.HasCredit
+                && !Model.HasReceipt;
+            helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = false;
+        }
+        //if (!Convert.ToBoolean(ViewBag.AllowVoid))
+        //{
+        //    helper.VoidButton.Visible = false;
+        //}
+        //else
+        //{
+        //    helper.VoidButton.Visible = mode == UIMode.Detail && Model.Status != (int)MPL.DocumentStatus.Void;
+        //}
+    }
+})

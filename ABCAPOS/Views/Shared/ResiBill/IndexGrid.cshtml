@@ -1,0 +1,142 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<ResiBillModel>
+@{
+    var dataCount = (int)ViewBag.DataCount;
+    var pageSize = (int)ViewBag.PageSize;
+    var startIndex = (int)ViewBag.StartIndex;
+    var selectedPage = startIndex / pageSize + 1;
+    var pageAmount = (dataCount / 20);
+
+    if (dataCount % 20 != 0)
+    {
+        pageAmount += 1;
+    }
+
+
+
+    var statement = string.Format("Page: {0} of {1}", selectedPage, pageAmount);
+  
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.DateColumn("Date","Date", "80px", delegate(GridColumn col)
+        {
+            col.Style = "text-align:center;width:80px;";
+        }),
+         Html.LabelColumn("Code"," Resi Bill Number", "180px", delegate(GridColumn col)
+        {
+            col.Style = "text-align:center;width:180px;";
+        }),
+        Html.LabelColumn("ExpeditionID","Expedition","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("ExpeditionName","Expedition","",delegate(GridColumn col){
+         
+        }),
+       
+        
+        Html.LabelColumn("TotalAmount","AMOUNT", "300px"),
+        Html.LabelColumn("StatusDesc","STATUS", "80px",delegate(GridColumn col){
+            col.SortField = "Status";
+        })
+    };
+
+    var statusList = new List<DropDownOption>()
+    {
+        //new DropDownOption(){ Value = "Open", Text = "New" },
+        //new DropDownOption(){ Value = "Paid", Text = "Paid In Full" },
+        //new DropDownOption(){ Value = ResiBillStatus.Void.ToString(), Text = ResiBillStatus.Void.ToString() },
+        new DropDownOption(){ Value = Convert.ToString((int)ResiBillStatus.New), Text = "New" },
+        new DropDownOption(){ Value = Convert.ToString((int)ResiBillStatus.PendingPayment), Text = "Pending Payment" },
+        new DropDownOption(){ Value = Convert.ToString((int)ResiBillStatus.Void), Text = ResiBillStatus.Void.ToString() },
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("DATE","Date"),
+        Html.GenericFilterTextBoxField("RESI BILL","Code"),
+        Html.GenericFilterTextBoxField("EXPEDITION ","ExpeditionName"),
+        Html.GenericFilterDropDownField("STATUS","Status",statusList,typeof(int))   
+        
+    };
+    var detailButton = new GridButtonColumn();
+    detailButton.CssClass = "iconContainer";
+    detailButton.ButtonCssClass = "details imageButton";
+    detailButton.Href = Url.Content("~/ResiBill/Detail?key=@idPropertyValue");
+    detailButton.IDPropertyName = "ID";
+    detailButton.Text = "Detail";
+    
+    var approveButton = new GridButtonColumn();
+    approveButton.CssClass = "iconContainer";
+    approveButton.ButtonCssClass = "approve imageButton";
+    approveButton.Href = Url.Content("~/ResiBill/ApproveFromIndex?key=@idPropertyValue");
+    approveButton.OnClick = "return confirm('Are you sure you want to approve this document?');";
+    approveButton.IDPropertyName = "ID";
+    approveButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var build = obj as ResiBillModel;
+        if (Convert.ToBoolean(ViewBag.AllowVoid))
+        {
+            if (build.Status == (int)ResiBillStatus.New)
+                return true;
+        }
+        return false;
+    };
+    approveButton.Text = "Approve";
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(detailButton);
+    grid.Buttons.Add(approveButton);
+
+    //if (Convert.ToBoolean(ViewBag.AllowVoid))
+    //{
+    //    grid.Buttons.Add(voidButton);
+    //}
+    
+}
+@*<script type="text/javascript">
+    $(function () {
+
+        addTooltip();
+        if ($.urlParam('filter.FilterFields%5B0%5D.Selected') == null) {
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+            var yyyy = today.getFullYear();
+
+            today = mm + '/' + dd + '/' + yyyy;
+            $("#filter_FilterFields_0_Value").val(today);
+        }
+    });
+    $(document).ready(function () {
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+    });
+   
+</script>*@
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "ResiBill", "ID", "Code", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    if (Convert.ToBoolean(ViewBag.AllowCreate))
+    {
+        helper.AddNewButton.Visible = true;
+    }
+    else
+    {
+        helper.AddNewButton.Visible = false;
+    }
+
+    helper.AddNewButton.Href = Url.Content("~/UncreatedResiBill");
+})
+<br />
+@statement

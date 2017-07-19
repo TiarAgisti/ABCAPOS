@@ -1,0 +1,19 @@
+﻿<Report Title="Rincian Sales Order">
+  <Columns>
+    <Column Field="ProductCode" HeaderText="Kode Produk" Width="1"/>
+    <Column Field="ProductName" HeaderText="Nama Produk" Width="3.7" />
+    <Column Field="Price" HeaderText="Harga per cm2" Width="1"/>
+    <Column Field="Quantity" HeaderText="Qty" Width=".6"/>
+    <Column Field="Discount" HeaderText="Discount" Width=".7"/>
+    <Column Field="Total" HeaderText="Total" Width="1"/>
+  </Columns>
+  -<Footers>
+    <Footer Content="=SUM(Fields!Total.Value)" Label="Total"/>
+    <Footer Content="=Fields!TaxValue.Value" Label="PPN"/>
+    <Footer Content="=Fields!GrandTotal.Value" Label="Grand Total"/>
+  </Footers>
+  <Group1 Field="SalesOrderID"
+          Header="=Fields!SalesOrderCode.Value 
+                   &amp;amp; &quot; - &quot; &amp;amp; Format(Fields!Date.Value, &quot;dd/MM/yyyy&quot;)
+                   &amp;amp; &quot; - &quot; &amp;amp; Fields!CustomerName.Value"/>
+</Report>

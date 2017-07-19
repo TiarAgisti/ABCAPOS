@@ -1,0 +1,522 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model AttendanceModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    string dateEditor = Convert.ToString(ViewBag.DateList);
+    var attendanceSetting = ViewBag.AttendanceSetting as AttendanceSettingModel;
+
+    var yesNoList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString(true), Text ="Ya" },
+        new DropDownOption(){ Value = Convert.ToString(false), Text = "Tidak" },
+    };
+
+    var hourList = ViewBag.HourList as List<object>;
+    var ddlHours = Util.GetDropDownOptions(hourList, "Text", "Value");
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        
+        Html.LabelFieldObjFor(p=>p.Code,"Kode", delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.Label;
+            f.GenerateHiddenField = true;
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.Description,"Keterangan", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+        Html.DateFieldObjFor(p=>p.Date,"Tanggal", delegate(FormField f){
+            f.Attributes = "onchange=\"changeDate();\"";
+        }),
+    };
+
+    TabbedGrid tabbedGrid = new TabbedGrid();
+
+    var courierGridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("StaffID"),
+        Html.LabelColumn("StaffName","Nama","", delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+        }),
+        Html.DropDownColumn("Alpha","Alpha",yesNoList,"70px", delegate(GridColumn col){
+            col.ItemAttributes = "onchange=\"calculateTotal($(this).parent().parent().index(),'Details');\"";
+        }),
+        Html.DropDownColumn("Leave","Izin",yesNoList,"70px", delegate(GridColumn col){
+            col.ItemAttributes = "onchange=\"calculateTotal($(this).parent().parent().index(),'Details');\"";
+        }),
+        Html.TextBoxColumn("OnDutyTime","On Duty","50px", delegate(GridColumn col){
+            col.ItemAttributes = " onblur=\"validateOnDuty($(this).parent().parent().index(),'Details');\"";
+        }),
+        Html.TextBoxColumn("OffDutyTime","Off Duty","50px", delegate(GridColumn col){
+            col.ItemAttributes = " onblur=\"validateOffDuty($(this).parent().parent().index(),'Details');\"";
+        }),
+        Html.TextBoxColumn("ClockInTime","Clock In","50px", delegate(GridColumn col){
+            col.ItemAttributes = " onblur=\"validateClockIn($(this).parent().parent().index(),'Details');\"";
+        }),
+        Html.TextBoxColumn("ClockOutTime","Clock Out","50px", delegate(GridColumn col){
+            col.ItemAttributes = " onblur=\"validateClockOut($(this).parent().parent().index(),'Details');\"";
+        }),
+        Html.LabelColumn("LateTotal","Total Keterlambatan","100px"),
+        Html.LabelColumn("OvertimeTotal","Total Lembur","70px"),
+        Html.DecimalLabelColumn("Amount","Bonus","90px"),
+        Html.DecimalLabelColumn("PenaltyAmount","Sanksi","90px"),
+    };
+
+    if (mode == UIMode.Detail)
+    {
+        courierGridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("StaffName","Nama",""),
+        Html.DropDownColumn("AlphaDescription","Alpha",yesNoList,"70px"),
+        Html.DropDownColumn("LeaveDescription","Izin",yesNoList,"70px"),
+        Html.TextBoxColumn("OnDutyTime","On Duty","50px"),
+        Html.TextBoxColumn("OffDutyTime","Off Duty","50px"),
+        Html.TextBoxColumn("ClockInTime","Clock In","50px"),
+        Html.TextBoxColumn("ClockOutTime","Clock Out","50px"),
+        Html.LabelColumn("LateTotal","Total Keterlambatan","100px"),
+        Html.LabelColumn("OvertimeTotal","Total Lembur","70px"),
+        Html.DecimalLabelColumn("Amount","Bonus","90px"),
+        Html.DecimalLabelColumn("PenaltyAmount","Sanksi","90px"),
+    };
+    }
+
+    var grid = new Grid();
+    grid.IncludeAddRowScript = false;
+    grid.IncludeDeleteRowButton = false;
+    grid.DefaultObject = new AttendanceDetailModel();
+    grid.Columns = courierGridColumns;
+    grid.ShowFooter = true;
+    grid.AllowSorting = false;
+
+    var operatorGridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("StaffID"),
+        Html.LabelColumn("StaffName","Nama","", delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+        }),
+        Html.DropDownColumn("Alpha","Alpha",yesNoList,"70px", delegate(GridColumn col){
+            col.ItemAttributes = "onchange=\"calculateTotal($(this).parent().parent().index(),'OperatorAttendance');\"";
+        }),
+        Html.DropDownColumn("Leave","Izin",yesNoList,"70px", delegate(GridColumn col){
+            col.ItemAttributes = "onchange=\"calculateTotal($(this).parent().parent().index(),'OperatorAttendance');\"";
+        }),
+        Html.TextBoxColumn("OnDutyTime","On Duty","50px", delegate(GridColumn col){
+            col.ItemAttributes = " onblur=\"validateOnDuty($(this).parent().parent().index(),'OperatorAttendance');\"";
+        }),
+        Html.TextBoxColumn("OffDutyTime","Off Duty","50px", delegate(GridColumn col){
+            col.ItemAttributes = " onblur=\"validateOffDuty($(this).parent().parent().index(),'OperatorAttendance');\"";
+        }),
+        Html.TextBoxColumn("ClockInTime","Clock In","50px", delegate(GridColumn col){
+            col.ItemAttributes = " onblur=\"validateClockIn($(this).parent().parent().index(),'OperatorAttendance');\"";
+        }),
+        Html.TextBoxColumn("ClockOutTime","Clock Out","50px", delegate(GridColumn col){
+            col.ItemAttributes = " onblur=\"validateClockOut($(this).parent().parent().index(),'OperatorAttendance');\"";
+        }),
+        Html.LabelColumn("LateTotal","Total Keterlambatan","100px"),
+        Html.LabelColumn("OvertimeTotal","Total Lembur","70px"),
+        Html.DecimalLabelColumn("Amount","Total","90px"),
+        Html.DecimalLabelColumn("PenaltyAmount","Sanksi","90px"),
+    };
+
+    if (mode == UIMode.Detail)
+    {
+        operatorGridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("StaffName","Nama",""),
+        Html.DropDownColumn("AlphaDescription","Alpha",yesNoList,"70px"),
+        Html.DropDownColumn("LeaveDescription","Izin",yesNoList,"70px"),
+        Html.TextBoxColumn("OnDutyTime","On Duty","50px"),
+        Html.TextBoxColumn("OffDutyTime","Off Duty","50px"),
+        Html.TextBoxColumn("ClockInTime","Clock In","50px"),
+        Html.TextBoxColumn("ClockOutTime","Clock Out","50px"),
+        Html.LabelColumn("LateTotal","Total Keterlambatan","100px"),
+        Html.LabelColumn("OvertimeTotal","Total Lembur","70px"),
+        Html.DecimalLabelColumn("Amount","Total","90px"),
+        Html.DecimalLabelColumn("PenaltyAmount","Sanksi","90px"),
+    };
+    }
+
+    var operatorGrid = new Grid();
+    operatorGrid.ID = "OperatorGrid";
+    operatorGrid.DataContainerName = "OperatorAttendance";
+    operatorGrid.DefaultObject = new AttendanceDetailModel();
+    operatorGrid.Columns = operatorGridColumns;
+    operatorGrid.ShowFooter = true;
+    operatorGrid.AllowSorting = false;
+
+    tabbedGrid.AddGrid("Operator", operatorGrid, Model.OperatorAttendance);
+
+
+    var form = new Form();
+    form.Fields = formFields;
+}
+<script type="text/javascript">
+    function changeDate() {
+        var dateStr = $("#txtDate").val().split("/");
+        var date = new Date(dateStr[2], dateStr[1] - 1, dateStr[0]);
+
+        var rowCount = $('#Grid1 tbody tr').length;
+
+        for (x = 0; x < rowCount; x++) {
+            var offDuty = $("#hdnOffDutyCourier").val();
+
+            if (date.getDay() == 6) {
+                offDuty = $("#hdnOffDutyCourierOnSaturday").val();
+            }
+
+            $("#Details_" + x + "_OffDutyTime").val(offDuty);
+            validateOffDuty(x, "Details");
+        }
+
+        rowCount = $('#OperatorGrid tbody tr').length;
+
+        for (x = 0; x < rowCount; x++) {
+            var offDuty = $("#hdnOffDutyOperator").val();
+
+            if (date.getDay() == 6) {
+                offDuty = $("#hdnOffDutyOperatorOnSaturday").val();
+            }
+
+            $("#OperatorAttendance_" + x + "_OffDutyTime").val(offDuty);
+            validateOffDuty(x, "OperatorAttendance");
+        }
+    }
+
+    function pad(num, size) {
+        var s = "00" + num;
+        return s.substr(s.length - size);
+    }
+
+    function validateTime(value) {
+        var valid = true;
+
+        if (value.length == 5) {
+            var hourStr = value.substring(0, 2);
+            var minuteStr = value.substring(3);
+
+            if (isNaN(hourStr) || isNaN(minuteStr)) {
+                alert("Jam/menit harus dalam angka");
+                valid = false;
+            }
+            else {
+                hour = parseFloat(hourStr);
+                minute = parseFloat(minuteStr);
+
+                if (hour < 0 || hour > 23) {
+                    alert("Jam harus antara 00 hingga 23");
+                    valid = false;
+                }
+                else if (minute < 0 || minute > 59) {
+                    alert("Menit harus antara 00 hingga 60");
+                    valid = false;
+                }
+            }
+        }
+        else {
+            alert("Format input tidak sesuai");
+            valid = false;
+        }
+
+        return valid;
+    }
+
+    function validateOnDuty(index, gridID) {
+        var onDuty = $("#" + gridID + "_" + index + "_OnDutyTime").val();
+
+        var valid = validateTime(onDuty);
+
+        if (valid) {
+            countLateTotal(index, gridID);
+            calculateTotal(index, gridID);
+        }
+    }
+
+    function validateOffDuty(index, gridID) {
+        var offDuty = $("#" + gridID + "_" + index + "_OffDutyTime").val();
+
+        var valid = validateTime(offDuty);
+
+        if (valid) {
+            countOvertimeTotal(index, gridID);
+            calculateTotal(index, gridID);
+        }
+    }
+
+    function validateClockIn(index, gridID) {
+        var clockIn = $("#" + gridID + "_" + index + "_ClockInTime").val();
+
+        var valid = validateTime(clockIn);
+
+        if (valid) {
+            countLateTotal(index, gridID);
+            calculateTotal(index, gridID);
+        }
+    }
+
+    function validateClockOut(index, gridID) {
+        var clockOut = $("#" + gridID + "_" + index + "_ClockOutTime").val();
+
+        var valid = validateTime(clockOut);
+
+        if (valid) {
+            countOvertimeTotal(index, gridID);
+            calculateTotal(index, gridID);
+        }
+    }
+
+    function countLateTotal(index, gridID) {
+        var clockIn = $("#" + gridID + "_" + index + "_ClockInTime").val();
+        var onDuty = $("#" + gridID + "_" + index + "_OnDutyTime").val();
+
+        var clockInHour = parseFloat(clockIn.substring(0, 2));
+        var onDutyHour = parseFloat(onDuty.substring(0, 2));
+
+        var clockInMinute = parseFloat(clockIn.substring(3));
+        var onDutyMinute = parseFloat(onDuty.substring(3));
+
+        if (clockInHour < onDutyHour || (clockInHour == onDutyHour && clockInMinute <= onDutyMinute))
+            $("#" + gridID + "_" + index + "_LateTotal").text("00:00");
+        else {
+            var hour = 0;
+            var minute = 0;
+
+            if (clockInMinute < onDutyMinute) {
+                clockInHour -= 1;
+                clockInMinute += 60;
+            }
+
+            hour = clockInHour - onDutyHour;
+            minute = clockInMinute - onDutyMinute;
+
+            $("#" + gridID + "_" + index + "_LateTotal").text(pad(hour, 2) + ":" + pad(minute, 2));
+        }
+    }
+
+    function countOvertimeTotal(index, gridID) {
+        var clockOut = $("#" + gridID + "_" + index + "_ClockOutTime").val();
+        var offDuty = $("#" + gridID + "_" + index + "_OffDutyTime").val();
+
+        var clockOutHour = parseFloat(clockOut.substring(0, 2));
+        var offDutyHour = parseFloat(offDuty.substring(0, 2));
+
+        var clockOutMinute = parseFloat(clockOut.substring(3));
+        var offDutyMinute = parseFloat(offDuty.substring(3));
+
+        if (clockOutHour >= offDutyHour || clockOutHour < 9) {
+            if (clockOutHour < 9) {
+                var hour = 0;
+                var minute = 0;
+
+                clockOutHour += 24;
+
+                if (clockOutMinute < offDutyMinute) {
+                    clockOutHour -= 1;
+                    clockOutMinute += 60;
+                }
+
+                hour = clockOutHour - offDutyHour;
+                minute = clockOutMinute - offDutyMinute;
+
+                $("#" + gridID + "_" + index + "_OvertimeTotal").text(pad(hour, 2) + ":" + pad(minute, 2));
+            }
+            else {
+                if (clockOutHour < offDutyHour || (clockOutHour == offDutyHour && clockOutMinute <= offDutyMinute))
+                    $("#" + gridID + "_" + index + "_OvertimeTotal").text("00:00");
+                else {
+                    var hour = 0;
+                    var minute = 0;
+
+                    if (clockOutMinute < offDutyMinute) {
+                        clockOutHour -= 1;
+                        clockOutMinute += 60;
+                    }
+
+                    hour = clockOutHour - offDutyHour;
+                    minute = clockOutMinute - offDutyMinute;
+
+                    $("#" + gridID + "_" + index + "_OvertimeTotal").text(pad(hour, 2) + ":" + pad(minute, 2));
+                }
+            }
+        }
+    }
+
+    function getLateHour(index, gridID) {
+        var late = $("#" + gridID + "_" + index + "_LateTotal").text();
+
+        var lateHour = parseFloat(late.substring(0, 2));
+        var lateMinute = parseFloat(late.substring(3));
+
+        if (lateMinute > 0)
+            lateHour += 1;
+
+        return lateHour;
+    }
+
+    function getOvertimeHour(index, gridID) {
+        var overtime = $("#" + gridID + "_" + index + "_OvertimeTotal").text();
+
+        var overtimeHour = parseFloat(overtime.substring(0, 2));
+        var overtimeMinute = parseFloat(overtime.substring(3));
+
+        if (overtimeMinute > 15) {
+            if (overtimeMinute < 46)
+                overtimeHour += 0.5;
+            else
+                overtimeHour += 1;
+        }
+
+        return overtimeHour;
+    }
+
+    function calculateTotal(index, gridID) {
+        var total = 0;
+        var mealAllowance = 0;
+        var overtimeAllowance = 0;
+        var latePenalty = 0;
+        var alphaPenalty = 0;
+        var penaltytotal = 0;
+
+        var alpha = $("#" + gridID + "_" + index + "_Alpha").val();
+        var leave = $("#" + gridID + "_" + index + "_Leave").val();
+
+        if (leave == "False") {
+            if (gridID == "Details") {
+                if (alpha == "True") {
+                    var dateStr = $("#txtDate").val().split("/");
+                    var date = new Date(dateStr[2], dateStr[1] - 1, dateStr[0]);
+
+                    if (date.getDay() == 6)
+                        alphaPenalty = parseFloat($("#hdnAlphaPenaltyCourierOnSaturday").val());
+                    else
+                        alphaPenalty = parseFloat($("#hdnAlphaPenaltyCourier").val());
+                }
+                else {
+                    mealAllowance = parseFloat($("#hdnMealAllowanceCourier").val());
+                    overtimeAllowance = parseFloat($("#hdnOvertimeCourier").val());
+                    latePenalty = parseFloat($("#hdnLatePenaltyCourier").val());
+                }
+            }
+            else {
+                if (alpha == "True") {
+                    alphaPenalty = parseFloat($("#hdnAlphaPenaltyOperator").val());
+                }
+                else {
+                    mealAllowance = parseFloat($("#hdnMealAllowanceOperator").val());
+                    overtimeAllowance = parseFloat($("#hdnOvertimeOperator").val());
+                    latePenalty = parseFloat($("#hdnLatePenaltyOperator").val());
+                }
+            }
+
+            var lateHour = getLateHour(index, gridID);
+            var overtimeHour = getOvertimeHour(index, gridID);
+
+            total = mealAllowance + (overtimeAllowance * overtimeHour)
+            penaltytotal = (latePenalty * lateHour) + alphaPenalty;
+        }
+
+        var strTotal = total.toFixed(0);
+        var strPenalty = penaltytotal.toFixed(0);
+
+        $("#" + gridID + "_" + index + "_Amount").text(strTotal);
+        $("#" + gridID + "_" + index + "_PenaltyAmount").text(strPenalty);
+    }
+
+    function validateDetails() {
+        var valid = true;
+
+        var rowCount = $('#Grid1 tbody tr').length;
+
+        for (x = 0; x < rowCount; x++) {
+            if (valid) {
+                var onDuty = $("#Details_" + x + "_OnDutyTime").val();
+                var offDuty = $("#Details_" + x + "_OffDutyTime").val();
+                var clockInDuty = $("#Details_" + x + "_ClockInTime").val();
+                var clockOutDuty = $("#Details_" + x + "_ClockOutTime").val();
+
+                valid = validateTime(onDuty);
+
+                if (valid)
+                    valid = validateTime(offDuty);
+
+                if (valid)
+                    valid = validateTime(clockInDuty);
+
+                if (valid)
+                    valid = validateTime(clockOutDuty);
+            }
+        }
+
+        rowCount = $('#OperatorGrid tbody tr').length;
+
+
+        for (x = 0; x < rowCount; x++) {
+            if (valid) {
+                var onDuty = $("#OperatorAttendance_" + x + "_OnDutyTime").val();
+                var offDuty = $("#OperatorAttendance_" + x + "_OffDutyTime").val();
+                var clockInDuty = $("#OperatorAttendance_" + x + "_ClockInTime").val();
+                var clockOutDuty = $("#OperatorAttendance_" + x + "_ClockOutTime").val();
+
+                valid = validateTime(onDuty);
+
+                if (valid)
+                    valid = validateTime(offDuty);
+
+                if (valid)
+                    valid = validateTime(clockInDuty);
+
+                if (valid)
+                    valid = validateTime(clockOutDuty);
+            }
+        }
+
+        if (valid) {
+            submitForm('Form1');
+        }
+    }
+</script>
+<input type="hidden" id="hdnOffDutyCourier" value="@attendanceSetting.OffDutyCourier" />
+<input type="hidden" id="hdnOffDutyOperator" value="@attendanceSetting.OffDutyOperator" />
+<input type="hidden" id="hdnOffDutyCourierOnSaturday" value="@attendanceSetting.OffDutyCourierOnSaturday" />
+<input type="hidden" id="hdnOffDutyOperatorOnSaturday" value="@attendanceSetting.OffDutyOperatorOnSaturday" />
+<input type="hidden" id="hdnMealAllowanceCourier" value="@attendanceSetting.MealAllowanceCourier" />
+<input type="hidden" id="hdnMealAllowanceOperator" value="@attendanceSetting.MealAllowanceOperator" />
+<input type="hidden" id="hdnOvertimeCourier" value="@attendanceSetting.OvertimeCourier" />
+<input type="hidden" id="hdnOvertimeOperator" value="@attendanceSetting.OvertimeOperator" />
+<input type="hidden" id="hdnLatePenaltyCourier" value="@attendanceSetting.LatePenaltyCourier" />
+<input type="hidden" id="hdnLatePenaltyOperator" value="@attendanceSetting.LatePenaltyOperator" />
+<input type="hidden" id="hdnAlphaPenaltyCourier" value="@attendanceSetting.AlphaPenaltyCourier" />
+<input type="hidden" id="hdnAlphaPenaltyCourierOnSaturday" value="@attendanceSetting.AlphaPenaltyCourierOnSaturday" />
+<input type="hidden" id="hdnAlphaPenaltyOperator" value="@attendanceSetting.AlphaPenaltyOperator" />
+@Html.MasterDetailForm(form, grid, Model, Model.Details, mode, "Attendance", "ID", delegate(MasterDetailFormHelper helper)
+    {
+        helper.TabbedGrid = tabbedGrid;
+        helper.DetailGridTitle = "Kurir";
+
+        helper.SaveButton.OnClick = "validateDetails();";
+        helper.SaveButton.Href = "";
+
+        if (mode == UIMode.Detail)
+        {
+            if (!Convert.ToBoolean(ViewBag.AllowCreate))
+            {
+                helper.CreateAnotherButton.Visible = false;
+            }
+
+            if (!Convert.ToBoolean(ViewBag.AllowEdit))
+            {
+                helper.EditButton.Visible = helper.CreateAnotherButton.Visible = helper.VoidButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+            }
+            else
+            {
+                helper.CopyTransactionButton.Visible = false;
+                //helper.EditButton.Visible = mode == UIMode.Detail && Model.Status != (int)DeliveryOrderStatus.Done && Model.Status != (int)DeliveryOrderStatus.Void;
+                //helper.VoidButton.Visible = mode == UIMode.Detail && Model.Status != (int)DeliveryOrderStatus.Void;
+                helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = false;
+            }
+        }
+    })

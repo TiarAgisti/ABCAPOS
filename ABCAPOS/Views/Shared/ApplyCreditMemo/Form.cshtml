@@ -1,0 +1,239 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model ApplyCreditMemoModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+    ViewBag.ErrorMessage = "";
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.CustomerID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.CurrencyID, ""),
+        Html.HiddenFieldFieldObjFor(p=>p.CreditMemoID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.CeilingAmount, ""),
+        
+        Html.LabelFieldObjFor(p=>p.CreditMemoID,"", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = f.DetailFieldType = FormFieldType.HiddenField;
+        }),
+        Html.DecimalFieldObjFor(p=>p.AmountChecked,"AMOUNT CHECKED", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = f.DetailFieldType = FormFieldType.HiddenField;
+        }),
+        Html.FullRowFormFieldObj("<br /><b>Primary Information</b><br/>","<br /><b>Primary Information</b><br/>","<br /><b>Primary Information</b><br/>"),
+
+        Html.LabelFieldObjFor(p=>p.Code,"REFERENCE NO.", delegate(FormField f){
+                f.UpdateFieldType = FormFieldType.Label;
+                f.GenerateHiddenField = true;
+            }),
+        Html.DateFieldObjFor(p=>p.Date,"DATE", delegate(FormField f){
+                f.DetailFormat = "MM/dd/yyyy";
+                f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+                f.Style = "width:300px";
+            }),
+        
+        Html.LabelFieldObjFor(p=>p.CustomerName,"CUSTOMER", delegate(FormField f){
+                f.Style = "width:300px";
+        }), 
+        
+        Html.LabelFieldObjFor(p=>p.CurrencyName,"CURRENCY", delegate(FormField f){
+        }),
+        
+        Html.DecimalFieldObjFor(p=>p.ExchangeRate,"EXCHANGE RATE", delegate(FormField f){
+            f.Attributes = " readonly";
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.CreditMemoCode,"CREATED FROM", delegate(FormField f){
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.Title,"MEMO", delegate(FormField f){
+                f.Style = "width:300px";
+        }),
+        Html.HiddenFieldFieldObjFor(p=>p.CeilingAmount, ""),
+        Html.TextBoxFieldObjFor(p=>p.CreditRemaining,"TOTAL UNAPPLIED", delegate(FormField f){
+                f.Style = "width:300px";
+                f.CreateFormat = f.UpdateFormat = "N2";
+                f.DetailFieldType = FormFieldType.None;
+                f.Attributes = " readonly";
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.VoidRemarks,"VOID REMARKS", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+            
+            if(string.IsNullOrEmpty(Model.VoidRemarks))
+            {
+                f.DetailFieldType = FormFieldType.None;
+            }
+        }),
+    };
+
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("InvoiceID"),
+        
+        Html.LabelColumn("InvoiceID", "","",delegate(GridColumn col){
+            col.CreateColumnType = col.DetailColumnType = col.UpdateColumnType = GridColumnType.HiddenField;
+        }),
+        Html.CheckBoxColumn("isAutoApply", "", false, delegate(GridColumn g){
+            g.UpdateColumnType = g.DetailColumnType = GridColumnType.HiddenField;
+            g.CreateColumnType = GridColumnType.CheckBox;
+            g.Style = "width:10px";
+            g.ItemAttributes = " onchange=\"isAutoApplyChange($(this).parent().parent().index())\" ";
+        }),
+        Html.LabelColumn("Code", "INVOICE CODE","100px",delegate(GridColumn col){
+
+        }),
+        
+        Html.LabelColumn("DueDate", "DUE DATE","100px",delegate(GridColumn col){
+            col.CreateFormat = col.DetailFormat = col.UpdateFormat = "MM/dd/yyyy";
+            col.ItemAttributes = " readonly";
+        }),
+        
+        Html.LabelColumn("OriginalAmount", "ORIGINAL AMOUNT","100px",delegate(GridColumn col){
+            col.DetailFormat = "N2";
+            col.CreateFormat = col.UpdateFormat = "N2";
+            col.ItemAttributes = " readonly";
+        }),
+        
+        Html.LabelColumn("AmountDue", "AMOUNT DUE","100px",delegate(GridColumn col){
+            col.DetailFormat = "N2";
+            col.CreateFormat = col.UpdateFormat = "N2";
+            col.ItemAttributes = " readonly";
+        }),
+        
+        Html.DecimalColumn("Amount", "APPLY CREDIT", "100px",delegate(GridColumn col){
+            col.ItemAttributes = " onblur=\"calculateCredit($(this).parent().parent().index())\" ";
+            col.DetailFormat = "N2";
+            //col.CreateFormat = col.UpdateFormat = "N2";
+        }),
+
+        Html.TextBoxColumn("Remarks", "REMARKS", "100px",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.Label;
+        }),
+    };
+
+
+    var grid = new Grid();
+    grid.IncludeAddRowScript = false;
+    grid.IncludeDeleteRowButton = false;
+    grid.DefaultObject = new ApplyCreditMemoDetailModel();
+    grid.Columns = gridColumns;
+    grid.ShowFooter = true;
+    grid.AllowSorting = false;
+
+    var form = new Form();
+    form.Fields = formFields;
+
+    TabbedGrid tabbedGrid = new TabbedGrid();
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.initNumeric = function () {
+            $(".decimalNumeric").numeric({
+                decimal: "."
+            });
+            $(".decimalNumeric").focus(function () {
+                var temp = $(this);
+                setTimeout(function () {
+                    temp.select();
+                }, 100);
+            });
+            $(".integerNumeric").numeric(false, function () { this.value = ""; this.focus(); });
+        }
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+
+        var mode = $("#hdnMode").val();
+
+        //if (mode == "Detail" || mode == "Create") {
+        var soID = $("#hdnCreditMemoID").val();
+        var soCode = $("#lblCreditMemoCode").text();
+
+        var soLink = "/CreditMemo/Detail?key=" + soID;
+        $("#lblCreditMemoCode").replaceWith('<a href="' + soLink + '">' + soCode + '</a>');
+
+        var noOfRows = $("#Grid1 tbody tr").length;
+        for (index = 0; index < noOfRows; index++) {
+            var soID = $("#Details_" + index + "_InvoiceID").val();
+            var soCode = $("#Details_" + index + "_Code").text();
+
+            var soLink = "/Invoice/Detail?key=" + soID;
+            $("#Details_" + index + "_Code").replaceWith('<a href="' + soLink + '">' + soCode + '</a>');
+        }
+        //}
+        $("#btnVoid").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                .addClass("dialog")
+                .attr("id", $(this).attr("data-dialog-id"))
+                .appendTo("body").dialog({
+                    title: "Void Remarks",
+                    close: function () {
+                        $(this).remove();
+                    },
+                    modal: true,
+                    height: 180,
+                    width: 700,
+                    left: 0
+                }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+    });
+</script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/Transaction/CustomerReturn.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/Transaction/ApplyCreditMemo.js")"></script>
+<input type="hidden" id="hdnMode" value="@mode" />
+@Html.AutoCompleteScript("initCustomerAutoComplete", "txtCustomerName", Url.Content("~/WebService.asmx/RetrieveCustomerByKey"), "",
+                Url.Content("~/WebService.asmx/RetrieveCustomer"), "vendorName", "Code", "Name", "onSelectCustomer", 50, 500)
+@Html.AutoCompleteScript("initEmployeeAutoComplete", "txtEmployeeName", Url.Content("~/WebService.asmx/RetrieveEmployeeByKey"), "",
+                Url.Content("~/WebService.asmx/RetrieveEmployee"), "employeeName", "Name", "RoleDescription", "onSelectEmployee", 50, 500)
+@Html.MasterDetailForm(form, grid, Model, Model.Details, mode, "Quotation", "ID", delegate(MasterDetailFormHelper helper)
+{
+    helper.DetailGridTitle = "Item";
+    helper.TabbedGrid = tabbedGrid;
+
+    if (mode == UIMode.Detail)
+    {
+        helper.DetailGridTitle = "Item";
+
+        helper.TabbedGrid = tabbedGrid;
+
+        helper.VoidButton.Href = Url.Content("~/ApplyCreditMemo/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+        helper.VoidButton.OnClick = "";
+        helper.VoidButton.ID = "btnVoid";
+
+        helper.CreateAnotherButton.Visible = false;
+        helper.CopyTransactionButton.Visible = false;
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+        }
+        else
+        {
+            helper.EditButton.Visible = mode == UIMode.Detail && Model.Status != (int)MPL.DocumentStatus.Void && Model.Status == (int)MPL.DocumentStatus.New;
+            helper.ApproveButton.Visible = false;
+            helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = false;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowVoid))
+        {
+            helper.VoidButton.Visible = false;
+        }
+        else
+        {
+            helper.VoidButton.Visible = mode == UIMode.Detail && Model.Status != (int)MPL.DocumentStatus.Void;
+        }
+    }
+})

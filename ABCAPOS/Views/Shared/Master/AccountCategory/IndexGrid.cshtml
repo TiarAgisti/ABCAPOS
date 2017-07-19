@@ -1,0 +1,33 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<AccountCategoryModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Description","Keterangan")
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("Keterangan","Description")
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.DefaultObject = new AccountCategoryModel();
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "AccountCategory", "ID", "Description", null, delegate(object obj, UIMode mode)
+    {
+        return false;
+    }, delegate(IndexGridHelper helper)
+    {
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.AddNewButton.Visible = true;
+        }
+        else
+        {
+            helper.AddNewButton.Visible = false;
+        }
+    })

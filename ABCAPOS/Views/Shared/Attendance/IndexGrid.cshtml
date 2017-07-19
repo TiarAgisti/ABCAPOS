@@ -1,0 +1,39 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util
+@using ABCAPOS.Models;
+@model List<AttendanceModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","Kode Absensi","100px"),
+        Html.DateColumn("Date","Tanggal", "100px"),
+        Html.LabelColumn("Description","Keterangan",""),
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("Kode Absensi","Code")
+        
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    //grid.Buttons.Add(detailButton);
+    //grid.Buttons.Add(readButton);
+    //grid.Buttons.Add(printButton);
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "Attendance", "ID", "Code", null, delegate(object obj, UIMode mode)
+    {
+        return false;
+    }, delegate(IndexGridHelper helper)
+    {
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.AddNewButton.Visible = true;
+        }
+        else
+        {
+            helper.AddNewButton.Visible = false;
+        }
+    })

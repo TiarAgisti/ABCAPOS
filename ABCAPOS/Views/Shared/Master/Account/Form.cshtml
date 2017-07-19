@@ -1,0 +1,103 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model AccountModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    var radioList = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = true,Text = "Aktif", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = false,Text = "Tidak Aktif", ReadOnly = mode == UIMode.Detail},
+    };
+
+    string InvoicePaymentEditor = Convert.ToString(ViewBag.InvoicePaymentCheckboxList);
+    var categoryList = ViewBag.CategoryList as IEnumerable<AccountCategoryModel>;
+    var ddlCategory = Util.GetDropDownOptions(categoryList, "Description", "ID");
+
+    var groupRadio = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = (int)AccountGroup.IncomeExpense,Text = "Neraca", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = (int)AccountGroup.ProfitAndLoss,Text = "Laba (Rugi)", ReadOnly = mode == UIMode.Detail},
+    };
+
+    var invoicePaymentAccountRadio = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = 1,Text = "Ya", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = 0,Text = "Tidak", ReadOnly = mode == UIMode.Detail},
+    };
+
+    var yesNoRadio = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = true,Text = "Ya", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = false,Text = "Tidak", ReadOnly = mode == UIMode.Detail},
+    };
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        
+        Html.TextBoxFieldObjFor(p=>p.Code,"Kode", delegate(FormField f){
+            //f.UpdateFieldType = FormFieldType.Label;
+            //f.GenerateHiddenField = true;
+        }),
+        Html.TextBoxFieldObjFor(p=>p.UserCode,"Kode Akun", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        Html.TextBoxFieldObjFor(p=>p.Name,"Nama", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.Description,"Keterangan",delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+        Html.RadioButtonFieldObjFor(p=>p.GroupID,"Grup", groupRadio),
+        
+        Html.DropDownFieldObjFor(p=>p.CategoryID,"Kategori", ddlCategory),
+        Html.LabelFieldObjFor(p=>p.CategoryDescription,"Kategori",delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+        Html.RadioButtonFieldObjFor(p=>p.InvoicePaymentAccount,"Akun Pembayaran", invoicePaymentAccountRadio),
+        
+        Html.DecimalFieldObjFor(p=>p.BeginningBalance,"Saldo Awal"),
+        
+        Html.RadioButtonFieldObjFor(p=>p.IsActive,"Status", radioList),
+    };
+
+    var form = new Form();
+    form.Fields = formFields;
+}
+<script>
+    $(document).ready(function () {
+        window.initNumeric = function () {
+            $(".decimalNumeric").numeric({
+                decimal: "."
+            });
+            $(".decimalNumeric").focus(function () {
+                var temp = $(this);
+                setTimeout(function () {
+                    temp.select();
+                }, 100);
+            });
+        }
+    });
+</script>
+@Html.MasterForm(form, Model, mode, "Account", "ID", delegate(MasterFormHelper<AccountModel> helper)
+{
+    if (mode == UIMode.Detail)
+    {
+        if (!Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.CreateAnotherButton.Visible = false;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = false;
+        }
+
+        helper.DeleteButton.Visible = false;
+    }
+})

@@ -1,0 +1,52 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<CustomerModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","ID"),
+        Html.LabelColumn("Name","NAME"),
+        Html.LabelColumn("SalesRepName","SALES REP"),
+        Html.LabelColumn("WarehouseName","LOCATION"),
+        Html.LabelColumn("Phone","PHONE"),
+        Html.LabelColumn("ShippingAddress","SHIPPING ADDRESS"),
+        Html.LabelColumn("City","CITY"),
+        Html.LabelColumn("Address","ADDRESS"),
+        //Html.LabelColumn("IsActiveDescription","STATUS", "",delegate(GridColumn col){
+        //    col.SortField = "IsActive";
+        //}),
+        //Html.LabelColumn("Category","CATEGORY"),
+        //Html.LabelColumn("Status","STATUS"),
+    };
+
+    var warehouseList = ViewBag.WarehouseList as List<WarehouseModel>;
+    var ddlWarehouse = Util.GetDropDownOptions(warehouseList, "Name", "ID");
+    
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("ID","Code"),
+        Html.GenericFilterTextBoxField("NAME","Name"),
+        Html.GenericFilterDropDownField("LOCATION","WarehouseID", ddlWarehouse, typeof(long)),
+        Html.GenericFilterTextBoxField("CITY","City"),
+        Html.GenericFilterTextBoxField("ADDRESS","Address"),
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.DefaultObject = new CustomerModel();
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "Customer", "ID", "Name", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    if (Convert.ToBoolean(ViewBag.AllowCreate))
+    {
+        helper.AddNewButton.Visible = true;
+    }
+    else
+    {
+        helper.AddNewButton.Visible = false;
+    }
+})

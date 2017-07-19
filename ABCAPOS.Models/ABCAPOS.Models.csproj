@@ -1,0 +1,203 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D9FD2576-30D7-4347-A469-68E50335C957}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ABCAPOS.Models</RootNamespace>
+    <AssemblyName>ABCAPOS.Models</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MPL">
+      <HintPath>..\ABCAPOS.Util\DLL\MPL.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AccountCategoryModel.cs" />
+    <Compile Include="AccountConfigurationDetailModel.cs" />
+    <Compile Include="AccountConfigurationModel.cs" />
+    <Compile Include="AccountingModel.cs" />
+    <Compile Include="AccountingResultModel.cs" />
+    <Compile Include="AccountModel.cs" />
+    <Compile Include="AllowanceDetailModel.cs" />
+    <Compile Include="AllowanceModel.cs" />
+    <Compile Include="AnnualVATModel.cs" />
+    <Compile Include="AssemblyBuildDetailModel.cs" />
+    <Compile Include="AssemblyBuildModel.cs" />
+    <Compile Include="AssemblyUnBuildDetailModel.cs" />
+    <Compile Include="AssemblyUnBuildModel.cs" />
+    <Compile Include="AttendanceDetailModel.cs" />
+    <Compile Include="AttendanceModel.cs" />
+    <Compile Include="AttendanceSettingModel.cs" />
+    <Compile Include="BasePriceLocationModel.cs" />
+    <Compile Include="BinModel.cs" />
+    <Compile Include="BinProductWarehouseModel.cs" />
+    <Compile Include="BookingOrderDetailModel.cs" />
+    <Compile Include="BookingOrderModel.cs" />
+    <Compile Include="BookingSalesDetailModel.cs" />
+    <Compile Include="BookingSalesModel.cs" />
+    <Compile Include="CashSalesDetailModel.cs" />
+    <Compile Include="CashSalesModel.cs" />
+    <Compile Include="ContainerModel.cs" />
+    <Compile Include="CurrencyDateModel.cs" />
+    <Compile Include="CurrencyModel.cs" />
+    <Compile Include="CompanySettingModel.cs" />
+    <Compile Include="BillCreditModel.cs" />
+    <Compile Include="BillCreditDetailModel.cs" />
+    <Compile Include="ExpeditionDetailModel.cs" />
+    <Compile Include="ExpeditionModel.cs" />
+    <Compile Include="FormulasiModel.cs" />
+    <Compile Include="GenericModel\PSIDetailModel.cs" />
+    <Compile Include="GenericModel\PSIHeaderModel.cs" />
+    <Compile Include="InvoiceResiDetailModel.cs" />
+    <Compile Include="LimitStockModel.cs" />
+    <Compile Include="LogDetailModel.cs" />
+    <Compile Include="LogModel.cs" />
+    <Compile Include="MakeMultiPayModel.cs" />
+    <Compile Include="ApplyBillCreditDetailModel.cs" />
+    <Compile Include="ApplyCreditMemoModel.cs" />
+    <Compile Include="ApplyCreditMemoDetailModel.cs" />
+    <Compile Include="ApplyBillCreditModel.cs" />
+    <Compile Include="MakeMultiPayDetailModel.cs" />
+    <Compile Include="CreditMemoDetailModel.cs" />
+    <Compile Include="CreditMemoModel.cs" />
+    <Compile Include="MakeMultiPaySalesDetailModel.cs" />
+    <Compile Include="MakeMultiPaySalesModel.cs" />
+    <Compile Include="MultipleInvoiceItemModel.cs" />
+    <Compile Include="PostingUlangModel.cs" />
+    <Compile Include="Report\InvoiceAgingReportModel.cs" />
+    <Compile Include="Report\PurchaseBillAgingReport.cs" />
+    <Compile Include="Report\InvoiceMonthlyModel.cs" />
+    <Compile Include="Report\ReportBonusModel.cs" />
+    <Compile Include="Report\InvoiceByItemSumModel.cs" />
+    <Compile Include="Report\InvoiceBySalesRepDetailModel.cs" />
+    <Compile Include="Report\InvoiceBySalesRepModel.cs" />
+    <Compile Include="Report\ReportCreditMemoModel.cs" />
+    <Compile Include="Report\ReportOverdueModel.cs" />
+    <Compile Include="ResiBillDetailModel.cs" />
+    <Compile Include="ResiBillModel.cs" />
+    <Compile Include="ResiDetailModel.cs" />
+    <Compile Include="ResiModel.cs" />
+    <Compile Include="ResiPaymentDetailModel.cs" />
+    <Compile Include="ResiPaymentModel.cs" />
+    <Compile Include="ResiPriceDetailModel.cs" />
+    <Compile Include="ReturnReceiptDetailModel.cs" />
+    <Compile Include="ReturnReceiptModel.cs" />
+    <Compile Include="CustomerReturnDetailModel.cs" />
+    <Compile Include="CustomerReturnModel.cs" />
+    <Compile Include="StockMovementModel.cs" />
+    <Compile Include="VendorReturnDeliveryDetailModel.cs" />
+    <Compile Include="VendorReturnDeliveryModel.cs" />
+    <Compile Include="VendorReturnDetailModel.cs" />
+    <Compile Include="VendorReturnModel.cs" />
+    <Compile Include="ExpedisiModel.cs" />
+    <Compile Include="TransferReceiptDetailModel.cs" />
+    <Compile Include="TransferReceiptModel.cs" />
+    <Compile Include="UnitModel.cs" />
+    <Compile Include="UnitDetailModel.cs" />
+    <Compile Include="InventoryAdjustmentDetailModel.cs" />
+    <Compile Include="InventoryAdjustmentModel.cs" />
+    <Compile Include="DepartmentModel.cs" />
+    <Compile Include="ExpenseAccountingDetailModel.cs" />
+    <Compile Include="HomeNotificationDetailModel.cs" />
+    <Compile Include="HomeNotificationModel.cs" />
+    <Compile Include="CustomerGroupModel.cs" />
+    <Compile Include="CustomerModel.cs" />
+    <Compile Include="DeliveryOrderDetailModel.cs" />
+    <Compile Include="DeliveryOrderModel.cs" />
+    <Compile Include="IncomeAccountingDetailModel.cs" />
+    <Compile Include="IncomeExpenseDetailModel.cs" />
+    <Compile Include="IncomeExpenseModel.cs" />
+    <Compile Include="InvoiceDetailModel.cs" />
+    <Compile Include="InvoiceModel.cs" />
+    <Compile Include="ItemLocationModel.cs" />
+    <Compile Include="LastBuyPriceModel.cs" />
+    <Compile Include="MonthlyDataModel.cs" />
+    <Compile Include="MultipleInvoicingDetailModel.cs" />
+    <Compile Include="MultipleInvoicingModel.cs" />
+    <Compile Include="NotyModel.cs" />
+    <Compile Include="PaymentMethodModel.cs" />
+    <Compile Include="PaymentModel.cs" />
+    <Compile Include="PPh21ExpenseModel.cs" />
+    <Compile Include="PrefixSettingModel.cs" />
+    <Compile Include="PriceLevelModel.cs" />
+    <Compile Include="ProductDetailModel.cs" />
+    <Compile Include="ProductModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PurchaseBillDetailModel.cs" />
+    <Compile Include="PurchaseBillModel.cs" />
+    <Compile Include="PurchaseDeliveryDetailModel.cs" />
+    <Compile Include="PurchaseDeliveryModel.cs" />
+    <Compile Include="PurchaseOrderDetailModel.cs" />
+    <Compile Include="PurchaseOrderModel.cs" />
+    <Compile Include="PurchasePaymentModel.cs" />
+    <Compile Include="PurchaseReturnDetailModel.cs" />
+    <Compile Include="PurchaseReturnModel.cs" />
+    <Compile Include="RateModel.cs" />
+    <Compile Include="Report\AccountTransactionModel.cs" />
+    <Compile Include="Report\TrialBalanceReportModel.cs" />
+    <Compile Include="RoleDetailModel.cs" />
+    <Compile Include="RoleModel.cs" />
+    <Compile Include="SalesmanModel.cs" />
+    <Compile Include="SalesOrderDetailModel.cs" />
+    <Compile Include="SalesOrderModel.cs" />
+    <Compile Include="StaffModel.cs" />
+    <Compile Include="SupplierGroupModel.cs" />
+    <Compile Include="SupplierModel.cs" />
+    <Compile Include="TermsOfPaymentModel.cs" />
+    <Compile Include="TransferDeliveryDetailModel.cs" />
+    <Compile Include="TransferDeliveryModel.cs" />
+    <Compile Include="TransferOrderDetailModel.cs" />
+    <Compile Include="TransferOrderModel.cs" />
+    <Compile Include="UserModel.cs" />
+    <Compile Include="VendorModel.cs" />
+    <Compile Include="WarehouseModel.cs" />
+    <Compile Include="WorkOrderDetailModel.cs" />
+    <Compile Include="WorkOrderModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ABCAPOS.Util\ABCAPOS.Util.csproj">
+      <Project>{5CFC4A51-316A-418E-B7BF-7D9A2DEA59E7}</Project>
+      <Name>ABCAPOS.Util</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

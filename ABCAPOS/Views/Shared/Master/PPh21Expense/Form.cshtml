@@ -1,0 +1,47 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model PPh21ExpenseModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    var yearList = ViewBag.YearList as List<object>;
+    var ddlYear = Util.GetDropDownOptions(yearList, "Text", "Value");
+    
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        
+        Html.DropDownFieldObjFor(p=>p.StrYear,"Tahun", ddlYear,delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.HiddenField;
+            //f.GenerateHiddenField = true;
+        }),
+        Html.LabelFieldObjFor(p=>p.Year,"Tahun",delegate(FormField f){
+            f.CreateFieldType = FormFieldType.None;
+            //f.GenerateHiddenField = true;
+        }),
+        
+        Html.DecimalFieldObjFor(p=>p.Amount,"Jumlah Per Bulan")
+    };
+
+    var form = new Form();
+    form.Fields = formFields;
+
+}
+@Html.MasterForm(form, Model, mode, "PPh21Expense", "ID", delegate(MasterFormHelper<PPh21ExpenseModel> helper)
+{
+    if (mode == UIMode.Detail)
+    {
+        if (!Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.CreateAnotherButton.Visible = false;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = false;
+        }
+
+        helper.DeleteButton.Visible = false;
+    }
+})

@@ -1,0 +1,59 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<ProductModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("ItemLocationID"),
+        Html.HiddenFieldColumn("ProductID"),
+        Html.LabelColumn("Code","ITEM",""),
+        Html.LabelColumn("ProductName","Product Name",""),
+        Html.LabelColumn("LocationName","Location",""),
+        Html.LabelColumn("UnitName","Unit",""),
+        Html.DecimalColumn("Qty_Minimum","Qty Minimum","",delegate(GridColumn col){
+            col.DetailFormat = "N2";
+        }),
+        Html.LabelColumn("QtyOnHand","Qty On Hand","",delegate(GridColumn col){
+            col.DetailFormat = "N2";
+        }),
+        Html.LabelColumn("PercentageText","Presentase","",delegate(GridColumn col){
+            col.DetailFormat = "N2";
+        }),
+    };
+
+
+    var warehouseList = ViewBag.WarehouseList as List<WarehouseModel>;
+    var ddlWarehouse = Util.GetDropDownOptions(warehouseList, "Name", "ID");
+
+    //var warehouseList = ViewBag.WarehouseList as List<ProductModel>;
+    //var ddlWarehouse = Util.GetDropDownOptions(warehouseList, "Location", "Location");
+
+    
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("ITEM","Code"),
+        Html.GenericFilterTextBoxField("NAMA PRODUK","ProductName"),
+        Html.GenericFilterDropDownField("LOCATION","LocationID", ddlWarehouse, typeof(long)),
+        
+    };
+
+    var createButton = new GridButtonColumn();
+    createButton.CssClass = "iconContainer";
+    createButton.ButtonCssClass = "add imageButton";
+    createButton.Href = Url.Content("~/WorkOrder/Create?productID=@idPropertyValue");
+    createButton.IDPropertyName = "ProductID";
+    createButton.Text = "Add";
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(createButton);
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "ListPendingWorkOrder", "ProductID", "ItemLocationID", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+    {
+        helper.AddNewButton.Visible = false;
+    })

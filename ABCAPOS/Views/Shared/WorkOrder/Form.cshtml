@@ -1,0 +1,610 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@using ABCAPOS;
+@model WorkOrderModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+    ViewBag.ErrorMessage = "";
+
+    var action = "";
+
+    /* Declarasi variable */
+    var staffList = ViewBag.StaffList as IEnumerable<StaffModel>;
+    var ddlStaff = Util.GetDropDownOptions(staffList, "Name", "ID");
+
+    //var ConversionList = ViewBag.Conversion as IEnumerable<FormulasiModel>;
+    var ddlConversion = new List<DropDownOption>();
+    
+    var formFields2 = new MPL.MVC.FormField[]{
+        Html.LabelFieldObjFor(p=>p.WarehouseName,"LOCATION",delegate(FormField f){
+            //f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        })
+    };
+
+   var formFields3 = new MPL.MVC.FormField[]
+   {
+        Html.TextBoxFieldObjFor(p=>p.EmployeeName,"EMPLOYEE",delegate(FormField f){
+            f.Style = "width:300px";
+        }),    
+   };
+
+    var formFields4 = new MPL.MVC.FormField[]
+   {
+       Html.LabelFieldObjFor(p=>p.DepartmentName,"DEPARTMENT",delegate(FormField f){
+           //f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+       }),
+   };
+
+    var formFields5 = new MPL.MVC.FormField[]
+   {
+       Html.TextAreaFieldObjFor(p=>p.Notes,"Notes",delegate(FormField f){
+           f.Style = "width:300px";
+       }),
+   };
+    /* end Declarasi variable */
+
+
+    /* form inputan */
+    var formFields = new List<IFormField>()
+   {
+       Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+       Html.HiddenFieldFieldObjFor(p=>p.ProductID,""),
+       Html.HiddenFieldFieldObjFor(p=>p.EmployeeID,""),
+       Html.HiddenFieldFieldObjFor(p=>p.Status,""),
+       Html.HiddenFieldFieldObjFor(p=>p.ConversionID,""),
+       Html.HiddenFieldFieldObjFor(p=>p.DepartmentID,""),
+       Html.HiddenFieldFieldObjFor(p=>p.WarehouseID,""),
+       
+       Html.LabelFieldObjFor(p=>p.SalesOrderID,"SO ID",delegate(FormField F){
+           F.CreateFieldType = F.UpdateFieldType = F.DetailFieldType = FormFieldType.HiddenField;
+       }),
+        Html.LabelFieldObjFor(p=>p.CustomerID,"Customer ID",delegate(FormField F){
+           F.CreateFieldType = F.UpdateFieldType = F.DetailFieldType = FormFieldType.HiddenField;
+       }),
+       /* Primary information */
+       Html.FullRowFormFieldObj("<br/><b>Primary Information</b><br/>","<br/><b>Primary Information</b><br/>","<br/><b>Primary Information</b><br/>"),
+       
+       Html.LabelFieldObjFor(p=>p.Code,"WO NUMBER",delegate(FormField F){
+           F.UpdateFieldType = FormFieldType.Label;
+           F.GenerateHiddenField = true;
+       }),
+       
+       Html.LabelFieldObjFor(p=>p.SalesOrderCode,"SO CODE",delegate(FormField F){
+       }),
+       
+       Html.LabelFieldObjFor(p=>p.CustomerName,"CUSTOMER",delegate(FormField F){
+       }),
+        
+       Html.TextBoxFieldObjFor(p=>p.ProductCode,"ITEM",delegate(FormField f){
+           f.Style = "width:300px";
+       }),
+       
+       Html.LabelFieldObjFor(p=>p.ProductName,"PRODUCT NAME",delegate(FormField f){
+           f.Style = "width:300px";
+       }),
+       
+       //Html.DualColumnFormFieldObj(
+        Html.LabelFieldObjFor(p=>p.ConversionName,"UNIT",delegate(FormField f){
+            //f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+       }),
+       
+       Html.DateFieldObjFor(p=>p.Date,"TANGGAL",delegate(FormField F){
+           F.DetailFormat = "MM/dd/yyyy";
+           F.CreateFormat = F.UpdateFormat = "MM/dd/yyyy";
+           F.Style = "width:300px";
+       }),
+       
+       Html.DecimalFieldObjFor(p=>p.QtyWO,"QUANTITY WO",delegate(FormField f){
+            f.Style = "width:150px";
+            f.Attributes = " onKeyUp=\"recalcQtyFormulasi()\" ";
+            f.CreateFormat = f.UpdateFormat = "F2";
+            f.DetailFormat = "N2";
+       }),
+      
+           //20
+       //),
+       
+       Html.LabelFieldObjFor(p=>p.QtyBuilt,"QUANTITY BUILT",delegate(FormField f){
+           f.DetailFormat = "N2";
+       }),
+       /* end primary information */
+       
+       /* Clasifications */
+       Html.FullRowFormFieldObj("<br/>","<br/>","<br/>"),
+       Html.FullRowFormFieldObj("<br/><b>Clasifications</b><br/>","<br/><b>Clasifications</b><br/>","<br/><b>Clasifications</b><br/>"),
+       
+       Html.DualColumnFormFieldObj(formFields2,formFields3,20),
+       Html.DualColumnFormFieldObj(formFields4,formFields5,20),
+       
+        Html.DualColumnFormFieldObj(
+            Html.LabelFieldObjFor(p=>p.StatusCreated,"CREATED BY", delegate(FormField f)
+            {
+                f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+            }),
+        
+            Html.LabelFieldObjFor(p=>p.StatusModified,"LAST MODIFIED BY", delegate(FormField f)
+            {
+                f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+            }),20
+        ),
+       
+       Html.LabelFieldObjFor(p=>p.StatusDescription,"STATUS",delegate(FormField f){
+           f.CreateFieldType = f.UpdateFieldType = FormFieldType.None; 
+       }),
+       
+       Html.LabelFieldObjFor(p=>p.VoidRemarks,"VOID REMARKS",delegate(FormField f){
+           f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+           
+           if(string.IsNullOrEmpty(Model.VoidRemarks))
+           {
+               f.DetailFieldType = FormFieldType.None;
+           }
+       }),
+       /* end Clasifications */
+   };
+    /* end form inputan */
+    /*subtab item*/
+   var gridColumns = new List<GridColumn>()
+   {
+       Html.HiddenFieldColumn("ItemNo"),
+       //Html.HiddenFieldColumn("ProductDetailID"),
+       Html.HiddenFieldColumn("ProductID"),
+       Html.HiddenFieldColumn("StockQtyHidden"),
+       Html.HiddenFieldColumn("StockAvailableHidden"),
+       
+       Html.HiddenFieldColumn("ConversionIDTemp","","",delegate(GridColumn col){
+            col.CreateColumnType = col.DetailColumnType = GridColumnType.None;
+       }),
+       
+       
+       Html.LabelColumn("ItemTypeID", "", "0px", delegate(GridColumn g){
+           g.CreateColumnType = g.UpdateColumnType = g.DetailColumnType = GridColumnType.HiddenField;
+       }),
+       
+       Html.LabelColumn("ProductDetailID", "", "0px", delegate(GridColumn g){
+           g.CreateColumnType = g.UpdateColumnType = g.DetailColumnType = GridColumnType.HiddenField;
+       }),
+       //Html.HiddenFieldColumn("ItemTypeID"),
+       //Html.HiddenFieldColumn("ConversionIDTemp","","",delegate(GridColumn col){
+       //    col.CreateColumnType = col.DetailColumnType = GridColumnType.None;
+       //}),
+       
+        Html.TextBoxColumn("ProductCode","ITEM*","",delegate(GridColumn col){
+            col.InitAutoCompleteFunctionName = "initProductAutoComplete";
+        }),
+        
+       Html.LabelColumn("ProductName","NAME","",delegate(GridColumn col){
+           col.GenerateHiddenField = true;
+       }),
+       
+       Html.LabelColumn("QtyOnHand","ON HAND","100px",delegate(GridColumn col){
+           col.GenerateHiddenField = true;
+           col.DetailFormat = "N2";
+           col.CreateFormat = col.UpdateFormat = "N2";
+       }),
+       Html.LabelColumn("QtyAvailable","AVAILABLE","100px",delegate(GridColumn col){
+           col.GenerateHiddenField = true;
+           col.DetailFormat = "N2";
+           col.CreateFormat = col.UpdateFormat = "N2";
+       }),
+       
+       
+       Html.DecimalColumn("Qty","QUANTITY","200px",delegate(GridColumn col){
+           //col.Attributes = " onchange=\"recalcQtyFormulasi()\" ";
+           col.DetailFormat = "N5";
+           col.CreateFormat = col.UpdateFormat = "F5";
+       }),
+       
+       Html.LabelColumn("UsedInBuilt","Used In Build","200px",delegate(GridColumn col){
+           col.DetailFormat = "N2";
+           col.CreateFormat = col.UpdateFormat = "F2";
+       }),
+       
+        Html.DropDownColumn("ConversionID", "UNIT", ddlConversion,"90px", delegate(GridColumn col){
+            //col.ItemAttributes = " onchange=\"setUnitChange($(this).parent().parent().index())\" ";
+            col.DetailColumnType = GridColumnType.None;
+            col.GenerateHiddenField = true;
+        }),
+        Html.LabelColumn("ConversionName", "UNIT", "90px", delegate(GridColumn col){
+            col.CreateColumnType = col.UpdateColumnType = GridColumnType.None;
+        }),
+        Html.TextBoxColumn("BatchNo","BATCH NO","",delegate(GridColumn col){
+        }),
+        Html.LabelColumn("SpesialOrder","SPESIAL ORDER","80px",delegate(GridColumn col){
+        }),
+        
+   };
+    /*end subtab*/
+
+
+   var addNewButton = new Button();
+   addNewButton.CssClass = "button";
+   addNewButton.Text = "Add";
+   addNewButton.OnClick = "addGrid1Row()";
+   addNewButton.ID = "btnAddNew";
+   addNewButton.Href = "#btnAddNew";
+   addNewButton.Visible = mode != UIMode.Detail;
+   
+   
+    var Grid = new Grid();
+    Grid.IncludeAddRowScript = true;
+    Grid.IncludeDeleteRowButton = true;
+    Grid.DefaultObject = new WorkOrderDetailModel();
+    Grid.Columns = gridColumns;
+    Grid.ShowFooter = false;
+    Grid.AllowSorting = false;
+    Grid.BelowButtons.Add(addNewButton);
+    //Grid.BelowButtons.Add(BOMButton);
+
+    var BuildGridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("ID","Assembly Build ID","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("Code", "Build Code", "150px"),
+        Html.DateColumn("Date", "DATE", "120px",delegate(GridColumn col){
+            col.DetailFormat = "dd/MM/yyyy";
+        }),
+        Html.LabelColumn("WorkOrderCode", "WO Code", "150px"),
+        Html.LabelColumn("ProductCode", "Product Code", ""),
+        Html.LabelColumn("ProductName", "Item Name"),
+        Html.LabelColumn("QtyWO", "Qty WO", "120px",delegate (GridColumn col){
+            col.DetailFormat = "N2";
+        }),
+        Html.LabelColumn("QtyBuild", "Qty Build", "120px",delegate (GridColumn col){
+            col.DetailFormat = "N2";
+        }),
+        Html.LabelColumn("QtyActual", "Qty Actual", "120px",delegate (GridColumn col){
+            col.DetailFormat = "N2";
+        }),
+        Html.LabelColumn("QtyLost", "Qty Lost", "120px",delegate (GridColumn col){
+            col.DetailFormat = "N2";
+        }),
+    };
+
+    var BuildGrid = new Grid();
+    BuildGrid.ID = "BuildGrid";
+    BuildGrid.DataContainerName = "buildDetails";
+    BuildGrid.IncludeAddRowScript = false;
+    BuildGrid.IncludeDeleteRowButton = false;
+    BuildGrid.Columns = BuildGridColumns;
+    BuildGrid.ShowFooter = false;
+    BuildGrid.AllowSorting = false;
+
+    TabbedGrid tabbedGrid = new TabbedGrid();
+    if (mode == UIMode.Detail)
+    {
+        tabbedGrid.AddGrid("Build", BuildGrid, ViewBag.BuildList);
+    }
+
+  
+    
+    var form = new Form();
+    form.Fields = formFields;
+    var textBoxName = "Details_@index_ProductCode";
+    var serviceUrl = Url.Content("~/WebService.asmx/RetrieveAllProductsByKey");
+    var retrieveSingleUrl = Url.Content("~/WebService.asmx/RetrieveProductByCode");
+
+    //TabbedGrid tabbedGrid = new TabbedGrid();
+    //tabbedGrid.AddGrid("Item", Grid, ViewBag.WorkOrderList);
+}
+<script type="text/javascript">
+
+    function onSelectEmployee(data) {
+        $("#hdnEmployeeID").val(data.ID);
+        $("#lblEmployeeName").text(data.Name);
+    }
+
+    function onSelectProduct(data, index) {
+        var productID = $("#hdnProductID").val();
+        $.ajax({
+            type: "POST",
+            async: true,
+            url: "/Webservice.asmx/GetUnitsByProductID",
+            data: "{productID: " + data.ID + "}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (validUnit) {
+                $("#Details_" + index + "_ConversionName").replaceWith("<select id='Details_" + index + "_ConversionID' name='Details[" + index + "].ConversionID'></select>");
+                $("#Details_" + index + "_ConversionID").empty();
+                $.each(validUnit.d, function (key, val) {
+                    var option = document.createElement('option');
+                    option.text = val.Name;
+                    option.value = val.ID;
+                    $("#Details_" + index + "_ConversionID").append(option);
+                });
+                var ddl = document.getElementById("Details_" + index + "_ConversionID");
+                var opts = ddl.options.length;
+                for (var i = 0; i < opts; i++) {
+                    if (ddl.options[i].value == data.conversionIDTemp) {
+                        //alert(data.conversionIDTemp);
+                        ddl.options[i].selected = true;
+                        break;
+                    }
+                }
+
+                $("#Details_" + index + "_ProductDetailID").val(data.ID);
+                $("#Details_" + index + "_ProductID").val(productID);
+                $("#Details_" + index + "_ProductCode").val(data.Code);
+                $("#Details_" + index + "_ProductName").text(data.ProductName);
+                $("#Details_" + index + "_QtyOnHand").text(data.StockQty);
+                $("#Details_" + index + "_QtyAvailable").text(data.StockAvailable);
+                //$("#Details_" + index + "_ConversionName").text(data.UnitTypeName);
+            }
+        });
+    }
+
+    function onSelectProductWO(data) {
+        $("#hdnProductID").val(data.ID);
+        $("#txtProductCode").val(data.Code);
+        $("#lblProductName").text(data.ProductName);
+        $("#lblConversionName").text(data.UnitTypeName);
+        var ProductID = $("#hdnProductID").val(data.ID);
+        window.location.href = "/WorkOrder/Create?productID=" + data.ID;
+        //Url.Content("~/WorkOrder/Create?productID=" + ProductID );
+    }
+
+
+    function getUnitOnProduct(index) {
+        var productID = $("#Details_" + index + "_ProductDetailID").val();
+        var conversionIDTemp = $("#hdn_ConversionID_" + index).val();
+        $.ajax({
+            type: "POST",
+            async: true,
+            url: "/Webservice.asmx/GetUnitsByProductID",
+            data: "{productID: " + productID + "}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (validUnit) {
+                $("#Details_" + index + "_ConversionID").empty();
+                $.each(validUnit.d, function (key, val) {
+                    var option = document.createElement('option');
+                    option.text = val.Name;
+                    option.value = val.ID;
+                    $("#Details_" + index + "_ConversionID").append(option);
+                });
+                var ddl = document.getElementById("Details_" + index + "_ConversionID");
+                var opts = ddl.options.length;
+                for (var i = 0; i < opts; i++) {
+                    //console.log(ddl.options[i].value + " " + conversionIDTemp);
+                    if (ddl.options[i].value == conversionIDTemp) {
+                        ddl.options[i].selected = true;
+                        break;
+                    }
+                }
+            }
+        });
+
+    }
+
+    function setUnitChange() {
+        var noOfRows = $("#Grid1 tbody tr").length;
+        var mode = $("#hdnMode").val();
+        if (mode == "Create" || mode == "Update") {
+            for (x = 0; x < noOfRows; x++) {
+                getUnitOnProduct(x);
+                //getStockQtyHidden(x);
+            }
+        }
+    }
+
+    function recalcQtyFormulasi() {
+        var rowCount = $('#Grid1 tbody tr').length;
+        var QtyFormulasi = 0;
+
+        var qtyWO = parseFloat($("#txtQtyWO").val());
+
+        if (qtyWO == 0)
+            qtyWO = 1;
+
+        if (qtyWO == "")
+            qtyWO = 1;
+
+        var mode = $("#hdnMode").val();
+
+        if (mode == "Create" || mode == "Update") {
+
+            for (x = 0; x < rowCount; x++) {
+                //var productQty = parseFloat($("#Details_" + x + "_StockQtyHidden").val().replaceAll(',', '').replaceAll('.', ','));
+                var productQty = parseFloat($("#Details_" + x + "_StockQtyHidden").val());
+                //alert(productQty);
+                //QtyFormulasi += qty;
+
+                var qty = productQty * qtyWO;
+
+                if (isNaN(qty))
+                    qty = 0;
+
+
+                $("#Details_" + x + "_Qty").val(qty.toFixed(5));
+                //addUrl(x);
+
+            }
+        }
+    }
+
+    function addTooltip() {
+        var noOfRows = $("#Grid1 tbody tr").length;
+        var mode = $("#hdnMode").val();
+
+        if (mode == "Detail") {
+
+            for (x = 0; x < noOfRows; x++) {
+                var buildID = $("#buildDetails_" + x + "_ID").val();
+                var buildCode = $("#buildDetails_" + x + "_Code").text();
+                var buildLink = "/AssemblyBuild/Detail?key=" + buildID;
+
+                $("#buildDetails_" + x + "_Code").replaceWith('<a href="' + buildLink + '" style="color: #505abc;">' + buildCode + '</a>');
+                addUrl(x);
+            }
+        }
+    }
+
+    function addSOUrl() {
+        var mode = $("#hdnMode").val();
+
+        if (mode == "Detail" || mode == "Create") {
+
+            var soID = $("#hdnSalesOrderID").val();
+            var soCode = $("#lblSalesOrderCode").text();
+            var soLink = "/SalesOrder/Detail?key=" + soID;
+            $("#lblSalesOrderCode").replaceWith('<a href="' + soLink + '">' + soCode + '</a>');
+        }
+    }
+
+    function addUrl(index) {
+        //var qtyAvail = parseFloat($("#Details_" + index + "_QtyAvailable").text().replaceAll(',', '').replaceAll('.', ','));
+        var qtyAvail = parseFloat($("#Details_" + index + "_QtyAvailable").text());
+        var ItemTypeID = parseFloat($("#Details_" + index + "_ItemTypeID").val());
+        //var SpesialOrder = parseFloat($("#Details_" + index + "_ItemTypeID").text());
+        var qty = parseFloat($("#Details_" + index + "_Qty").text().replaceAll(',', '').replaceAll('.', ','));
+       
+        if (qty > qtyAvail) {
+            var prodID = $("#Details_" + index + "_ProductDetailID").val();
+            //alert(prodID);
+            if (ItemTypeID == 3 || ItemTypeID == 4) {
+                var woLink = "/WorkOrder/Create?productID=" + prodID;
+                $("#Details_" + index + "_SpesialOrder").replaceWith('<a href="' + woLink + '">Order</a>');
+            }
+            else if (ItemTypeID == 1 || ItemTypeID == 2) {
+                var poLink = "/PurchaseOrder/Create?productID=" + prodID;
+                $("#Details_" + index + "_SpesialOrder").replaceWith('<a href="' + poLink + '">Order</a>');
+            }
+        }
+    }
+
+    $(document).ready(function () {
+        window.initNumeric = function () {
+            $(".decimalNumeric").numeric({
+                decimal: "."
+            });
+            $(".decimalNumeric").focus(function () {
+                var temp = $(this);
+                setTimeout(function () {
+                    temp.select();
+                }, 100);
+            });
+            $(".integerNumeric").numeric(false, function () { this.value = ""; this.focus(); });
+        }
+
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+
+        $("#btnVoid").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                .addClass("dialog")
+                .attr("id", $(this).attr("data-dialog-id"))
+                .appendTo("body").dialog({
+                    title: "Void Remarks",
+                    close: function () {
+                        $(this).remove();
+                    },
+                    modal: true,
+                    height: 180,
+                    width: 700,
+                    left: 0
+                }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+
+        var action = $("#hdnAction").val();
+        $("[name='lnkAddNewGrid1']").hide();
+
+        if (action == "Create")
+            recalcQtyFormulasi();
+
+        addTooltip();
+        setUnitChange();
+        addSOUrl();
+       
+    });
+
+    
+</script>
+<input type="hidden" id="hdnAction" value="@action" />
+<input type="hidden" id="hdnMode" value="@ViewBag.Mode" />
+@Html.AutoCompleteScript("initProductAutoCompleteWO", "txtProductCode", Url.Content("~/WebService.asmx/RetreiveProductWorkOrder"), "",
+                Url.Content("~/WebService.asmx/RetrieveProductByProductCode"), "productCode", "Code", "ProductName", "onSelectProductWO", 50, 500)
+@Html.GridAutoCompleteScript("initProductAutoComplete", "Grid1", textBoxName, serviceUrl, "", retrieveSingleUrl,
+                "productCode", "Code", "ProductName", "onSelectProduct", 50, 500)
+@Html.AutoCompleteScript("initEmployeeAutoComplete", "txtEmployeeName", Url.Content("~/WebService.asmx/RetrieveEmployeeByKey"), "",
+                Url.Content("~/WebService.asmx/RetrieveEmployee"), "employeeName", "Name", "RoleDescription", "onSelectEmployee", 50, 500)
+@Html.MasterDetailForm(form, Grid, Model, Model.Details, mode, "WorkOrder", "ID", delegate(MasterDetailFormHelper helper)
+{
+    helper.DetailGridTitle = "Item";
+    helper.TabbedGrid = tabbedGrid;
+
+    helper.VoidButton.Href = Url.Content("~/WorkOrder/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+    helper.VoidButton.OnClick = "";
+    helper.VoidButton.ID = "btnVoid";
+
+    helper.CreateAnotherButton.Visible = false;
+    helper.CopyTransactionButton.Visible = false;
+
+    if (mode == UIMode.Detail)
+    {
+        helper.BackToListButton.Href = Url.Content("~/WorkOrder");
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.CreateAnotherButton.Visible = false;
+            helper.CopyTransactionButton.Visible = false;
+            helper.SubmitButton.Visible = false;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+        }
+        else
+        {
+            if (Model.Status==(int)WorkOrderStatus.FullyBuild)
+            {
+                helper.EditButton.Visible = false;
+            }
+            else
+            {
+                helper.EditButton.Visible = mode == UIMode.Detail && Model.Status != (int)MPL.DocumentStatus.Void;
+                helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = false;
+            }
+            
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowVoid))
+        {
+            helper.VoidButton.Visible = false;
+        }
+        else
+        {
+            helper.ApproveButton.Visible = mode == UIMode.Detail && Model.Status == (int)MPL.DocumentStatus.New;
+            
+            if (mode == UIMode.Detail && Model.Status == (int)WorkOrderStatus.New)
+            {
+                helper.VoidButton.Visible = true;
+            }
+            else if (mode == UIMode.Detail && Model.Status == (int)WorkOrderStatus.Void)
+            {
+                helper.VoidButton.Visible = false;
+            }
+            else if (mode == UIMode.Detail && Model.Status == (int)WorkOrderStatus.FullyBuild)
+            {
+                helper.VoidButton.Visible = false;
+            }
+            else if (mode == UIMode.Detail && Model.Status == (int)WorkOrderStatus.Approved)
+            {
+                helper.VoidButton.Visible = true;
+            }
+        }
+    }
+    
+})

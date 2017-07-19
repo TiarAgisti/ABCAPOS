@@ -1,0 +1,12 @@
+﻿<Report Title="Daftar Invoice">
+  <Columns>
+    <Column Field="Code" HeaderText="# Invoice" Width=".8"/>
+    <Column Field="Date" HeaderText="Tanggal" Width=".8"/>
+    <Column Field="CustomerName" HeaderText="Nama Customer" Width="2.25"/>
+    <Column Field="DeliveryOrderCode" HeaderText="# Delivery Order" Width=".8"/>
+    <Column Field="SalesOrderCode" HeaderText="# Sales Order" Width=".8"/>
+    <Column Field="Amount" HeaderText="Jumlah Sebelum Pajak" Width=".8"/>
+    <Column Field="TaxAmount" HeaderText="Pajak" Width=".8"/>
+    <Column Field="GrandTotal" HeaderText="Jumlah" Width="1"/>
+  </Columns>
+</Report>

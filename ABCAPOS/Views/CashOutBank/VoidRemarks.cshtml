@@ -1,0 +1,37 @@
+﻿@using ABCAPOS.Models
+@model IncomeExpenseModel
+@{
+    Layout = null;
+}
+<script type="text/javascript">
+    function voidDocument() {
+        var agree = confirm('Apakah Anda yakin ingin membatalkan dokumen ini?');
+
+        if (agree) {
+            $('#voidForm').submit();
+        }
+    }
+</script>
+<form id="voidForm" action="@Url.Content("~/CashOutBank/VoidRemarks?key=" + Model.ID)" method="post" >
+<input type="hidden" name="ID" value="@Model.ID" />
+<input type="hidden" name="hdnVoidFromIndex" value="@ViewBag.VoidFromIndex" />
+<table class="basic">
+    <tr>
+        <td style="vertical-align: top; width: 120px">
+            Alasan Void
+        </td>
+        <td style="vertical-align: top" class="separatorColumn">
+            :
+        </td>
+        <td>
+            @Html.TextAreaFor(p => p.VoidRemarks, new { style = "width:500px" })
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <input type="button" class="button" value="Simpan" onclick="voidDocument();" />
+            <input type="button" class="button" value="Batal" id="btnCloseVoidForm" />
+        </td>
+    </tr>
+</table>
+</form>

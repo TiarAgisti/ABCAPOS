@@ -1,0 +1,135 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<CashSalesModel>
+@{
+    var dataCount = (int)ViewBag.DataCount;
+    var pageSize = (int)ViewBag.PageSize;
+    var startIndex = (int)ViewBag.StartIndex;
+    var selectedPage = startIndex / pageSize + 1;
+    var pageAmount = (dataCount / 20);
+
+    if (dataCount % 20 != 0)
+    {
+        pageAmount += 1;
+    }
+
+    var statement = string.Format("Page: {0} of {1}", selectedPage, pageAmount);
+
+    var gridColumns = new List<GridColumn>()
+    {
+        // Html.LabelColumn("ID","ID","",delegate(GridColumn col){
+        //    col.DetailColumnType = GridColumnType.HiddenField;
+        //}),
+        Html.DateColumn("Date","DATE"),
+        Html.LabelColumn("Code","NO CS","180px"),
+        Html.LabelColumn("CustomerName","CUSTOMER"),
+        Html.LabelColumn("WarehouseName","LOCATION"),
+        Html.LabelColumn("StatusDescription","STATUS", "",delegate(GridColumn col){
+            col.SortField = "Status";
+        }),
+        Html.LabelColumn("Title","MEMO"),
+        Html.HiddenFieldColumn("IsPayable")
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("TRANSACTION DATE","Date", delegate(GenericFilterField gf){
+            //gf.Value = DateTime.Now.ToShortDateString();
+            //gf.Value1 = DateTime.Now.ToShortDateString();
+        }),
+        Html.GenericFilterTextBoxField("NO SO","Code"),
+        Html.GenericFilterTextBoxField("CUSTOMER","CustomerName"),
+        Html.GenericFilterTextBoxField("LOCATION","WarehouseName"),
+        Html.GenericFilterTextBoxField("STATUS","StatusDescription"),
+        
+    };
+
+    var detailButton = new GridButtonColumn();
+    detailButton.CssClass = "iconContainer";
+    detailButton.ButtonCssClass = "details imageButton";
+    detailButton.Href = Url.Content("~/CashSales/Detail?key=@idPropertyValue");
+    detailButton.IDPropertyName = "ID";
+    detailButton.Text = "Detail";
+
+    var printButton = new GridButtonColumn();
+    //var so = CashSalesModel();
+    printButton.CssClass = "iconContainer";
+    printButton.ButtonCssClass = "print imageButton";
+    printButton.OnClick = String.Format("window.open('{0}');", Url.Action("PopUp", "ReportViewer", new { type = ABCAPOS.Controllers.ReportViewerController.PrintOutType.Invoice, queryString = SystemConstants.str_CashSalesID + "=@idPropertyValue" }));
+    printButton.IDPropertyName = "ID";
+    printButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        return true;
+    };
+    printButton.Text = "Print";
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(detailButton);
+    grid.Buttons.Add(printButton);
+
+}
+<script type="text/javascript">
+    $(function () {
+        $("[name='lnkAddNewGrid1']").hide();
+
+        $(".cancel").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                .addClass("dialog")
+                .attr("id", $(this).attr("data-dialog-id"))
+                .appendTo("body").dialog({
+                    title: "Void Remarks",
+                    close: function () {
+                        $(this).remove();
+                    },
+                    modal: true,
+                    height: 180,
+                    width: 700,
+                    left: 0
+                }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+
+        if ($.urlParam('filter.FilterFields%5B0%5D.Selected') == null) {
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+            var yyyy = today.getFullYear();
+
+            today = mm + '/' + dd + '/' + yyyy;
+            $("#filter_FilterFields_0_Value").val(today);
+        }
+    });
+    $(document).ready(function () {
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+    });
+</script>
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "CashSales", "ID", "Code", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+    {
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.AddNewButton.Visible = true;
+        }
+        else
+        {
+            helper.AddNewButton.Visible = false;
+        }
+    })
+<br />
+@statement

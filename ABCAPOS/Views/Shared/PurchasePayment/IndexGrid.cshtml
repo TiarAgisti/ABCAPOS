@@ -1,0 +1,111 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<PurchasePaymentModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("PurchaseOrderID","Purchase Order ID","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("InvoiceID","Invoice ID","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("Code","BILL PAYMENT NUMBER","120px"),
+        Html.DateColumn("Date","DATE"),
+        Html.LabelColumn("PurchaseOrderCode","PO NUMBER","120px"),
+        Html.LabelColumn("PurchaseBillCode","BILL NUMBER","120px"),
+        Html.LabelColumn("VendorName","VENDOR"),
+        Html.DecimalColumn("Amount","JUMLAH", "",delegate(GridColumn col){
+            col.DetailFormat = "N2";
+        }),
+        //Html.LabelColumn("StatusDescription","Status", "",delegate(GridColumn col){
+        //    col.SortField = "Status";
+        //})
+    };
+
+    var statusList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)MPL.DocumentStatus.New), Text = MPL.DocumentStatus.New.ToString() },
+        new DropDownOption(){ Value = Convert.ToString((int)MPL.DocumentStatus.Approved), Text = MPL.DocumentStatus.Approved.ToString() },
+        new DropDownOption(){ Value = Convert.ToString((int)MPL.DocumentStatus.Void), Text = MPL.DocumentStatus.Void.ToString() },
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("DATE","Date"),
+        Html.GenericFilterTextBoxField("BILL PAYMENT NUMBER","Code"),
+        Html.GenericFilterTextBoxField("PO NUMBER","PurchaseOrderCode"),
+        Html.GenericFilterTextBoxField("VENDOR","VendorName"),
+        //Html.GenericFilterDropDownField("Status","Status",statusList,typeof(int))
+    };
+
+    var detailButton = new GridButtonColumn();
+    detailButton.CssClass = "iconContainer";
+    detailButton.ButtonCssClass = "details imageButton";
+    detailButton.Href = Url.Content("~/PurchasePayment/Detail?key=@idPropertyValue");
+    detailButton.IDPropertyName = "ID";
+    detailButton.Text = "Detail";
+    
+    var voidButton = new GridButtonColumn();
+    voidButton.CssClass = "iconContainer";
+    voidButton.ButtonCssClass = "cancel imageButton";
+    voidButton.Href = Url.Content("~/PurchasePayment/VoidRemarks?key=@idPropertyValue&voidFromIndex=true");
+    voidButton.IDPropertyName = "ID";
+    voidButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var PurchasePayment = obj as PurchasePaymentModel;
+
+        if (PurchasePayment.Status != (int)PurchasePaymentStatus.Void)
+            return true;
+
+        return false;
+    };
+    voidButton.Text = "Void";
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+
+    if (Convert.ToBoolean(ViewBag.AllowVoid))
+    {
+        grid.Buttons.Add(detailButton);
+        grid.Buttons.Add(voidButton);
+    }
+    
+}
+<script type="text/javascript">
+    $(function () {
+        addTooltip();
+    });
+
+    function addTooltip() {
+        var noOfRows = $("#Grid1 tbody tr").length;
+
+        for (x = 0; x < noOfRows; x++) {
+            var purchaseOrderID = $("#Details_" + x + "_PurchaseOrderID").val();
+            var purchaseOrderCode = $("#Details_" + x + "_PurchaseOrderCode").text();
+
+            var purchaseOrderLink = "/PurchaseOrder/Detail?key=" + purchaseOrderID;
+            //var invoiceLink = "/Invoice/Detail?key=" + invoiceID;
+
+            $("#Details_" + x + "_PurchaseOrderCode").replaceWith('<a href="' + purchaseOrderLink + '" >' + purchaseOrderCode + '</a>');
+        }
+    }
+</script>
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "PurchasePayment", "ID", "Code", null, delegate(object obj, UIMode mode)
+    {
+        return false;
+    }, delegate(IndexGridHelper helper)
+    {
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.AddNewButton.Visible = true;
+        }
+        else
+        {
+            helper.AddNewButton.Visible = false;
+        }
+        
+        helper.AddNewButton.Href = Url.Content("~/UncreatedPurchasePayment");
+    })

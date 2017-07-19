@@ -1,0 +1,27 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<UserModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("UserID","User ID"),
+        Html.LabelColumn("RoleName","Nama Peran")
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+}
+@Html.IndexGrid(grid, Model, "User", "UserID", "UserID", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    if (Convert.ToBoolean(ViewBag.AllowCreate))
+    {
+        helper.AddNewButton.Visible = true;
+    }
+    else
+    {
+        helper.AddNewButton.Visible = false;
+    }
+})

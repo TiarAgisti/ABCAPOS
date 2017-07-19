@@ -1,0 +1,37 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<UnitModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("ID","INTERNAL ID"),
+        Html.LabelColumn("Name","NAME"),
+        Html.LabelColumn("BaseUnitName","BASE UNIT", "",delegate(GridColumn col){
+        })
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("NAME","Name"),
+        Html.GenericFilterTextBoxField("BASE UNIT","BaseUnitName"),
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.DefaultObject = new UnitModel();
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "Unit", "ID", "Name", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    if (Convert.ToBoolean(ViewBag.AllowCreate))
+    {
+        helper.AddNewButton.Visible = true;
+    }
+    else
+    {
+        helper.AddNewButton.Visible = false;
+    }
+})

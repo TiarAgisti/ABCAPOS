@@ -1,0 +1,189 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<WorkOrderModel>
+@{
+    var dataCount = (int)ViewBag.DataCount;
+    var pageSize = (int)ViewBag.PageSize;
+    var startIndex = (int)ViewBag.StartIndex;
+    var selectedPage = startIndex / pageSize + 1;
+    var pageAmount = (dataCount / 20);
+
+    if (dataCount % 20 != 0)
+    {
+        pageAmount += 1;
+    }
+
+    var statement = string.Format("Page: {0} of {1}", selectedPage, pageAmount);
+
+    //@ListWO
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.DateColumn("Date","Date"),
+        Html.LabelColumn("Code","WO NUMBER"),
+        Html.LabelColumn("ProductCode","PRODUCT CODE"),
+        Html.LabelColumn("ProductName","PRODUCT NAME"),
+        Html.DecimalColumn("QtyWO","QTY WO"),
+        Html.DecimalColumn("QtyBuilt","QTY BUILT"),
+        Html.LabelColumn("ConversionName","UNIT"),
+        Html.LabelColumn("WarehouseName","LOCATION"),
+        Html.LabelColumn("StatusDescription","STATUS", "",delegate(GridColumn col){
+            col.SortField = "Status";
+        }),
+        Html.LabelColumn("Notes","NOTES"),
+    };
+
+    var warehouseList = ViewBag.WarehouseList as List<WarehouseModel>;
+    var ddlWarehouse = Util.GetDropDownOptions(warehouseList, "Name", "Name");
+    
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("TRANSACTION DATE","Date"),
+        Html.GenericFilterTextBoxField("WO NUMBER","Code"),
+        Html.GenericFilterTextBoxField("PRODUCT CODE","ProductCode"),
+        Html.GenericFilterTextBoxField("PRODUCT NAME","ProductName"),
+        Html.GenericFilterDropDownField("LOCATION","WarehouseName", ddlWarehouse, typeof(string)),
+    };
+
+    var detailButton = new GridButtonColumn();
+    detailButton.CssClass = "iconContainer";
+    detailButton.ButtonCssClass = "details imageButton";
+    detailButton.Href = Url.Content("~/WorkOrder/Detail?key=@idPropertyValue");
+    detailButton.IDPropertyName = "ID";
+    detailButton.Text = "Detail";
+
+    var approveButton = new GridButtonColumn();
+    approveButton.CssClass = "iconContainer";
+    approveButton.ButtonCssClass = "approve imageButton";
+    approveButton.Href = Url.Content("~/WorkOrder/ApproveFromIndex?key=@idPropertyValue");
+    approveButton.OnClick = "return confirm('Are you sure you want to approve this document?');";
+    approveButton.IDPropertyName = "ID";
+    approveButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var wo = obj as WorkOrderModel;
+        if (Convert.ToBoolean(ViewBag.AllowVoid))
+        {
+            if (wo.Status == (int)MPL.DocumentStatus.New && ABCAPOS.MembershipHelper.GetRoleID() != (int)PermissionStatus.AdminProduksi)
+                return true;
+        }
+        return false;
+    };
+    approveButton.Text = "Approve";
+
+
+    var printButton = new GridButtonColumn();
+    printButton.CssClass = "iconContainer";
+    printButton.ButtonCssClass = "print imageButton";
+    printButton.OnClick = String.Format("window.open('{0}');", Url.Action("PopUp", "ReportViewer", new { type = ABCAPOS.Controllers.ReportViewerController.PrintOutType.WorkOrder, queryString = SystemConstants.str_WorkOrderID + "=@idPropertyValue" }));
+    printButton.IDPropertyName = "ID";
+    printButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var WorkOrder = obj as WorkOrderModel;
+
+        if (WorkOrder.Status != (int)WorkOrderStatus.Void)
+            return true;
+
+        return false;
+    };
+    printButton.Text = "Print";
+
+
+    var voidButton = new GridButtonColumn();
+    voidButton.CssClass = "iconContainer";
+    voidButton.ButtonCssClass = "cancel imageButton";
+    //voidButton.Href = Url.Content("~/PurchaseOrder/VoidRemarks?key=@idPropertyValue&voidFromIndex=true");
+    voidButton.IDPropertyName = "ID";
+    voidButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var WorkOrder = obj as WorkOrderModel;
+        if (Convert.ToBoolean(ViewBag.AllowVoid))
+        {
+            if (WorkOrder.Status != (int)MPL.DocumentStatus.Void)
+                return true;
+        }
+        return false;
+
+       
+    };
+    voidButton.Text = "Void";
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(detailButton);
+    grid.Buttons.Add(approveButton);
+    grid.Buttons.Add(printButton); //printButton disabled
+    
+    /*ADDITIONAL BUTTONS*/
+    Button listWOButton = new Button();
+    listWOButton.CssClass = "button";
+    listWOButton.Href = "/ListPendingWorkOrder/";
+    listWOButton.Text = "List Pending WO";
+    /*ADDITIONAL BUTTONS*/
+}
+<script type="text/javascript">
+    $(function () {
+        //$("[name='lnkAddNewGrid1']").hide();
+
+        $(".cancel").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                .addClass("dialog")
+                .attr("id", $(this).attr("data-dialog-id"))
+                .appendTo("body").dialog({
+                    title: "Void Remarks",
+                    close: function () {
+                        $(this).remove();
+                    },
+                    modal: true,
+                    height: 180,
+                    width: 700,
+                    left: 0
+                }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+        if ($.urlParam('filter.FilterFields%5B0%5D.Selected') == null) {
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+            var yyyy = today.getFullYear();
+
+            today = mm + '/' + dd + '/' + yyyy;
+            $("#filter_FilterFields_0_Value").val(today);
+        }
+    });
+    $(document).ready(function () {
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+    });
+</script>
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "WorkOrder", "ID", "Code", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+    {
+        //if (Convert.ToBoolean(ViewBag.AllowCreate))
+        //{
+        //    helper.AddNewButton.Visible = true;
+        //}
+        //else
+        //{
+        //    helper.AddNewButton.Visible = false;
+        //}
+        helper.AddNewButton.Visible = true;
+        helper.AddNewButton.Href = Url.Content("~/WorkOrder/Create");
+        helper.Buttons.Add(listWOButton);
+        //helper.Buttons.Add(voidButton);
+        
+    })
+<br />
+@statement

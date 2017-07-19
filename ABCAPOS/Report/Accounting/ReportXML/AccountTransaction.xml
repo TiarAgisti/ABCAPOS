@@ -1,0 +1,14 @@
+﻿<Report Title="Laporan Buku Besar">
+  <Columns>
+    <Column Field="Date" HeaderText="Tanggal" Width="1"/>
+    <Column Field="Remarks" HeaderText="Kode Akun"/>
+    <Column Field="DebitAmount" HeaderText="Debet" Width=".8"/>
+    <Column Field="CreditAmount" HeaderText="Kredit" Width=".8"/>
+    <Column Field="DebitBalance" HeaderText="S. Debet" Width=".8"/>
+    <Column Field="CreditBalance" HeaderText="S. Kredit" Width=".8"/>
+  </Columns>
+  <Footers>
+    <Group1 Field="AccountID"
+          Header="=Fields!AccountDescription.Value"/>
+  </Footers>
+</Report>

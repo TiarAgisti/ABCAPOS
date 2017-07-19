@@ -1,0 +1,36 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<BinModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Name", "BIN NUMBER"),
+        Html.LabelColumn("WarehouseName","LOCATION NAME"),
+        Html.LabelColumn("Memo", "MEMO"),
+        Html.LabelColumn("IsActive","INACTIVE"),
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("BIN NUMBER","Name")
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.DefaultObject = new BinModel();
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "BinNumber", "ID", "Name", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    if (Convert.ToBoolean(ViewBag.AllowCreate))
+    {
+        helper.AddNewButton.Visible = true;
+    }
+    else
+    {
+        helper.AddNewButton.Visible = false;
+    }
+})

@@ -1,0 +1,729 @@
+﻿@using ABCAPOS.Helpers;
+@{
+    
+    var menu = MenuHelper.GetMenuList();
+
+    var isPurchaseOrderAllowed = false;
+    var isBookingOrderAllowed = false;
+    var isBookingSalesAllowed = false;
+    var isPurchaseDeliveryAllowed = false;
+    var isPurchaseBillAllowed = false;
+    var isSalesOrderAllowed = false;
+    var isDeliveryOrderAllowed = false;
+    var isInvoiceAllowed = false;
+    var isPaymentAllowed = false;
+    var isTransferOrderAllowed = false;
+    var isTransferDeliveryAllowed = false;
+    var isTransferReceiptAllowed = false;
+    var isInventoryAdjustmentAllowed = false;
+    var isUnitAllowed = false;
+    var isWorkOrderAllowed = false;
+    var isAssemblyBuildAllowed = false;
+    var isAssemblyUnBuildAllowed = false;
+
+    if (menu.Contains("PurchaseOrder"))
+    {
+        isPurchaseOrderAllowed = true;
+    }
+    if (menu.Contains("BookingOrder"))
+    {
+        isBookingOrderAllowed = true;
+    }
+    if (menu.Contains("BookingSales"))
+    {
+        isBookingSalesAllowed = true;
+    }
+    if (menu.Contains("PurchaseDelivery"))
+    {
+        isPurchaseDeliveryAllowed = true;
+    }
+    if (menu.Contains("PurchaseBill"))
+    {
+        isPurchaseBillAllowed = true;
+    }
+    if (menu.Contains("SalesOrder"))
+    {
+        isSalesOrderAllowed = true;
+    }
+    if (menu.Contains("DeliveryOrder"))
+    {
+        isDeliveryOrderAllowed = true;
+    }
+    if (menu.Contains("Invoice"))
+    {
+        isInvoiceAllowed = true;
+    }
+    if (menu.Contains("Payment"))
+    {
+        isPaymentAllowed = true;
+    }
+    if (menu.Contains("TransferOrder"))
+    {
+        isTransferOrderAllowed = true;
+    }
+    if (menu.Contains("TransferDelivery"))
+    {
+        isTransferDeliveryAllowed = true;
+    }
+    if (menu.Contains("TransferReceipt"))
+    {
+        isTransferReceiptAllowed = true;
+    }
+    if (menu.Contains("InventoryAdjustment"))
+    {
+        isInventoryAdjustmentAllowed = true;
+    }
+    if (menu.Contains("Unit"))
+    {
+        isUnitAllowed = true;
+    }
+    if (menu.Contains("WorkOrder"))
+    {
+        isWorkOrderAllowed = true;
+    }
+    if (menu.Contains("AssemblyBuild"))
+    {
+        isAssemblyBuildAllowed = true;
+    }
+    if (menu.Contains("AssemblyUnBuild"))
+    {
+        isAssemblyUnBuildAllowed = true;
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <cfheader name="X-XSS-Protection" value="0">
+    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/Style.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/Menu.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/UI.css")" rel="stylesheet" type="text/css" />
+    @*<script src="@Url.Content("~/Scripts/jquery-1.4.4.min.js")" type="text/javascript"></script>*@
+    <script src="@Url.Content("~/Scripts/noty/jquery-1.7.2.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery-ui-1.8.16.custom/js/jquery-ui-1.8.16.custom.min.js")" type="text/javascript"></script>
+    <link href="@Url.Content("~/Scripts/jquery-ui-1.8.16.custom/css/redmond/jquery-ui-1.8.16.custom.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/jquery.numeric.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/UI.js")" type="text/javascript"></script>
+    @*sendJSON*@
+    <script src="@Url.Content("~/Scripts/global.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jsExtension.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jshashtable-2.1.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.numberformatter-1.2.3.jsmin.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/menucss/IndicatorContainer.js")" type="text/javascript"></script>
+    @* for Noty *@
+    <script src="@Url.Content("~/Scripts/noty/packaged/jquery.noty.packaged.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/noty/layouts/topRight.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/Notification/notification.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/Notification/formNotification.js")" type="text/javascript"></script>
+    @RenderSection("JavaScript", required: false)
+    <script>
+        var detailsValidatorMember = [];
+    </script>
+    <style>
+        div#tabs.ui-tabs.ui-widget.ui-widget-content.ui-corner-all {
+            overflow: overlay
+        }
+        .PSI-footer {
+            color:white;
+            /*padding-bottom:25px;*/
+            text-align:center;
+            font-size:14px;
+        }
+        .rmenulink {
+            float:right;
+            color:white;
+        }
+        @@media all and (min-width: 801px) {
+            .rmenulink {
+                vertical-align : top; 
+                display:inline-block;
+                width: 8%;
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <input type="hidden" id="hdnNotificationShown" value="" />
+    <input type="hidden" id="isPurchaseOrderAllowed" value="@isPurchaseOrderAllowed"/>
+    <input type="hidden" id="isBookingOrderAllowed" value="@isBookingOrderAllowed"/>
+    <input type="hidden" id="isBookingSalesAllowed" value="@isBookingSalesAllowed"/>
+    <input type="hidden" id="isPurchaseDeliveryAllowed" value="@isPurchaseDeliveryAllowed"/>
+    <input type="hidden" id="isPurchaseBillAllowed" value="@isPurchaseBillAllowed"/>
+    <input type="hidden" id="isSalesOrderAllowed" value="@isSalesOrderAllowed"/>
+    <input type="hidden" id="isDeliveryOrderAllowed" value="@isDeliveryOrderAllowed"/>
+    <input type="hidden" id="isUnitAllowed" value="@isUnitAllowed" />
+    <input type="hidden" id="isInvoiceAllowed" value="@isInvoiceAllowed"/>
+    <input type="hidden" id="isPaymentAllowed" value="@isPaymentAllowed"/>
+    <input type="hidden" id="isTransferOrderAllowed" value="@isTransferOrderAllowed"/>
+    <input type="hidden" id="isTransferDeliveryAllowed" value="@isTransferDeliveryAllowed"/>
+    <input type="hidden" id="isTransferReceiptAllowed" value="@isTransferReceiptAllowed"/>
+    <input type="hidden" id="isInventoryAdjustmentAllowed" value="@isInventoryAdjustmentAllowed"/>
+    <input type="hidden" id="isWorkOrderAllowed" value="@isWorkOrderAllowed" />
+    <input type="hidden" id="isAssemblyBuildAllowed" value="@isAssemblyBuildAllowed" />
+    <input type="hidden" id="isAssemblyUnBuildAllowed" value="@isAssemblyUnBuildAllowed" />
+    <input type="hidden" id="hdnSuccessNotification" value="@ViewBag.SuccessNotification" />
+    <input type="hidden" id="hdnErrorNotification" value="@ViewBag.ErrorNotification" />
+
+    <div class="mainDiv" style="position: fixed; z-index: 999">
+        <div style="width: 100%;">
+            <table style="width: 97%;" class="basic">
+                <tr>
+                    <td>
+                        @{
+                            var paddingAttr = "padding-left:2%;height:92%;";
+
+                            if (Membership.GetUser() == null)
+                            {
+                                paddingAttr = "padding-left:2%;height:92%;";
+
+                            }
+                        }
+                        <img src="@Url.Content("~/Uploads/Logo/logo.png")" style="@paddingAttr" />
+                    </td>
+                    <td class="rightAlign" style="vertical-align: top">
+                        <span style="color: Black">
+                            @if (Membership.GetUser() != null)
+                            {
+                                @Html.Raw("<b style='color:Black'>" + Membership.GetUser().UserName + "</b>&nbsp; | &nbsp;")<a href="@Url.Content("~/User/LogOut")" style="text-decoration:none; color:Black">Log
+                                    Out</a>
+                            }
+                            else
+                            {
+                                <a href="@Url.Content("~/User/LogOn")" style="text-decoration:none; color:Black">Log
+                                    On</a>
+                            }
+                        </span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id='cssmenu' class="page">
+            <ul>
+
+                @if (Membership.GetUser() != null)
+                {
+                    if (menu.Contains("Product") || menu.Contains("Supplier") || menu.Contains("Customer") || menu.Contains("Warehouse") ||
+                        menu.Contains("Vendor") || menu.Contains("Salesman") || menu.Contains("AnnualVAT") ||
+                        menu.Contains("Account") || menu.Contains("AccountConfiguration") || menu.Contains("User") ||
+                        menu.Contains("Department") || menu.Contains("AccountCategory") || menu.Contains("BinNumber") ||
+                        menu.Contains("Unit") ||
+                        menu.Contains("TermsOfPayment") ||
+                        menu.Contains("Role") || menu.Contains("PaymentMethod") || menu.Contains("Staff") || menu.Contains("PPh21Expense") || menu.Contains("Expedition"))
+                    {
+                    <li class='active'><a href='@Url.Content("~/Home")'><span>Dashboard</span></a>
+                        <ul>
+                            @if (menu.Contains("Dashboard"))
+                            {
+                                var startDate = "1/1/" + DateTime.Now.Year;  //1%2F1%2F2015
+                                var endDate = "12/31/" + DateTime.Now.Year;
+                                <li><a href='@Url.Content("~/HomeProduct?filter.FilterFields%5B0%5D.Selected=true&filter.FilterFields%5B0%5D.Value=" + @startDate + "&filter.FilterFields%5B0%5D.Value1=" + @endDate + "&filter.FilterFields%5B0%5D.FieldType=DateRange&filter.FilterFields%5B0%5D.PropertyName=Date&filter.FilterFields%5B0%5D.TargetDataType=System.DateTime&filter.FilterFields%5B0%5D.FilterOperator=Like&filter.FilterFields%5B1%5D.Value=&filter.FilterFields%5B1%5D.FieldType=TextBox&filter.FilterFields%5B1%5D.PropertyName=ProductCode&filter.FilterFields%5B1%5D.TargetDataType=System.String&filter.FilterFields%5B1%5D.FilterOperator=Like")'><span>Goods Sold By Product</span></a></li>
+                                <li><a href='@Url.Content("~/HomeCustomer?filter.FilterFields%5B0%5D.Selected=true&filter.FilterFields%5B0%5D.Value=" + @startDate + "&filter.FilterFields%5B0%5D.Value1=" + @endDate + "&filter.FilterFields%5B0%5D.FieldType=DateRange&filter.FilterFields%5B0%5D.PropertyName=Date&filter.FilterFields%5B0%5D.TargetDataType=System.DateTime&filter.FilterFields%5B0%5D.FilterOperator=Like&filter.FilterFields%5B1%5D.Value=&filter.FilterFields%5B1%5D.FieldType=TextBox&filter.FilterFields%5B1%5D.PropertyName=CustomerName&filter.FilterFields%5B1%5D.TargetDataType=System.String&filter.FilterFields%5B1%5D.FilterOperator=Like&filter.FilterFields%5B2%5D.Value=&filter.FilterFields%5B2%5D.FieldType=TextBox&filter.FilterFields%5B2%5D.PropertyName=ProductCode&filter.FilterFields%5B2%5D.TargetDataType=System.String&filter.FilterFields%5B2%5D.FilterOperator=Like#")'><span>Goods Sold By Customer</span></a></li>
+                            }
+                        </ul>
+                    </li>
+                    <li class='has-sub'><a href='#'><span>Master</span></a>
+                        <ul>
+                            @if (menu.Contains("Product") || menu.Contains("Unit"))
+                            {
+                                <li><a><span>Produk</span></a>
+                                    <ul>
+                                        @if (menu.Contains("Product"))
+                                        {
+                                            <li><a href='@Url.Content("~/Product")'><span>Produk</span></a></li>
+                                        }
+                                        @if (menu.Contains("Unit"))
+                                        {
+                                            <li><a href='@Url.Content("~/Unit")'><span>Unit of Measurement</span></a></li>
+                                        }
+                                    </ul>
+                                </li>   
+                            }
+                            @if (menu.Contains("Warehouse"))
+                            {
+                                <li><a href='@Url.Content("~/Warehouse")'><span>Location</span></a></li>
+                            }
+                            @if (menu.Contains("Department"))
+                            {
+                                <li><a href='@Url.Content("~/Department")'><span>Department</span></a></li>
+                            }
+                            @if (menu.Contains("Supplier"))
+                            {
+                                <li><a href='@Url.Content("~/SupplierGroup")'><span>Grup Supplier</span></a></li>
+                                <li><a href='@Url.Content("~/Supplier")'><span>Supplier</span></a></li>
+                            }
+                            @if (menu.Contains("Customer"))
+                            {
+@*<li><a href='@Url.Content("~/CustomerGroup")'><span>Grup Pelanggan</span></a></li>*@
+                                <li><a href='@Url.Content("~/Customer")'><span>Customer</span></a></li>
+                            }
+                            @if (menu.Contains("Vendor"))
+                            {
+                                <li><a href='@Url.Content("~/Vendor")'><span>Vendor</span></a></li>
+                            }
+                            @if (menu.Contains("Salesman"))
+                            {
+                                <li><a href='@Url.Content("~/Salesman/Index")'><span>Marketing</span></a></li>
+                            }
+                            @if (menu.Contains("Staff"))
+                            {
+                                <li><a href='@Url.Content("~/Staff")'><span>Employee</span></a></li>
+                            }
+                            @if (menu.Contains("TermsOfPayment"))
+                            {
+                                <li><a href='@Url.Content("~/TermsOfPayment")'><span>Terms Of Payment</span></a></li>
+                            }
+                            @if (menu.Contains("BinNumber"))
+                            {
+                                <li><a href='@Url.Content("~/BinNumber")'><span>Bin Number</span></a></li>
+                            }
+                            @if (menu.Contains("Account") || menu.Contains("AccountCategory") || menu.Contains("AccountConfiguration"))
+                            {
+                                <li><a><span>Akun</span></a>
+                                    <ul>
+                                        @if (menu.Contains("Account"))
+                                        {
+                                            <li><a href='@Url.Content("~/Account")'><span>Akun</span></a></li>
+                                        }
+                                        @if (menu.Contains("AccountCategory"))
+                                        {
+                                            <li><a href='@Url.Content("~/AccountCategory")'><span>Kategori Akun</span></a></li>
+                                        }
+                                        @if (menu.Contains("AccountConfiguration"))
+                                        {
+                                            <li><a href='@Url.Content("~/AccountConfiguration/Index")'><span>Daftar Transaksi</span></a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                           
+                            @if (menu.Contains("User") || menu.Contains("Role"))
+                            {
+                                <li><a><span>User</span></a>
+                                    <ul>
+                                        @if (menu.Contains("User"))
+                                        {
+                                            <li><a href='@Url.Content("~/User")'><span>User</span></a></li>
+                                        }
+                                        @if (menu.Contains("Role"))
+                                        {
+                                            <li><a href='@Url.Content("~/Role")'><span>Otorisasi Modul</span></a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                           
+                            @if (menu.Contains("PaymentMethod"))
+                            {
+                                <li><a href='@Url.Content("~/PaymentMethod")'><span>Metode Pembayaran</span></a></li>
+                            }
+                            @if (menu.Contains("AnnualVAT") || menu.Contains("PPh21Expense"))
+                            {
+                                <li><a><span>Pajak</span></a>
+                                    <ul>
+                                        @if (menu.Contains("AnnualVAT"))
+                                        {
+                                            <li><a href='@Url.Content("~/AnnualVAT")'><span>Taksiran Pajak Penghasilan</span></a></li>
+                                        }
+                                        @if (menu.Contains("PPh21Expense"))
+                                        {
+                                            <li class='last'><a href='@Url.Content("~/PPh21Expense")'><span>Beban PPh Pasal 21</span></a></li>
+                                        }
+                                     </ul>
+                                </li>
+                            }
+                            
+                            
+                            @if (menu.Contains("Currency"))
+                            {
+                                <li><a href='@Url.Content("~/Currency")'><span>Kurs</span></a></li>
+                            }
+                            @if (menu.Contains("Expedition"))
+                            {
+                                <li class='last'><a href='@Url.Content("~/Expedition/Index")'><span>Expedition</span></a></li>
+                            }
+                        </ul>
+                    </li>
+                    }
+                    if (menu.Contains("CompanySetting") || menu.Contains("PrefixSetting") || menu.Contains("Attendance"))
+                    {
+                    <li class='has-sub'><a href='#'><span>Pengaturan</span></a>
+                        <ul>
+                            @if (menu.Contains("CompanySetting"))
+                            {
+                                <li><a href='@Url.Content("~/CompanySetting/Detail")'><span>Info Perusahaan</span></a></li>
+                            }
+                            @if (menu.Contains("PrefixSetting"))
+                            {
+                                <li><a href='@Url.Content("~/PrefixSetting/Detail")'><span>Pengaturan Kode</span></a></li>
+                            }
+                            @if (menu.Contains("Attendance"))
+                            {
+                                <li><a href='@Url.Content("~/AttendanceSetting/Detail")'><span>Pengaturan
+                                    Absensi</span></a></li>
+                            }
+                        </ul>
+                    </li>
+                    }
+                    if (menu.Contains("PurchaseOrder") || menu.Contains("PurchaseDelivery") || menu.Contains("PurchaseBill") || menu.Contains("SalesOrder") || menu.Contains("DeliveryOrder") || menu.Contains("Invoice") ||
+                        menu.Contains("Payment") || menu.Contains("Accounting") ||
+                        menu.Contains("Allowance") || menu.Contains("Attendance") || menu.Contains("AccountingReport")
+                        || menu.Contains("BookingOrder")
+                        || menu.Contains("BookingSales")
+                        || menu.Contains("TransferOrder")
+                        || menu.Contains("TransferDelivery")
+                        || menu.Contains("TransferReceipt")
+                        || menu.Contains("InventoryAdjustment")
+                        || menu.Contains("VendorReturn")
+                        || menu.Contains("VendorReturnDelivery")
+                        || menu.Contains("BillCredit")
+                        || menu.Contains("CustomerReturn")
+                        || menu.Contains("ReturnReceipt")
+                        || menu.Contains("CreditMemo")
+                        || menu.Contains("WorkOrder")
+                        || menu.Contains("AssemblyBuild")
+                        || menu.Contains("AssemblyUnBuild")
+                        || menu.Contains("StockMovement")
+                        || menu.Contains("AveragePaymentOverDue")
+                        || menu.Contains("Resi")
+                        || menu.Contains("ResiBill")
+                        || menu.Contains("ResiPayment")
+                        )
+                    {
+                    <li class='has-sub'><a href='#'><span>Transaction</span></a>
+                        <ul>
+                            @if (menu.Contains("PurchaseOrder")
+                                || menu.Contains("BookingOrder")
+                                || menu.Contains("PurchaseDelivery")
+                                || menu.Contains("PurchaseBill")
+                                || menu.Contains("PurchaseReturn")
+                                || menu.Contains("MakeMultiPay")
+                                || menu.Contains("MakeMultiPaySales")
+                                || menu.Contains("VendorReturn")
+                                || menu.Contains("VendorReturnDelivery")
+                                || menu.Contains("BillCredit")
+                                )
+                            {
+                                <li><a><span>Purchases</span></a>
+                                    <ul>
+                                        @if (menu.Contains("PurchaseOrder"))
+                                        {
+                                            <li><a href='@Url.Content("~/PurchaseOrder/Index")'><span>Purchase Order</span></a>
+                                                <ul>
+                                                    <li><a href='@Url.Content("~/PurchaseOrder/Create")'><span>New</span></a></li>
+                                                </ul>
+                                            </li>
+                                        }
+                                        @if (menu.Contains("BookingOrder"))
+                                        {
+                                            <li><a href='@Url.Content("~/BookingOrder/Index")'><span>Booking PO</span></a></li>
+                                        }
+                                        @if (menu.Contains("PurchaseDelivery"))
+                                        {
+                                            <li><a href='@Url.Content("~/PurchaseDelivery/Index")'><span>Item Receipts</span></a></li>
+                                        }
+                                        @if (menu.Contains("PurchaseBill"))
+                                        {
+                                            <li><a href='@Url.Content("~/PurchaseBill/Index")'><span>Purchase Bill</span></a></li>
+                                        }
+                                        @if (menu.Contains("MakeMultiPay"))
+                                        {
+                                            <li><a href='@Url.Content("~/MakeMultiPay/Index")'><span>Purchase Bill Payment</span></a></li>
+                                        }
+                                        @if (menu.Contains("VendorReturn"))
+                                        {
+                                            <li><a href='@Url.Content("~/VendorReturn/Index")'><span>Vendor Return</span></a></li>
+                                        }
+                                        @if (menu.Contains("VendorReturnDelivery"))
+                                        {
+                                            <li><a href='@Url.Content("~/VendorReturnDelivery/Index")'><span>Vendor Return Delivery</span></a></li>
+                                        }
+                                        @if (menu.Contains("BillCredit"))
+                                        {
+                                            <li><a href='@Url.Content("~/BillCredit/Index")'><span>Bill Credit</span></a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+
+                            @if (menu.Contains("SalesOrder")
+                                || menu.Contains("BookingSales")
+                                || menu.Contains("DeliveryOrder")
+                                || menu.Contains("Invoice")
+                                || menu.Contains("Payment")
+                                || menu.Contains("CashSales")
+                                || menu.Contains("CustomerReturn")
+                                || menu.Contains("ReturnReceipt")
+                                || menu.Contains("CreditMemo")
+                                )
+                            {
+                                <li><a><span>Sales</span></a>
+                                    <ul>
+                                        @if (menu.Contains("SalesOrder"))
+                                        {
+                                            <li><a href='@Url.Content("~/SalesOrder/Index")'><span>Sales Order</span></a>
+                                                <ul>
+                                                    <li><a href='@Url.Content("~/SalesOrder/Create")'><span>New</span></a></li>
+                                                </ul>
+                                            </li>
+                                        }
+                                        @if (menu.Contains("BookingSales"))
+                                        {
+                                            <li><a href='@Url.Content("~/BookingSales/Index")'><span>Booking SO</span></a></li>
+                                        }
+                                        @if (menu.Contains("DeliveryOrder"))
+                                        {
+                                            <li><a href='@Url.Content("~/DeliveryOrder/Index")'><span>Item Fulfillment</span></a></li>
+                                        }
+                                        @if (menu.Contains("Invoice"))
+                                        {
+                                            <li><a href='@Url.Content("~/Invoice/Index")'><span>Invoice</span></a></li>
+                                            <li><a href='@Url.Content("~/MultipleInvoicing/Index")'><span>Multiple Invoicing</span></a></li>
+                                        }
+                                        @if (menu.Contains("MakeMultiPaySales"))
+                                        {
+                                            <li><a href='@Url.Content("~/MakeMultiPaySales/Index")'><span>Invoice Payment</span></a></li>
+                                        }
+                                        @if (menu.Contains("CashSales"))
+                                        {
+                                            <li><a href='@Url.Content("~/CashSales/Index")'><span>Cash Sales</span></a></li>
+                                        }
+                                        @if (menu.Contains("CustomerReturn"))
+                                        {
+                                            <li><a href='@Url.Content("~/CustomerReturn/Index")'><span>Customer Return</span></a></li>
+                                        }
+                                        @if (menu.Contains("ReturnReceipt"))
+                                        {
+                                            <li><a href='@Url.Content("~/ReturnReceipt/Index")'><span>Return Receipt</span></a></li>
+                                        }
+                                        @if (menu.Contains("CreditMemo"))
+                                        {
+                                            <li><a href='@Url.Content("~/CreditMemo/Index")'><span>Credit Memo</span></a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                            @if (menu.Contains("Accounting"))
+                            {
+                                <li><a href='@Url.Content("~/Accounting/Index")'><span>Accounting</span></a></li>
+                            }
+                            @if (menu.Contains("TransferOrder") || menu.Contains("TransferDelivery") || menu.Contains("InventoryReceipt"))
+                            {
+                                <li><a><span>Transfers</span></a>
+                                    <ul>
+                                        @if (menu.Contains("TransferOrder"))
+                                        {
+                                            <li><a href='@Url.Content("~/TransferOrder/Index")'><span>Transfer Order</span></a></li>                                      
+                                        }
+                                        @if (menu.Contains("TransferDelivery"))
+                                        {
+                                            <li><a href='@Url.Content("~/TransferDelivery/Index")'><span>Transfer Delivery</span></a></li>
+                                        }
+                                        @if (menu.Contains("TransferReceipt"))
+                                        {
+                                            <li><a href='@Url.Content("~/TransferReceipt/Index")'><span>Transfer Receipt</span></a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+
+                            @if (menu.Contains("InventoryAdjustment"))
+                            {
+                                <li><a href='@Url.Content("~/InventoryAdjustment/Index")'><span>Inventory Adjustment</span></a></li>
+                            }
+                            
+                            @if (menu.Contains("StockMovement"))
+                            {
+                                <li><a href='@Url.Content("~/StockMovement/Index")'><span>Stock Movement</span></a></li>
+                            }
+                            @if (menu.Contains("AveragePaymentOverDue"))
+                            {
+                                <li><a href='@Url.Content("~/AveragePaymentOverDue/Index")'><span>Average Payment OverDue</span></a></li>
+                            }
+                            @if (menu.Contains("WorkOrder") || menu.Contains("AssemblyBuild") || menu.Contains("AssemblyUnBuild"))
+                            {
+                                <li><a><span>Manufacture</span></a>
+                                    <ul>
+                                        @if (menu.Contains("WorkOrder"))
+                                        {
+                                            <li><a href='@Url.Content("~/WorkOrder/Index")'><span>Work Order</span></a>
+                                                <ul>
+                                                    <li><a href='@Url.Content("~/WorkOrder/Create")'><span>Add New</span></a></li>
+                                                    <li><a href='@Url.Content("~/ListPendingWorkOrder/Index")'><span>List Pending Work Order</span></a></li>
+                                                    <li><a href='@Url.Content("~/WorkOrder/Create")'><span>Add Work Order Experiment</span></a></li>
+                                                </ul>
+                                            </li>
+                                        }
+                                        @if (menu.Contains("AssemblyBuild"))
+                                        {
+                                            <li>
+                                                <a href='@Url.Content("~/AssemblyBuild/Index")'><span>Build</span></a>
+                                            </li>
+                                        }
+                                        @if (menu.Contains("AssemblyUnBuild"))
+                                        {
+                                            <li>
+                                                <a href='@Url.Content("~/AssemblyUnBuild/Index")'><span>UnBuild</span></a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                            @if (menu.Contains("Resi") || menu.Contains("ResiPayment"))
+                            {
+                                <li><a><span>Expedition</span></a>
+                                    <ul>
+                                        @if (menu.Contains("Resi"))
+                                        {
+                                            <li><a href='@Url.Content("~/Resi/Index")'><span>Resi Expedition</span></a></li>         
+                                        }
+                                         @if (menu.Contains("ResiBill"))
+                                        {
+                                            <li><a href='@Url.Content("~/ResiBill/Index")'><span>Resi Bill</span></a></li>         
+                                        }
+                                        @if (menu.Contains("ResiPayment"))
+                                        {
+                                            <li><a href='@Url.Content("~/ResiPayment/Index")'><span>Resi Payment</span></a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                            if (menu.Contains("SalesOrderReport") || menu.Contains("PurchaseOrderReport")
+                                || menu.Contains("PurchaseBillReport") || menu.Contains("ItemFulfillmentReport")
+                                || menu.Contains("InvoiceReport") || menu.Contains("PaymentReport") || menu.Contains("ReportOverdue")
+                                || menu.Contains("ReportStock") || menu.Contains("CreditMemoByItemReport") || menu.Contains("ManufactureReport"))
+                            {
+                    <li class='has-sub'><a href='#'><span>Report</span></a>
+                        <ul>
+                            @*
+                                <li><a href='@Url.Content("~/ReportViewer/Index?type=InvoiceCreditMemo")'><span>Report Invoice & Credit Memo By Sales Rep</span></a></li>*@
+                            @if (menu.Contains("PurchaseOrderReport"))
+                            {
+                                <li><a href='@Url.Content("~/ReportViewer/Index?type=PurchaseOrder")'><span>Report Purchase Order (Detail)</span></a></li>
+                            }
+                            @if (menu.Contains("SalesOrderReport"))
+                            {
+                                <li><a href='#'><span>Sales Order Report</span></a>
+                                    <ul>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=SalesOrderBySalesRepSumNoCustomer")'><span>Sales Order By Sales Rep</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=InvoiceBySalesRepSum")'><span>Sales Order By Sales Rep Sum</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=InvoiceBySalesRepDetail")'><span>Sales Order By Sales Rep Detail</span></a></li>
+                                    </ul>
+                                </li>    
+                            }
+                            @if (menu.Contains("PurchaseBillReport"))
+                            {
+                                <li><a href='#'><span>Purchase Bill Report</span></a>
+                                    <ul>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=PurchaseBill")'><span>Purchase Bill</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=PurchaseBillOverdue")'><span>Purchase Bill Overdue</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=PurchaseBillAging")'><span>Purchase Bill Aging</span></a></li>
+                                    </ul>
+                                </li>  
+                            }
+                            @if (menu.Contains("ItemFulfillmentReport"))
+                            {
+                                <li><a href='#'><span>Item Fulfillment Report</span></a>
+                                    <ul>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=DeliveryOrder")'><span>Daftar Fulfillment</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=FulfillmentByItemDetail")'><span>Fulfillment By Item Detail</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=FulfillmentByItemSummary")'><span>Fulfillment By Item Summary</span></a></li>
+                                    </ul>
+                                </li>
+                            }
+                            @if (menu.Contains("InvoiceReport"))
+                            {
+                                <li><a href='#'><span>Invoice Report</span></a>
+                                    <ul>
+                                        <li><a href='#'><span>Invoice Monthly</span></a>
+                                            <ul>
+                                                <li><a href='@Url.Content("~/ReportViewer/Index?type=InvoiceMonthly")'><span>Invoice Monthly</span></a>
+                                                <li><a href='@Url.Content("~/ReportViewer/Index?type=InvoiceMonthlySummary")'><span>Invoice Monthly Summary</span></a>
+                                            </ul>
+                                        </li> 
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=InvoiceByItemSum")'><span>Invoice By Item Sum</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=InvoiceAging")'><span>Invoice Aging</span></a></li> 
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=ReportBonus")'><span>Report Bonus By Invoice</span></a></li> 
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=InvoicePaymentSummary")'><span>Invoice Payment Summary</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=InvoicePaymentDetail")'><span>Invoice Payment Detail</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=InvoiceCreditMemo")'><span>Report Invoice & Credit Memo By Sales Rep</span></a></li>
+                                    </ul>
+                                </li>
+                            }
+                            @if(menu.Contains("PaymentReport"))
+                            {
+                                <li><a href='#'><span>Payment Report</span></a>
+                                    <ul>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=PaymentBill")'><span>Payment History By Bill</span></a></li> 
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=PaymentInvoice")'><span>Payment History By Invoice</span></a></li>
+                                    </ul>
+                                </li> 
+                            }
+                            @if(menu.Contains("ReportOverdue"))
+                            {
+                                <li><a href='@Url.Content("~/ReportViewer/Index?type=ReportOverdue")'><span>Report Overdue</span></a></li> 
+                            }
+                            @if(menu.Contains("ReportStock"))
+                            {
+                                <li><a href='@Url.Content("~/ReportViewer/Index?type=Product")'><span>Report Stock</span></a></li>
+                            }
+                            @if(menu.Contains("CreditMemoByItemReport"))
+                            {
+                                <li><a href='@Url.Content("~/ReportViewer/Index?type=CreditMemo")'><span>Credit Memo By Item</span></a></li>
+                            }
+                            @if(menu.Contains("ManufactureReport"))
+                            {
+                                <li><a href='#'><span>Manufacture Report</span></a>
+                                    <ul>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=AssemblyBuild")'><span>Report Hpp</span></a></li>
+                                    </ul>
+                                </li>
+                            }
+
+                        </ul>
+                    </li>
+                            }
+                            if (menu.Contains("AccountingReport"))
+                            {
+                                <li class='has-sub'><a href='#'><span>Accounting Report</span></a>
+                                    <ul>
+
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=GeneralJournal")'><span>Jurnal
+                                                Umum</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=TrialBalance")'><span>Neraca Saldo</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=AccountTransaction")'><span>Buku
+                                                Besar</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=Stock")'><span>Product Stock Report</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=TransactionStock")'><span>Transaction Stock Report</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=GoodsSoldByProduct")'><span>Goods Sold By Product</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=GoodsSoldByCustomer")'><span>Goods Sold By Customer</span></a></li>
+                                        <li><a href='@Url.Content("~/ReportViewer/Index?type=GoodsReturnedByCustomer")'><span>Goods Returned By Customer</span></a></li>
+                                    </ul>
+                                </li>
+                            }
+                    }
+                }
+
+            </ul>
+        </div>
+    </div>
+    <div class="page" style="overflow: auto; padding-top: 120px">
+        <div id="main">
+            @RenderBody()
+        </div>
+        <div id="footer">
+        </div>
+    </div>
+    <div class="PSI-footer">
+         PrimeSuite © All Rights Reserved.
+    </div>
+    <input type="hidden" id="btnCreateShadow">
+    <script src="/Scripts/psi/psiMVCFix.js" type="text/javascript"></script>
+    <script src="/Scripts/psi/JQueryRTablePagination.min.js" type="text/javascript"></script>
+</body>
+</html>

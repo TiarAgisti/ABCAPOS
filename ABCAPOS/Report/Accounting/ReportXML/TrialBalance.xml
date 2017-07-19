@@ -1,0 +1,13 @@
+﻿<Report Title="Laporan Neraca Saldo">
+  <Columns>
+    <Column Field="AccountCode" HeaderText="Kode Akun" Width="1"/>
+    <Column Field="AccountName" HeaderText="Nama Akun"/>
+    <Column Field="DebitBalance" HeaderText="Debet" Width=".8"/>
+    <Column Field="CreditBalance" HeaderText="Kredit" Width=".8"/>
+  </Columns>
+  <Footers>
+    <Footer Label="Total" LabelSpan="2"
+            Content="=SUM(Fields!DebitBalance.Value)"
+            Content2="=SUM(Fields!CreditBalance.Value)"/>
+  </Footers>
+</Report>

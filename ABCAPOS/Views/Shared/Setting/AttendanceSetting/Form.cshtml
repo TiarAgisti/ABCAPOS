@@ -1,0 +1,39 @@
+﻿@using ABCAPOS.Models
+@using MPL.MVC;
+@model AttendanceSettingModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,"ID"),
+        
+        Html.DecimalFieldObjFor(p=>p.MealAllowanceCourier,"Uang Makan Kurir"),
+        Html.DecimalFieldObjFor(p=>p.MealAllowanceOperator,"Uang Makan Operator"),
+        
+        Html.DecimalFieldObjFor(p=>p.OvertimeCourier,"Uang Lembur Kurir"),
+        Html.DecimalFieldObjFor(p=>p.OvertimeOperator,"Uang Lembur Operator"),
+        
+        Html.DecimalFieldObjFor(p=>p.LatePenaltyCourier,"Denda Keterlambatan Kurir"),
+        Html.DecimalFieldObjFor(p=>p.LatePenaltyOperator,"Denda Keterlambatan Operator"),
+        
+        Html.DecimalFieldObjFor(p=>p.AlphaPenaltyCourier,"Denda Alpha Kurir"),
+        Html.DecimalFieldObjFor(p=>p.AlphaPenaltyCourierOnSaturday,"Denda Alpha Kurir Hari Sabtu"),
+        Html.DecimalFieldObjFor(p=>p.AlphaPenaltyOperator,"Denda Alpha Operator"),
+        
+        Html.TextBoxFieldObjFor(p=>p.OffDutyCourier,"Jam Pulang Kurir"),
+        Html.TextBoxFieldObjFor(p=>p.OffDutyCourierOnSaturday,"Jam Pulang Kurir Hari Sabtu"),
+        
+        Html.TextBoxFieldObjFor(p=>p.OffDutyOperator,"Jam Pulang Operator"),
+        Html.TextBoxFieldObjFor(p=>p.OffDutyOperatorOnSaturday,"Jam Pulang Operator Hari Sabtu"),     
+       
+    };
+
+    var form = new Form();
+    form.Fields = formFields;
+}
+@Html.MasterForm(form, Model, mode, "AttendanceSetting", "ID", delegate(MasterFormHelper<AttendanceSettingModel> helper)
+    {
+        helper.CreateAnotherButton.Visible = helper.DeleteButton.Visible = false;
+        helper.BackToListButton.Href = Url.Content("~");
+    })

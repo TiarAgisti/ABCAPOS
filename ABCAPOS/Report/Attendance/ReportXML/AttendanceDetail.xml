@@ -1,0 +1,14 @@
+﻿<Report Title="Laporan Uang Lembur Kantor">
+  <Columns>
+    <Column Field="StaffName" HeaderText="Nama Staff"/>
+    <Column Field="Amount" HeaderText="Jumlah" Width="1.1"/>
+  </Columns>
+  <Footers>
+    <Footer Label="Total" Content="=SUM(Fields!Amount.Value)"/>
+  </Footers>
+  <Group1 Field="AttendanceID"
+          Header="=Fields!Code.Value 
+                   &amp;amp; &quot; - &quot; &amp;amp; Format(Fields!AttendanceDate.Value, &quot;dd/MM/yyyy&quot;)"
+          FooterLabel="=&quot;Total Keseluruhan &quot; &amp;amp; &quot;:&quot;"
+          FooterContent="=Sum(Fields!Amount.Value)"/>
+</Report>

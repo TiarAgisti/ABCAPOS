@@ -1,0 +1,200 @@
+table.basic
+{
+    border: 0;
+    padding: 0;
+    border-collapse: collapse;
+}
+
+table.basic td
+{
+    padding: 0px;
+    border: solid 0px #e8eef4;
+    vertical-align: top;
+}
+
+table.basic th
+{
+    padding: 0px 0px;
+    text-align: left;
+}
+
+table.detailGrid
+{
+    border: 0;
+    padding: 0;
+    border-collapse: collapse;
+}
+
+table.detailGrid td
+{
+    padding: 0px;
+    vertical-align: middle;
+}
+
+table.detailGrid th
+{
+    padding: 0px 0px;
+    text-align: left;
+}
+
+table.index
+{
+    width: 100%;
+    border: 1px Solid Gray;
+    padding: 0;
+    border-collapse: collapse;
+}
+
+table.index td
+{
+    padding: 2px 5px 2px 5px;
+}
+
+table.index thead tr
+{
+    text-align: center;
+    background-color: #FE2E64;
+    color: White;
+}
+
+table.index thead td
+{
+    height: 35px;
+}
+
+table.index .trOdd
+{
+    background-color: #F6D8CE;
+}
+
+table.index .trEven
+{
+    background-color: White;
+}
+
+table.index tbody td
+{
+    height: 25px;
+}
+
+.leftAlign
+{
+    text-align: left;
+}
+
+.centerAlign
+{
+    text-align: center;
+}
+
+.rightAlign
+{
+    text-align: right;
+}
+
+.gridButtonColumn
+{
+    width: 16px;
+}
+
+.separatorColumn
+{
+    width: 20px;
+}
+
+.warning
+{
+    color: Red;
+}
+
+a.gridLink
+{
+    color: #FFFFFF;
+}
+
+.imageButton
+{
+    border: none;
+    width: 16px;
+    height: 16px;
+    background-repeat: no-repeat;
+    text-indent: -9999px;
+    display: block;
+    overflow: hidden;
+}
+
+/*a.button
+{
+    text-decoration: none;
+    color: #000000;
+    cursor:pointer;
+}
+
+.button
+{
+    background-color: #F5A9A9;
+    border: solid 1px #FE2E64;
+    margin: 5px;
+    height: 18px;
+    float: left;
+    display: block;
+    padding: 5px 5px 2px 22px;
+    background-position: 5% 50%;
+    background-repeat: no-repeat;
+}
+
+.button:hover
+{
+    background-color: #F78181;
+}
+
+.button:active
+{
+    border-top: solid 1px black;
+}*/
+
+.add
+{
+    background-image: url('style/add.png');
+}
+
+.save
+{
+    background-image: url('style/save.png');
+}
+
+.cancel
+{
+    background-image: url('style/cancel.png');
+}
+
+.delete
+{
+    background-image: url('style/delete.png');
+}
+
+.details
+{
+    background-image: url('style/details.png');
+}
+
+.find
+{
+    background-image: url('style/find.png');
+}
+
+table.filterBox
+{
+    width: 50%;
+}
+
+table.filterBox thead tr
+{
+    background-color: #FE2E64;
+    color: White;
+}
+
+table.filterBox tbody tr .firstColumn
+{
+    width:150px;
+}

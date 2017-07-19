@@ -1,0 +1,118 @@
+﻿@using ABCAPOS.Helpers
+@using ABCAPOS.Models
+@using MPL.MVC;
+@{
+    ViewBag.Title = "Goods Sold By Product";
+
+    var notifications = ViewBag.NotificationList as List<HomeNotificationModel>;
+
+    var customerGroupList = ViewBag.CustomerGroupList as List<CustomerGroupModel>;
+    //var itemSoldList = ViewBag.SalesOrderItemSoldList as List<ProductModel>;
+
+    var menu = MenuHelper.GetMenuList();
+}
+<style type="text/css">
+    
+    table td {
+        border: 1px solid #e8eef4;
+        padding: 0px;
+    }
+    
+    .genericFilter {
+        width:98%;
+    }
+
+    a:link {
+        text-decoration: initial !important;
+    }
+</style>
+<link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.js")" type="text/javascript"></script>
+<link rel="stylesheet" href="@Url.Content("~/Scripts/amcharts/style.css")" type="text/css">
+<link rel="stylesheet" href="@Url.Content("~/Content/jquery.dataTables.min.css")" type="text/css">
+<script src="@Url.Content("~/Scripts/amcharts/amcharts.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/amcharts/serial.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.dataTables.min.js")" type="text/javascript"></script>
+ 
+<script type="text/javascript">
+    function initDatePicker() {
+        $("input.datepicker").datepicker({
+            dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+            buttonImageOnly: true
+        });
+        $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+    }
+    $(function () {
+        $('#btnSearchButton').attr('style', 'color: #ffffff;');
+        $('#btnClearSearchButton').attr('style', 'color: #ffffff;');
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+        initDatePicker();
+        $(".genericFilterHeader").html('&nbsp;Goods Sold By Product');
+
+        $('#tblTopGoodSold').DataTable({
+            "iDisplayLength": 20,
+            "sDom": 'rtip',
+            "order": [[2, "desc"]]
+        });
+        
+    });
+</script>
+@{
+    var floatLeft = "";
+
+    if (menu.Contains("Dashboard"))
+    {
+        floatLeft = "float:left;";
+    }
+}
+@if (menu.Contains("Dashboard"))
+{
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("TANGGAL","Date", delegate(GenericFilterField gff)
+        {
+            //gff.Value = "1/1/" + DateTime.Now.Year;
+            //gff.Value1 = "12/31/" + DateTime.Now.Year;
+        }),
+        Html.GenericFilterTextBoxField("PRODUCT CODE","ProductCode"),
+        
+    };
+
+   @Html.GenericFilter(filterList, delegate(GenericFilter gf)
+    {
+        gf.SearchButtonID = "btnSearchButton";
+        gf.ClearSearchButtonID = "btnClearSearchButton";
+    })
+    
+<input type="hidden" id="hdnYear" value="@ViewBag.Year" />
+<table id="tblTopGoodSold" class="tblTopGoodSold displayGrid" style="width: 98%;border:2px solid #dbdbdb;margin:2px;clear:both;">
+    <thead>
+     
+    <tr>
+        <td>PRODUCT CODE</td>
+        <td>PRODUCT NAME</td>
+        <td>QUANTITY</td>
+    </tr> 
+    </thead> 
+   <tbody>
+       @foreach (ProductModel prod in ViewBag.ProductItemSold)
+       {
+          <tr>
+            <td style="text-align:center;width:15%;">@prod.ProductCode</td>
+            <td>@prod.ProductName</td>
+            <td style="text-align:right;width:15%;">@Convert.ToDecimal(@prod.QtySold).ToString("N0")</td>
+        </tr>           
+       }
+    </tbody> 
+    
+
+</table>
+<br />
+}

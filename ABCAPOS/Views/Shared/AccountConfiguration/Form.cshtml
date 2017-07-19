@@ -1,0 +1,153 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model AccountConfigurationModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    var radioList = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = true,Text = "Aktif", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = false,Text = "Tidak Aktif", ReadOnly = mode == UIMode.Detail},
+    };
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.Modifiable,""),
+        
+        Html.LabelFieldObjFor(p=>p.Code,"Kode", delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.Label;
+            f.GenerateHiddenField = true;
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.Description,"Keterangan", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+        Html.RadioButtonFieldObjFor(p=>p.Active,"Status",radioList),
+    };
+
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("AccountID"),
+        Html.TextBoxColumn("AccountUserCode","Kode Akun","115px",delegate(GridColumn col){
+            col.InitAutoCompleteFunctionName = "initDebitAutoComplete";
+        }),
+        Html.LabelColumn("AccountDescription","Keterangan Akun"),
+    };
+
+    var addNewButton = new Button();
+    addNewButton.CssClass = "button";
+    addNewButton.Text = "Buat Baru";
+    addNewButton.OnClick = "addGrid1Row()";
+    addNewButton.ID = "btnAddNew";
+    addNewButton.Href = "#btnAddNew";
+    addNewButton.Visible = mode != UIMode.Detail;
+
+    var grid = new Grid();
+    grid.IncludeAddRowScript = true;
+    grid.IncludeDeleteRowButton = true;
+    grid.DefaultObject = new AccountConfigurationDetailModel();
+    grid.Columns = gridColumns;
+    grid.ShowFooter = true;
+    grid.AllowSorting = false;
+    grid.BelowButtons.Add(addNewButton);
+
+    var creditGridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("AccountID"),
+        Html.TextBoxColumn("AccountUserCode","Kode Akun","115px",delegate(GridColumn col){
+            col.InitAutoCompleteFunctionName = "initCreditAutoComplete";
+        }),
+        Html.LabelColumn("AccountDescription","Keterangan Akun"),
+    };
+
+    var creditAddNewButton = new Button();
+    creditAddNewButton.CssClass = "button";
+    creditAddNewButton.Text = "Buat Baru";
+    creditAddNewButton.OnClick = "addCreditGridRow()";
+    creditAddNewButton.ID = "btnAddNewCredit";
+    creditAddNewButton.Href = "#btnAddNew";
+    creditAddNewButton.Visible = mode != UIMode.Detail;
+
+    var creditGrid = new Grid();
+    creditGrid.ID = "CreditGrid";
+    creditGrid.DataContainerName = "CreditDetails";
+    creditGrid.IncludeAddRowScript = true;
+    creditGrid.IncludeDeleteRowButton = true;
+    creditGrid.DefaultObject = new AccountConfigurationDetailModel();
+    creditGrid.Columns = creditGridColumns;
+    creditGrid.ShowFooter = true;
+    creditGrid.AllowSorting = false;
+    creditGrid.BelowButtons.Add(creditAddNewButton);
+
+    var form = new Form();
+    form.Fields = formFields;
+
+    TabbedGrid tabbedGrid = new TabbedGrid();
+    tabbedGrid.AddGrid("Kredit", creditGrid, Model.CreditDetails);
+
+    var creditTextBoxName = "Details_@index_AccountUserCode";
+    var debitTextBoxName = "Expenses_@index_AccountUserCode";
+    var serviceUrl = Url.Content("~/WebService.asmx/RetrieveAccountByKey");
+    var retrieveSingleUrl = Url.Content("~/WebService.asmx/RetrieveAccount");
+}
+<script type="text/javascript">
+    $(function () {
+        changeFormAction();
+
+        $('a[name=lnkAddNewGrid1]').hide();
+        $('a[name=lnkAddNewCreditGrid]').hide();
+    });
+
+    function changeFormAction() {
+        var mode = $("#hdnMode").val();
+
+        if (mode === "Create")
+            $("#Form1").attr("action", "/AccountConfiguration/CreateAccountConfiguration");
+        else
+            $("#Form1").attr("action", "/AccountConfiguration/UpdateAccountConfiguration");
+    }
+
+    function onSelectDebitAccount(data, index) {
+        $("#Details_" + index + "_AccountID").val(data.ID);
+        $("#Details_" + index + "_AccountDescription").text(data.Description);
+    }
+
+    function onSelectCreditAccount(data, index) {
+        $("#CreditDetails_" + index + "_AccountID").val(data.ID);
+        $("#CreditDetails_" + index + "_AccountDescription").text(data.Description);
+    }
+    
+</script>
+<input type="hidden" id="hdnMode" value="@mode" />
+@Html.GridAutoCompleteScript("initDebitAutoComplete", "Grid1", creditTextBoxName, serviceUrl, null, retrieveSingleUrl,
+                                         "accountName", "", "Code", "FullDescription", "onSelectDebitAccount", 50, 500)
+@Html.GridAutoCompleteScript("initCreditAutoComplete", "CreditGrid", debitTextBoxName, serviceUrl, null, retrieveSingleUrl,
+                                                 "accountName", "", "Code", "FullDescription", "onSelectCreditAccount", 50, 500)
+@Html.MasterDetailForm(form, grid, Model, Model.Details, mode, "Accounting", "ID", delegate(MasterDetailFormHelper helper)
+    {
+        helper.TabbedGrid = tabbedGrid;
+        helper.DetailGridTitle = "Debit";
+
+        if (mode == UIMode.Detail)
+        {
+            helper.ApproveButton.Visible = false;
+
+            if (!Convert.ToBoolean(ViewBag.AllowCreate))
+            {
+                helper.CreateAnotherButton.Visible = false;
+            }
+
+            if (!Convert.ToBoolean(ViewBag.AllowEdit) || !Model.Modifiable)
+            {
+                helper.EditButton.Visible = helper.CreateAnotherButton.Visible = helper.VoidButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+            }
+            else
+            {
+                helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.CopyTransactionButton.Visible = false;
+                helper.EditButton.Visible = mode == UIMode.Detail;
+            }
+        }
+    })

@@ -1,0 +1,263 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model InventoryAdjustmentModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+    ViewBag.ErrorMessage = "";
+
+    var warehouseList = ViewBag.WarehouseList as IEnumerable<WarehouseModel>;
+    var ddlWarehouse = Util.GetDropDownOptions(warehouseList, "Name", "ID");
+
+    var departmentList = ViewBag.DepartmentList as IEnumerable<DepartmentModel>;
+    var ddlDepartment = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)0), Text ="" }
+    };
+    ddlDepartment.AddRange(Util.GetDropDownOptions(departmentList, "DepartmentDesc", "ID"));
+
+    var conversionList = ViewBag.ConversionList as List<UnitDetailModel>;
+    var ddlConversion = Util.GetDropDownOptions(conversionList, "Name", "ID");
+
+    var deptField = new MPL.MVC.FormField[]{
+        Html.DropDownFieldObjFor(p=>p.DepartmentID,"DEPARTMENT",ddlDepartment, delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        Html.LabelFieldObjFor(p=>p.DepartmentDesc,"DEPARTMENT", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        })
+    };
+
+    var staffField = new MPL.MVC.FormField[]
+    {
+        Html.TextBoxFieldObjFor(p=>p.StaffName,"EMPLOYEE", delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+    };
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.StaffID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.CustomerID,""),
+        
+        Html.FullRowFormFieldObj("<br /><b>Primary Information</b><br/>","<br /><b>Primary Information</b><br/>","<br /><b>Primary Information</b><br/>"),
+       
+        Html.LabelFieldObjFor(p=>p.Code,"REFERENCE #", delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.Label;
+            f.GenerateHiddenField = true;
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.CustomerName,"CUSTOMER", delegate(FormField f){
+                f.Style = "width:300px";
+        }), 
+        
+        Html.DateFieldObjFor(p=>p.Date,"DATE", delegate(FormField f){
+            f.DetailFormat = "MM/dd/yyyy";
+            f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+            f.Style = "width:300px";
+        }),
+            
+        Html.TextBoxFieldObjFor(p=>p.Title,"MEMO", delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.VoidRemarks,"VOID REMARKS", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+            
+            if(string.IsNullOrEmpty(Model.VoidRemarks))
+            {
+                f.DetailFieldType = FormFieldType.None;
+            }
+        }),
+            
+        
+        Html.FullRowFormFieldObj("<br />","<br />","<br />"),
+        
+        Html.FullRowFormFieldObj("<br /><b>Classifications</b><br/>","<br /><b>Clasifications</b><br/>","<br /><b>Clasifications</b><br/>"),
+        
+        Html.DualColumnFormFieldObj(deptField, staffField, 20),
+        
+        Html.DropDownFieldObjFor(p=>p.WarehouseID,"ADJUSTMENT LOCATION",ddlWarehouse, delegate(FormField f){
+            f.Style = "width:300px";
+            f.DetailFieldType = FormFieldType.None;
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.WarehouseName,"ADJUSTMENT LOCATION", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+        
+    };
+
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("ItemNo"),
+        Html.HiddenFieldColumn("ProductID"),
+        Html.HiddenFieldColumn("WarehouseIDDetail"),
+        
+        Html.TextBoxColumn("ProductCode","ITEM*","110px",delegate(GridColumn col){
+            col.InitAutoCompleteFunctionName = "initProductAutoComplete";
+        }),
+        Html.LabelColumn("ProductName", "DISPLAY NAME","",delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+        }),
+        //Html.DropDownColumn("WarehouseIDDetail","LOCATION*",ddlWarehouse, "100px", delegate(GridColumn col){
+        //    col.DetailColumnType = GridColumnType.None;
+        //}),
+        //Html.LabelColumn("WarehouseNameDetail","LOCATION*", "110px", delegate(GridColumn gc){
+        //    gc.CreateColumnType = gc.UpdateColumnType = GridColumnType.None;
+        //}),
+        Html.LabelColumn("QtyOnHandOld", "QTY ON HAND", "110px",delegate(GridColumn col){
+            col.DetailFormat = "N0";
+        }),
+        Html.DecimalColumn("Quantity", "ADJUST QTY BY", "110px",delegate(GridColumn col){
+            col.ItemAttributes = " onblur=\"calc($(this).parent().parent().index())\" ";
+            col.GenerateHiddenField = true;
+            col.DetailFormat = "N0";
+            col.CreateFormat = col.UpdateFormat = "F0";
+        }),
+        Html.LabelColumn("QtyOnHandNew", "NEW QUANTITY", "110px",delegate(GridColumn col){
+            col.DetailFormat = "N0";
+        }),
+        Html.DropDownColumn("ConversionID", "UNIT", ddlConversion,"110px", delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.None;
+            col.ItemAttributes = " onchange=\"unitChange($(this).parent().parent().index())\"";
+            // TODO: onmouseover trim is very inefficient. should fix if time
+            col.ItemAttributes += " onmouseover=\"trimUnitOption($(this).parent().parent().index())\" ";
+        }),
+        Html.LabelColumn("ConversionName", "UNIT", "110px", delegate(GridColumn gc){
+            gc.CreateColumnType = gc.UpdateColumnType = GridColumnType.None;
+        }),
+        Html.LabelColumn("BinNumber", "BIN NUMBER","100px", delegate(GridColumn col)
+        {
+            col.UpdateColumnType = col.CreateColumnType = GridColumnType.None;
+        }),
+        Html.TextBoxColumn("Memo", "MEMO", "110px",delegate(GridColumn col){
+        })
+    };
+
+    var addNewButton = new Button();
+    addNewButton.CssClass = "button";
+    addNewButton.Text = "Add";
+    addNewButton.OnClick = "addGrid1Row()";
+    addNewButton.ID = "btnAddNew";
+    addNewButton.Href = "#btnAddNew";
+    addNewButton.Visible = mode != UIMode.Detail;
+
+    var grid = new Grid();
+    grid.IncludeAddRowScript = true;
+    grid.IncludeDeleteRowButton = true;
+    grid.DefaultObject = new InventoryAdjustmentDetailModel();
+    grid.Columns = gridColumns;
+    grid.ShowFooter = true;
+    grid.AllowSorting = false;
+    grid.BelowButtons.Add(addNewButton);
+
+    var form = new Form();
+    form.Fields = formFields;
+
+    var textBoxName = "Details_@index_ProductCode";
+    var serviceUrl = Url.Content("~/WebService.asmx/RetrieveProductByKey");
+    var retrieveSingleUrl = Url.Content("~/WebService.asmx/RetrieveProductOnInventoryAdjustment");
+
+    TabbedGrid tabbedGrid = new TabbedGrid();
+
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.initNumeric = function () {
+            $(".decimalNumeric").numeric({
+                decimal: "."
+            });
+            $(".decimalNumeric").focus(function () {
+                var temp = $(this);
+                setTimeout(function () {
+                    temp.select();
+                }, 100);
+            });
+            $(".integerNumeric").numeric(false, function () { this.value = ""; this.focus(); });
+        }
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+    });
+</script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/Transaction/InventoryAdjustment.js")"></script>
+<input type="hidden" id="hdnMode" value="@mode" />
+@Html.AutoCompleteScript("initCustomerAutoComplete", 
+    "txtCustomerName", 
+    Url.Content("~/WebService.asmx/RetrieveCustomerByKey"), 
+    "",
+    Url.Content("~/WebService.asmx/RetrieveCustomer"), 
+    "customerName", 
+    "Code", 
+    "Name", 
+    "onSelectCustomer", 
+    50, 
+    500)
+@Html.AutoCompleteScript("initEmployeeAutoComplete",
+    "txtStaffName",
+    Url.Content("~/WebService.asmx/RetrieveEmployeeByKey"),
+    "",
+    Url.Content("~/WebService.asmx/RetrieveEmployee"),
+    "employeeName",
+    "Name",
+    "RoleDescription",
+    "onSelectEmployee",
+    50,
+    500)
+@Html.GridAutoCompleteScript("initProductAutoComplete",
+    "Grid1",
+    textBoxName,
+    serviceUrl,
+    "",
+    retrieveSingleUrl,
+    "productCode",
+    ",'warehouseID':'\"+getWarehouseID()+\"'",
+    "Code",
+    "ProductName",
+    "onSelectProduct",
+    50,
+    500)
+@Html.MasterDetailForm(form, grid, Model, Model.Details, mode, "InventoryAdjustment", "ID", delegate(MasterDetailFormHelper helper)
+{
+    helper.DetailGridTitle = "Item";
+    helper.TabbedGrid = tabbedGrid;
+    
+    if (mode == UIMode.Detail)
+    {
+        helper.DetailGridTitle = "Item";
+
+        helper.VoidButton.Href = Url.Content("~/InventoryAdjustment/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+        helper.VoidButton.OnClick = "";
+        helper.VoidButton.ID = "btnVoid";
+
+        helper.CreateAnotherButton.Visible = false;
+        helper.CopyTransactionButton.Visible = false;
+
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            //helper.Buttons.Add(reviseButton);
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = helper.VoidButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+        }
+        else
+        {
+            //helper.EditButton.Visible = mode == UIMode.Detail && Model.Status != (int)MPL.DocumentStatus.Void && Model.Status == (int)MPL.DocumentStatus.New;
+            helper.EditButton.Visible = false;
+            helper.ApproveButton.Visible = false;
+            helper.VoidButton.Visible = mode == UIMode.Detail && Model.Status != (int)MPL.DocumentStatus.Void;
+            helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = false;
+        }
+    }
+})

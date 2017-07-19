@@ -1,0 +1,67 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model BinModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    var radioList = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = true,Text = "YES", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = false,Text = "NO", ReadOnly = mode == UIMode.Detail},
+    };
+
+    
+
+    /* combo box gudang */
+    var warehouseList = ViewBag.WarehouseList as IEnumerable<WarehouseModel>;
+    var ddlWarehouse = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)0), Text ="" }
+    };
+    ddlWarehouse.AddRange(Util.GetDropDownOptions(warehouseList, "Name", "ID"));
+    /* end combo box */
+    
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.DropDownFieldObjFor(p=> p.WarehouseID, "LOCATION", ddlWarehouse, delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+         Html.LabelFieldObjFor(p=>p.WarehouseName, "LOCATION", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.Name,"BIN NUMBER", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        Html.RadioButtonFieldObjFor(p=>p.IsActive, "BIN IS ACTIVE", radioList),
+        
+       Html.TextAreaFieldObjFor(p=>p.Memo,"MEMO", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+    };
+
+    var form = new Form();
+    form.Fields = formFields;
+
+}
+@Html.MasterForm(form, Model, mode, "Bin", "ID", delegate(MasterFormHelper<BinModel> helper)
+{
+    if (mode == UIMode.Detail)
+    {
+        if (!Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.CreateAnotherButton.Visible = false;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = false;
+        }
+
+        helper.DeleteButton.Visible = false;
+    }
+})

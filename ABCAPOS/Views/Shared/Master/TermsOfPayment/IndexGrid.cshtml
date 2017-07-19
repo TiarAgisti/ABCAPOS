@@ -1,0 +1,34 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<TermsOfPaymentModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Name","NAME"),
+        Html.LabelColumn("Terms","TERMS"),
+    };
+    
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("NAME","Name"),
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.DefaultObject = new TermsOfPaymentModel();
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "TermsOfPayment", "ID", "Name", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    if (Convert.ToBoolean(ViewBag.AllowCreate))
+    {
+        helper.AddNewButton.Visible = true;
+    }
+    else
+    {
+        helper.AddNewButton.Visible = false;
+    }
+})

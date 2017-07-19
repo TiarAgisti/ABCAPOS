@@ -1,0 +1,176 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<ReturnReceiptModel>
+@{
+    var dataCount = (int)ViewBag.DataCount;
+    var pageSize = (int)ViewBag.PageSize;
+    var startIndex = (int)ViewBag.StartIndex;
+    var selectedPage = startIndex / pageSize + 1;
+    var pageAmount = (dataCount / 20);
+
+    if (dataCount % 20 != 0)
+    {
+        pageAmount += 1;
+    }
+
+    var statement = string.Format("Page: {0} of {1}", selectedPage, pageAmount);
+  
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("CustomerReturnID","CustomerReturn ID","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("CustomerReturnTitle","Customer Return Title","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("Code","ITEM RECEIPT NO", "80px", delegate(GridColumn col)
+        {
+            col.Style = "text-align:center;width:80px;";
+        }),
+        Html.DateColumn("Date","DATE", "80px", delegate(GridColumn col)
+        {
+            col.Style = "text-align:center;width:80px;";
+        }),
+        Html.LabelColumn("CustomerReturnCode","RETURN NUMBER", "80px", delegate(GridColumn col)
+        {
+            col.Style = "text-align:center;width:80px;";
+        }),
+        Html.LabelColumn("CustomerName","CUSTOMER", "300px"),
+        Html.LabelColumn("Remarks","MEMO"),
+        //Html.LabelColumn("StatusDescription","Status", "80px",delegate(GridColumn col){
+        //    col.SortField = "Status";
+        //})
+    };
+
+    var statusList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)MPL.DocumentStatus.New), Text = "Receipt" },
+        new DropDownOption(){ Value = Convert.ToString((int)MPL.DocumentStatus.Void), Text = MPL.DocumentStatus.Void.ToString() },
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("TRANSACTION DATE","Date"),
+        Html.GenericFilterTextBoxField("ITEM RECEIPT NUMBER","Code"),
+        Html.GenericFilterTextBoxField("PO NUMBER","CustomerReturnCode"),
+        Html.GenericFilterTextBoxField("CUSTOMER NAME","CustomerName"),
+        Html.GenericFilterDropDownField("STATUS","Status",statusList,typeof(int))    
+    };
+
+    var detailButton = new GridButtonColumn();
+    detailButton.CssClass = "iconContainer";
+    detailButton.ButtonCssClass = "details imageButton";
+    detailButton.Href = Url.Content("~/ReturnReceipt/Detail?key=@idPropertyValue");
+    detailButton.IDPropertyName = "ID";
+    detailButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var spk = obj as ReturnReceiptModel;
+
+        return true;
+    };
+    detailButton.Text = "Detail";
+
+    var voidButton = new GridButtonColumn();
+    voidButton.CssClass = "iconContainer openPopUp void";
+    voidButton.ButtonCssClass = "cancel imageButton";
+    voidButton.Href = Url.Content("~/ReturnReceipt/VoidRemarks?key=@idPropertyValue&voidFromIndex=true");
+    voidButton.IDPropertyName = "ID";
+    voidButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var quotation = obj as ReturnReceiptModel;
+
+        if (quotation.Status != (int)MPL.DocumentStatus.Void)
+            return true;
+
+        return false;
+    };
+    voidButton.Text = "Void";
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(detailButton);
+
+    if (Convert.ToBoolean(ViewBag.AllowVoid))
+    {
+        grid.Buttons.Add(voidButton);
+    }
+}
+<script type="text/javascript">
+    $(function () {
+
+        $(".cancel").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                .addClass("dialog")
+                .attr("id", $(this).attr("data-dialog-id"))
+                .appendTo("body").dialog({
+                    title: "Void Remarks",
+                    close: function () {
+                        $(this).remove();
+                    },
+                    modal: true,
+                    height: 180,
+                    width: 700,
+                    left: 0
+                }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+
+
+        addTooltip();
+        if ($.urlParam('filter.FilterFields%5B0%5D.Selected') == null) {
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+            var yyyy = today.getFullYear();
+
+            today = mm + '/' + dd + '/' + yyyy;
+            $("#filter_FilterFields_0_Value").val(today);
+        }
+    });
+    $(document).ready(function () {
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+    });
+    function addTooltip() {
+        var noOfRows = $("#Grid1 tbody tr").length;
+
+        for (x = 0; x < noOfRows; x++) {
+            var customerReturnID = $("#Details_" + x + "_CustomerReturnID").val();
+            var customerReturnCode = $("#Details_" + x + "_CustomerReturnCode").text();
+            var customerReturnTitle = $("#Details_" + x + "_CustomerReturnTitle").val();
+
+            var link = "/CustomerReturn/Detail?key=" + customerReturnID;
+            $("#Details_" + x + "_CustomerReturnCode").replaceWith('<a href="' + link + '" title="' + customerReturnTitle + '">' + customerReturnCode + '</a>');
+        }
+    }
+</script>
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "ReturnReceipt", "ID", "Name", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    if (Convert.ToBoolean(ViewBag.AllowCreate))
+    {
+        helper.AddNewButton.Visible = true;
+    }
+    else
+    {
+        helper.AddNewButton.Visible = false;
+    }
+
+    helper.AddNewButton.Href = Url.Content("~/UncreatedReturnReceipt");
+})
+<br />
+@statement

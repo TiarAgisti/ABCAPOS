@@ -1,0 +1,160 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<TransferDeliveryModel>
+@{
+    var dataCount = (int)ViewBag.DataCount;
+    var pageSize = (int)ViewBag.PageSize;
+    var startIndex = (int)ViewBag.StartIndex;
+    var selectedPage = startIndex / pageSize + 1;
+    var pageAmount = (dataCount / 20);
+
+    if (dataCount % 20 != 0)
+    {
+        pageAmount += 1;
+    }
+
+    var statement = string.Format("Page: {0} of {1}", selectedPage, pageAmount);
+  
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("TransferOrderID","TRANSFER ORDER ID","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("TransferOrderTitle","TRANSFER ORDER TITLE","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("Code","TRF DELIVERY NO","180px"),
+        Html.DateColumn("Date","DATE"),
+        Html.LabelColumn("TransferOrderCode","REF TRANSFER ORDER","100px"),
+        Html.LabelColumn("FromWarehouseName","FROM LOCATION"),
+        Html.LabelColumn("ToWarehouseName","TO LOCATION"),
+        Html.LabelColumn("StatusDescription","STATUS", "100px",delegate(GridColumn col){
+            col.SortField = "Status";
+        })
+    };
+
+    var statusList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)DeliveryOrderStatus.New), Text = "PICKED"},
+        new DropDownOption(){ Value = Convert.ToString((int)DeliveryOrderStatus.Packed), Text = "APPROVED" },
+        new DropDownOption(){ Value = Convert.ToString((int)DeliveryOrderStatus.Shipped), Text = "SHIPPED" },
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("TRF DELIVERY NO","Code"),
+        Html.GenericFilterDateRangeField("TRANSACTION DATE","Date"),
+        Html.GenericFilterTextBoxField("REF TRANSFER ORDER","TransferOrderCode"),
+        Html.GenericFilterTextBoxField("FROM LOCATION","FromWarehouseName"),
+        Html.GenericFilterTextBoxField("TO LOCATION","ToWarehouseName"),
+        Html.GenericFilterDropDownField("STATUS","Status",statusList,typeof(int))
+        
+    };
+
+    var detailButton = new GridButtonColumn();
+    detailButton.CssClass = "iconContainer";
+    detailButton.ButtonCssClass = "details imageButton";
+    detailButton.Href = Url.Content("~/TransferDelivery/Detail?key=@idPropertyValue");
+    detailButton.IDPropertyName = "ID";
+    detailButton.Text = "Detail";
+
+    var printButton = new GridButtonColumn();
+    printButton.CssClass = "iconContainer";
+    printButton.ButtonCssClass = "print imageButton";
+    printButton.OnClick = String.Format("window.open('{0}');", Url.Action("PopUp", "ReportViewer", new { type = ABCAPOS.Controllers.ReportViewerController.PrintOutType.DeliveryOrder, queryString = "deliveryOrderID=@idPropertyValue" }));
+    printButton.IDPropertyName = "ID";
+    printButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var deliveryOrder = obj as TransferDeliveryModel;
+
+        if (deliveryOrder.Status != (int)SPKStatus.Void && deliveryOrder.Status != (int)MPL.DocumentStatus.Approved)
+            return true;
+
+        return false;
+    };
+    printButton.Text = "PRINT";
+
+    var voidButton = new GridButtonColumn();
+    voidButton.CssClass = "iconContainer";
+    voidButton.ButtonCssClass = "cancel imageButton";
+    voidButton.Href = Url.Content("~/TransferDelivery/VoidFromIndex?key=@idPropertyValue");
+    voidButton.OnClick = "return confirm('Apakah Anda yakin ingin membatalkan dokumen ini?');";
+    voidButton.IDPropertyName = "ID";
+    voidButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var deliveryOrder = obj as TransferDeliveryModel;
+
+        if (deliveryOrder.Status != (int)DeliveryOrderStatus.Void)
+            return true;
+
+        return false;
+    };
+    voidButton.Text = "Void";
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(detailButton);
+    //grid.Buttons.Add(approveButton);
+    //grid.Buttons.Add(printButton);
+
+    if (Convert.ToBoolean(ViewBag.AllowVoid))
+    {
+        //grid.Buttons.Add(voidButton);
+    }
+}
+<script type="text/javascript">
+    $(function () {
+        addTooltip();
+        if ($.urlParam('filter.FilterFields%5B1%5D.Selected') == null) {
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+            var yyyy = today.getFullYear();
+
+            today = mm + '/' + dd + '/' + yyyy;
+            $("#filter_FilterFields_1_Value").val(today);
+        }
+    });
+    $(document).ready(function () {
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+    });
+    function addTooltip() {
+        var noOfRows = $("#Grid1 tbody tr").length;
+
+        for (x = 0; x < noOfRows; x++) {
+            var transferOrderID = $("#Details_" + x + "_TransferOrderID").val();
+            var transferOrderCode = $("#Details_" + x + "_TransferOrderCode").text();
+            var transferOrderTitle = $("#Details_" + x + "_TransferOrderTitle").val();
+
+            var transferOrderLink = "/TransferOrder/Detail?key=" + transferOrderID;
+
+            $("#Details_" + x + "_TransferOrderCode").replaceWith('<a href="' + transferOrderLink + '" title="' + transferOrderTitle + '">' + transferOrderCode + '</a>');
+        }
+    }
+</script>
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "TransferDelivery", "ID", "Code", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+    {
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.AddNewButton.Visible = true;
+        }
+        else
+        {
+            helper.AddNewButton.Visible = false;
+        }
+
+        helper.AddNewButton.Href = Url.Content("~/UncreatedTransferDelivery/");
+    })
+<br />
+@statement

@@ -1,0 +1,13 @@
+﻿<Report Title="Rincian Delivery Order">
+  <Columns>
+    <Column Field="ProductCode" HeaderText="Kode Produk" Width="1"/>
+    <Column Field="ProductName" HeaderText="Nama Produk"/>
+    <Column Field="Quantity" HeaderText="Qty" Width=".8"/>
+    
+  </Columns>
+  <Group1 Field="DeliveryOrderID"
+          Header="=Fields!DeliveryOrderCode.Value 
+                   &amp;amp; &quot; - &quot; &amp;amp; Format(Fields!Date.Value, &quot;dd/MM/yyyy&quot;)
+                   &amp;amp; &quot; - &quot; &amp;amp; Fields!CustomerName.Value
+                   &amp;amp; &quot; - &quot; &amp;amp; Fields!SalesOrderCode.Value"/>
+</Report>

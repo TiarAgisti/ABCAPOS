@@ -1,0 +1,136 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<IncomeExpenseModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","Kode Pengeluaran","100px"),
+        Html.DateColumn("Date","Tanggal"),
+        Html.LabelColumn("Title","Judul"),
+        Html.LabelColumn("StatusDescription","Status", "",delegate(GridColumn col){
+            col.SortField = "Status";
+        })
+    };
+
+    var statusList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)IncomeExpenseStatus.New), Text = IncomeExpenseStatus.New.ToString() },
+        new DropDownOption(){ Value = Convert.ToString((int)IncomeExpenseStatus.Approved), Text = "Disetujui" },
+        new DropDownOption(){ Value = Convert.ToString((int)IncomeExpenseStatus.Void), Text = IncomeExpenseStatus.Void.ToString() },
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("Tanggal","Date"),
+        Html.GenericFilterTextBoxField("Kode Pengeluaran","Code"),
+        Html.GenericFilterTextBoxField("Judul","Title"),
+        Html.GenericFilterDropDownField("Status","Status",statusList,typeof(int))
+    };
+
+    var detailButton = new GridButtonColumn();
+    detailButton.CssClass = "iconContainer";
+    detailButton.ButtonCssClass = "details imageButton";
+    detailButton.Href = Url.Content("~/ExpenseBank/Detail?key=@idPropertyValue");
+    detailButton.IDPropertyName = "ID";
+    detailButton.Text = "Detail";
+
+    var approveButton = new GridButtonColumn();
+    approveButton.CssClass = "iconContainer";
+    approveButton.ButtonCssClass = "approve imageButton";
+    approveButton.Href = Url.Content("~/ExpenseBank/ApproveFromIndex?key=@idPropertyValue");
+    approveButton.OnClick = "return confirm('Apakah Anda yakin ingin menyetujui dokumen ini?');";
+    approveButton.IDPropertyName = "ID";
+    approveButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var quotation = obj as IncomeExpenseModel;
+
+        if (quotation.Status == (int)IncomeExpenseStatus.New && Convert.ToBoolean(ViewBag.AllowEdit))
+            return true;
+
+        return false;
+    };
+    approveButton.Text = "Setujui";
+
+    var printButton = new GridButtonColumn();
+    printButton.CssClass = "iconContainer";
+    printButton.ButtonCssClass = "print imageButton";
+    printButton.OnClick = String.Format("window.open('{0}');", Url.Action("PopUp", "ReportViewer", new { type = ABCAPOS.Controllers.ReportViewerController.PrintOutType.IncomeBank, queryString = SystemConstants.str_IncomeExpenseID + "=@idPropertyValue" }));
+    printButton.IDPropertyName = "ID";
+    printButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var incomeExpense = obj as IncomeExpenseModel;
+
+        if (incomeExpense.Status != (int)IncomeExpenseStatus.Void)
+            return true;
+
+        return false;
+    };
+    printButton.Text = "Cetak";
+
+    var voidButton = new GridButtonColumn();
+    voidButton.CssClass = "iconContainer";
+    voidButton.ButtonCssClass = "cancel imageButton";
+    voidButton.Href = Url.Content("~/ExpenseBank/VoidRemarks?key=@idPropertyValue&voidFromIndex=true");
+    //voidButton.OnClick = "return confirm('Apakah Anda yakin ingin membatalkan dokumen ini?');";
+    voidButton.IDPropertyName = "ID";
+    voidButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var incomeExpense = obj as IncomeExpenseModel;
+
+        if (incomeExpense.Status != (int)IncomeExpenseStatus.Void)
+            return true;
+
+        return false;
+    };
+    voidButton.Text = "Void";
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(detailButton);
+    grid.Buttons.Add(approveButton);
+    grid.Buttons.Add(printButton);
+    grid.Buttons.Add(voidButton);
+}
+<script type="text/javascript">
+    $(function () {
+        $("[name='lnkAddNewGrid1']").hide();
+
+        $(".cancel").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                .addClass("dialog")
+                .attr("id", $(this).attr("data-dialog-id"))
+                .appendTo("body").dialog({
+                    title: "Alasan Void",
+                    close: function () {
+                        $(this).remove();
+                    },
+                    modal: true,
+                    height: 180,
+                    width: 700,
+                    left: 0
+                }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+    });
+</script>
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "ExpenseBank", "ID", "Code", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+    {
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.AddNewButton.Visible = true;
+        }
+        else
+        {
+            helper.AddNewButton.Visible = false;
+        }
+    })

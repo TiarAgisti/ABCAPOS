@@ -1,0 +1,49 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<SalesOrderModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","SO NO","120px"),
+        Html.DateColumn("Date","DATE"),
+        Html.LabelColumn("CustomerName","CUSTOMER"),
+        //Html.LabelColumn("StatusDescription","Status", "",delegate(GridColumn col){
+        //    col.SortField = "Status";
+        //})
+    };
+
+    var statusList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)MPL.DocumentStatus.New), Text = MPL.DocumentStatus.New.ToString() },
+        new DropDownOption(){ Value = Convert.ToString((int)MPL.DocumentStatus.Approved), Text = "Approved" },
+        new DropDownOption(){ Value = Convert.ToString((int)MPL.DocumentStatus.Void), Text = MPL.DocumentStatus.Void.ToString() },
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("TRANSACTION DATE","TransactionDate"),
+        Html.GenericFilterTextBoxField("SO NO","Code"),
+        Html.GenericFilterTextBoxField("CUSTOMER","CustomerName"),
+        //Html.GenericFilterDropDownField("Status","Status",statusList,typeof(int))
+    };
+
+    var createButton = new GridButtonColumn();
+    createButton.CssClass = "iconContainer";
+    createButton.ButtonCssClass = "add imageButton";
+    createButton.Href = Url.Content("~/DeliveryOrder/Create?salesOrderID=@idPropertyValue");
+    createButton.IDPropertyName = "ID";
+    createButton.Text = "Detail";
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(createButton);
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "UncreatedDO", "ID", "Code", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+    {
+        helper.AddNewButton.Visible = false;
+    })

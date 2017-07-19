@@ -1,0 +1,10 @@
+﻿<Report Title="Daftar Purchase Order">
+  <Columns>
+    <Column Field="Code" HeaderText="Kode Purchase Order" Width="1.2"/>
+    <Column Field="Date" HeaderText="Tanggal" Width=".6"/>
+    <Column Field="VendorName" HeaderText="Nama Vendor" Width="3.5"/>
+    <Column Field="ExchangeRate" HeaderText="Rate" Width="0.9"/>
+    <Column Field="POTotalDollar" HeaderText="Total (Dollar)" Width=".9"/>
+    <Column Field="POTotal" HeaderText="Total (Rupiah)" Width="0.9"/>
+  </Columns>
+</Report>

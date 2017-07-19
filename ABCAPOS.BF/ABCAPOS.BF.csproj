@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{710F5AA8-AF98-47EB-BADD-2F4D16FF2732}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ABCAPOS.BF</RootNamespace>
+    <AssemblyName>ABCAPOS.BF</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MPL">
+      <HintPath>..\ABCAPOS.Util\DLL\MPL.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AccountBFC.cs" />
+    <Compile Include="AccountCategoryBFC.cs" />
+    <Compile Include="AccountConfigurationBFC.cs" />
+    <Compile Include="AccountingBFC.cs" />
+    <Compile Include="AccountingResultBFC.cs" />
+    <Compile Include="AllowanceBFC.cs" />
+    <Compile Include="AnnualVATBFC.cs" />
+    <Compile Include="AssemblyBuildBFC.cs" />
+    <Compile Include="AssemblyUnBuildBFC.cs" />
+    <Compile Include="AttendanceBFC.cs" />
+    <Compile Include="AttendanceSettingBFC.cs" />
+    <Compile Include="BasePriceLocationBFC.cs" />
+    <Compile Include="BinProductWarehouseBFC.cs" />
+    <Compile Include="BinBFC.cs" />
+    <Compile Include="BillCreditBFC.cs" />
+    <Compile Include="ApplyBillCreditBFC.cs" />
+    <Compile Include="ApplyCreditMemoBFC.cs" />
+    <Compile Include="BookingOrderBFC.cs" />
+    <Compile Include="BookingSalesBFC.cs" />
+    <Compile Include="CashSalesBFC.cs" />
+    <Compile Include="ContainerBFC.cs" />
+    <Compile Include="CurrencyBFC.cs" />
+    <Compile Include="CurrencyDateBFC.cs" />
+    <Compile Include="ExpeditionBFC.cs" />
+    <Compile Include="FormulasiBFC.cs" />
+    <Compile Include="LimitStockBFC.cs" />
+    <Compile Include="LogBFC.cs" />
+    <Compile Include="MakeMultiPayBFC.cs" />
+    <Compile Include="CreditMemoBFC.cs" />
+    <Compile Include="MakeMultiPaySalesBFC.cs" />
+    <Compile Include="GenericBFC\PSIGenericBFC.cs" />
+    <Compile Include="GenericBFC\PSIGenericTransactionBFC.cs" />
+    <Compile Include="GenericBFC\PSIMasterDetailBFC.cs" />
+    <Compile Include="ResiBFC.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="ResiBillBFC.cs" />
+    <Compile Include="ResiPaymentBFC.cs" />
+    <Compile Include="ResiPriceDetailBFC.cs" />
+    <Compile Include="ReturnReceiptBFC.cs" />
+    <Compile Include="CustomerReturnBFC.cs" />
+    <Compile Include="TermsOfPaymentBFC.cs" />
+    <Compile Include="VendorReturnDeliveryBFC.cs" />
+    <Compile Include="VendorReturnBFC.cs" />
+    <Compile Include="ExpedisiBFC.cs" />
+    <Compile Include="MultipleInvoicingBFC.cs" />
+    <Compile Include="CompanySettingBFC.cs" />
+    <Compile Include="TransferReceiptBFC.cs" />
+    <Compile Include="UnitBFC.cs" />
+    <Compile Include="InventoryAdjustmentBFC.cs" />
+    <Compile Include="CustomerBFC.cs" />
+    <Compile Include="CustomerGroupBFC.cs" />
+    <Compile Include="DeliveryOrderBFC.cs" />
+    <Compile Include="DepartmentBFC.cs" />
+    <Compile Include="IncomeExpenseBFC.cs" />
+    <Compile Include="InvoiceBFC.cs" />
+    <Compile Include="ItemLocationBFC.cs" />
+    <Compile Include="PaymentBFC.cs" />
+    <Compile Include="PaymentMethodBFC.cs" />
+    <Compile Include="PPh21ExpenseBFC.cs" />
+    <Compile Include="PrefixSettingBFC.cs" />
+    <Compile Include="PriceLevelBFC.cs" />
+    <Compile Include="ProductBFC.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PurchaseBillBFC.cs" />
+    <Compile Include="PurchaseDeliveryBFC.cs" />
+    <Compile Include="PurchaseOrderBFC.cs" />
+    <Compile Include="PurchasePaymentBFC.cs" />
+    <Compile Include="PurchaseReturnBFC.cs" />
+    <Compile Include="RateBFC.cs" />
+    <Compile Include="RoleBFC.cs" />
+    <Compile Include="SalesmanBFC.cs" />
+    <Compile Include="SalesOrderBFC.cs" />
+    <Compile Include="StaffBFC.cs" />
+    <Compile Include="SupplierBFC.cs" />
+    <Compile Include="SupplierGroupBFC.cs" />
+    <Compile Include="TransferDeliveryBFC.cs" />
+    <Compile Include="TransferOrderBFC.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="VendorBFC.cs" />
+    <Compile Include="WarehouseBFC.cs" />
+    <Compile Include="WorkOrderBFC.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ABCAPOS.DA\ABCAPOS.DA.csproj">
+      <Project>{36740731-8C87-42E4-A623-EA450A7DB818}</Project>
+      <Name>ABCAPOS.DA</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ABCAPOS.EDM\ABCAPOS.EDM.csproj">
+      <Project>{D8263B1A-A382-4A90-A9B3-85743194E807}</Project>
+      <Name>ABCAPOS.EDM</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ABCAPOS.Models\ABCAPOS.Models.csproj">
+      <Project>{D9FD2576-30D7-4347-A469-68E50335C957}</Project>
+      <Name>ABCAPOS.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ABCAPOS.ReportEDS\ABCAPOS.ReportEDS.csproj">
+      <Project>{7EADA648-3B96-4473-9239-945CD0ABAEFB}</Project>
+      <Name>ABCAPOS.ReportEDS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ABCAPOS.Util\ABCAPOS.Util.csproj">
+      <Project>{5CFC4A51-316A-418E-B7BF-7D9A2DEA59E7}</Project>
+      <Name>ABCAPOS.Util</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

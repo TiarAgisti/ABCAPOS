@@ -1,0 +1,10 @@
+﻿<Report Title="Daftar Sales Order">
+  <Columns>
+    <Column Field="Code" HeaderText="Kode Sales Order" Width="1.2"/>
+    <Column Field="Date" HeaderText="Tanggal" Width=".6"/>
+    <Column Field="CustomerName" HeaderText="Nama Pelanggan" Width="3.5"/>
+    <Column Field="SubTotal" HeaderText="Sub Total" Width="0.9"/>
+    <Column Field="TaxValue" HeaderText="Jumlah Pajak" Width=".9"/>
+    <Column Field="GrandTotal" HeaderText="Total" Width=".9"/>
+  </Columns>
+</Report>

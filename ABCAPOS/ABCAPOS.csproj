@@ -1,0 +1,1707 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B750C9D2-3AB1-4DEF-9172-61690F3E66EA}</ProjectGuid>
+    <ProjectTypeGuids>{E53F8FEA-EAE0-44A6-8774-FFD645390401};{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ABCAPOS</RootNamespace>
+    <AssemblyName>ABCAPOS</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>false</UseIISExpress>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <MvcProjectUpgradeChecked>true</MvcProjectUpgradeChecked>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AjaxControlToolkit, Version=4.1.40412.0, Culture=neutral, PublicKeyToken=28f01b0e84b6d53e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\AjaxControlToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.ReportViewer.WebForms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MPL">
+      <HintPath>..\ABCAPOS.Util\DLL\MPL.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI, Version=1.2.5.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ITPOS\ITPOS\bin\NPOI.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.1.0.20105.408\lib\net40\System.Web.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.1.0.20105.408\lib\net40\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.1.0.20105.408\lib\net40\System.Web.WebPages.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.1.0.20105.408\lib\net40\System.Web.WebPages.Deployment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.1.0.20105.408\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CheckEmail.aspx.cs">
+      <DependentUpon>CheckEmail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CheckEmail.aspx.designer.cs">
+      <DependentUpon>CheckEmail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\AccountConfigurationController.cs" />
+    <Compile Include="Controllers\AccountingController.cs" />
+    <Compile Include="Controllers\AllowanceController.cs" />
+    <Compile Include="Controllers\AssemblyBuildController.cs" />
+    <Compile Include="Controllers\AssemblyUnBuildController.cs" />
+    <Compile Include="Controllers\AttendanceController.cs" />
+    <Compile Include="Controllers\AveragePaymentOverDueController.cs" />
+    <Compile Include="Controllers\BillCreditController.cs" />
+    <Compile Include="Controllers\BookingOrderController.cs" />
+    <Compile Include="Controllers\BookingSalesController.cs" />
+    <Compile Include="Controllers\CashInBankController.cs" />
+    <Compile Include="Controllers\CashOutBankController.cs" />
+    <Compile Include="Controllers\ApplyBillCreditController.cs" />
+    <Compile Include="Controllers\ApplyCreditMemoController.cs" />
+    <Compile Include="Controllers\CashSalesController.cs" />
+    <Compile Include="Controllers\GenericController\PSIGenericController.cs" />
+    <Compile Include="Controllers\GenericController\PSIGenericTransactionController.cs" />
+    <Compile Include="Controllers\GenericController\PSIMasterDetailController.cs" />
+    <Compile Include="Controllers\HomeCustomerController.cs" />
+    <Compile Include="Controllers\HomeProductController.cs" />
+    <Compile Include="Controllers\ListPendingWorkOrderController.cs" />
+    <Compile Include="Controllers\List\UncreatedBuildController.cs" />
+    <Compile Include="Controllers\List\UncreatedMakeMultiPayController.cs" />
+    <Compile Include="Controllers\List\UncreatedMakeMultiPaySalesController.cs" />
+    <Compile Include="Controllers\List\UncreatedResiBillController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controllers\List\UncreatedResiPaymentController.cs" />
+    <Compile Include="Controllers\MakeMultiPayController.cs" />
+    <Compile Include="Controllers\CreditMemoController.cs" />
+    <Compile Include="Controllers\CustomerReturnController.cs" />
+    <Compile Include="Controllers\List\UncreatedBillCreditController.cs" />
+    <Compile Include="Controllers\List\UncreatedReturnReceiptController.cs" />
+    <Compile Include="Controllers\List\UncreatedTransferDeliveryController.cs" />
+    <Compile Include="Controllers\List\UncreatedTransferReceiptController.cs" />
+    <Compile Include="Controllers\List\UncreatedVendorReturnDeliveryController.cs" />
+    <Compile Include="Controllers\MakeMultiPaySalesController.cs" />
+    <Compile Include="Controllers\Master\AccountCategoryController.cs" />
+    <Compile Include="Controllers\Master\BinNumberController.cs" />
+    <Compile Include="Controllers\Master\CurrencyController.cs" />
+    <Compile Include="Controllers\Master\CurrencyDateController.cs" />
+    <Compile Include="Controllers\Master\ExpeditionController.cs" />
+    <Compile Include="Controllers\Master\TermsOfPaymentController.cs" />
+    <Compile Include="Controllers\ResiBillController.cs" />
+    <Compile Include="Controllers\ResiController.cs" />
+    <Compile Include="Controllers\ResiPaymentController.cs" />
+    <Compile Include="Controllers\ReturnReceiptController.cs" />
+    <Compile Include="Controllers\StockMovementController.cs" />
+    <Compile Include="Controllers\TransferReceiptController.cs" />
+    <Compile Include="Controllers\InventoryAdjustmentController.cs" />
+    <Compile Include="Controllers\List\UncreatedMultipleInvoicingController.cs" />
+    <Compile Include="Controllers\MultipleInvoicingController.cs" />
+    <Compile Include="Controllers\Master\UnitController.cs" />
+    <Compile Include="Controllers\TransferDeliveryController.cs" />
+    <Compile Include="Controllers\TransferOrderController.cs" />
+    <Compile Include="Controllers\DeliveryOrderController.cs" />
+    <Compile Include="Controllers\ExpenseBankController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\IncomeBankController.cs" />
+    <Compile Include="Controllers\InvoiceController.cs" />
+    <Compile Include="Controllers\List\UncreatedInvoiceController.cs" />
+    <Compile Include="Controllers\List\UncreatedPurchaseBillController.cs" />
+    <Compile Include="Controllers\List\UncreatedDOController.cs" />
+    <Compile Include="Controllers\List\UncreatedPaymentController.cs" />
+    <Compile Include="Controllers\List\UncreatedPurchaseDeliveryController.cs" />
+    <Compile Include="Controllers\List\UncreatedPurchasePaymentController.cs" />
+    <Compile Include="Controllers\Master\AccountController.cs" />
+    <Compile Include="Controllers\Master\AnnualVATController.cs" />
+    <Compile Include="Controllers\Master\CustomerController.cs" />
+    <Compile Include="Controllers\Master\CustomerGroupController.cs" />
+    <Compile Include="Controllers\Master\DepartmentController.cs" />
+    <Compile Include="Controllers\Master\PaymentMethodController.cs" />
+    <Compile Include="Controllers\Master\PPh21ExpenseController.cs" />
+    <Compile Include="Controllers\Master\ProductController.cs" />
+    <Compile Include="Controllers\Master\RoleController.cs" />
+    <Compile Include="Controllers\Master\SalesmanController.cs" />
+    <Compile Include="Controllers\Master\StaffController.cs" />
+    <Compile Include="Controllers\Master\UserController.cs" />
+    <Compile Include="Controllers\Master\VendorController.cs" />
+    <Compile Include="Controllers\Master\WarehouseController.cs" />
+    <Compile Include="Controllers\PaymentController.cs" />
+    <Compile Include="Controllers\PurchaseBillController.cs" />
+    <Compile Include="Controllers\PurchaseDeliveryController.cs" />
+    <Compile Include="Controllers\PurchaseOrderController.cs" />
+    <Compile Include="Controllers\PurchasePaymentController.cs" />
+    <Compile Include="Controllers\PurchaseReturnController.cs" />
+    <Compile Include="Controllers\ReportViewerController.cs" />
+    <Compile Include="Controllers\SalesOrderController.cs" />
+    <Compile Include="Controllers\Setting\AttendanceSettingController.cs" />
+    <Compile Include="Controllers\Setting\CompanySettingController.cs" />
+    <Compile Include="Controllers\Setting\PrefixSettingController.cs" />
+    <Compile Include="Controllers\VendorReturnController.cs" />
+    <Compile Include="Controllers\VendorReturnDeliveryController.cs" />
+    <Compile Include="Controllers\WorkOrderController.cs" />
+    <Compile Include="PostingUlang.aspx.cs">
+      <DependentUpon>PostingUlang.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PostingUlang.aspx.designer.cs">
+      <DependentUpon>PostingUlang.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GenericFilter.ascx.cs">
+      <DependentUpon>GenericFilter.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GenericFilter.ascx.designer.cs">
+      <DependentUpon>GenericFilter.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GenericFilterField.ascx.cs">
+      <DependentUpon>GenericFilterField.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GenericFilterField.ascx.designer.cs">
+      <DependentUpon>GenericFilterField.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\AccountingHelper.cs" />
+    <Compile Include="Helpers\EmailHelper.cs" />
+    <Compile Include="Helpers\MenuHelper.cs" />
+    <Compile Include="Helpers\ModuleHelper.cs" />
+    <Compile Include="ImportData.aspx.cs">
+      <DependentUpon>ImportData.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ImportData.aspx.designer.cs">
+      <DependentUpon>ImportData.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="MembershipHelper.cs" />
+    <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="PrintOut\Allowance\AllowancePrintOut.aspx.cs">
+      <DependentUpon>AllowancePrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\Allowance\AllowancePrintOut.aspx.designer.cs">
+      <DependentUpon>AllowancePrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\BookingSales\BookingSalesPrintOut.aspx.cs">
+      <DependentUpon>BookingSalesPrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\BookingSales\BookingSalesPrintOut.aspx.designer.cs">
+      <DependentUpon>BookingSalesPrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\Invoice\InvoiceExcelPrintOut.aspx.cs">
+      <DependentUpon>InvoiceExcelPrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\Invoice\InvoiceExcelPrintOut.aspx.designer.cs">
+      <DependentUpon>InvoiceExcelPrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\TaxInvoice\TaxInvoiceExcelPrintOut.aspx.cs">
+      <DependentUpon>TaxInvoiceExcelPrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\TaxInvoice\TaxInvoiceExcelPrintOut.aspx.designer.cs">
+      <DependentUpon>TaxInvoiceExcelPrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\TransferDelivery\TransferDeliveryPrintOut.aspx.cs">
+      <DependentUpon>TransferDeliveryPrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\TransferDelivery\TransferDeliveryPrintOut.aspx.designer.cs">
+      <DependentUpon>TransferDeliveryPrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\DeliveryOrder\DeliveryOrderPrintOut.aspx.cs">
+      <DependentUpon>DeliveryOrderPrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\DeliveryOrder\DeliveryOrderPrintOut.aspx.designer.cs">
+      <DependentUpon>DeliveryOrderPrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\IncomeExpense\IncomeExpensePrintout.aspx.cs">
+      <DependentUpon>IncomeExpensePrintout.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\IncomeExpense\IncomeExpensePrintout.aspx.designer.cs">
+      <DependentUpon>IncomeExpensePrintout.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\Invoice\InvoicePrintOut.aspx.cs">
+      <DependentUpon>InvoicePrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\Invoice\InvoicePrintOut.aspx.designer.cs">
+      <DependentUpon>InvoicePrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\MultipleInvoicing\MultipleInvoicingPrintOut.aspx.cs">
+      <DependentUpon>MultipleInvoicingPrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\MultipleInvoicing\MultipleInvoicingPrintOut.aspx.designer.cs">
+      <DependentUpon>MultipleInvoicingPrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\PurchaseOrder\PurchaseOrderPrintOut.aspx.cs">
+      <DependentUpon>PurchaseOrderPrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\PurchaseOrder\PurchaseOrderPrintOut.aspx.designer.cs">
+      <DependentUpon>PurchaseOrderPrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\SalesOrder\PickingTicketPrintOut.aspx.cs">
+      <DependentUpon>PickingTicketPrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\SalesOrder\PickingTicketPrintOut.aspx.designer.cs">
+      <DependentUpon>PickingTicketPrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\SalesOrder\SalesOrderPrintOut.aspx.cs">
+      <DependentUpon>SalesOrderPrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\SalesOrder\SalesOrderPrintOut.aspx.designer.cs">
+      <DependentUpon>SalesOrderPrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\Site.Master.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\Site.Master.designer.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\TaxInvoice\TaxInvoicePrintOut.aspx.cs">
+      <DependentUpon>TaxInvoicePrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\TaxInvoice\TaxInvoicePrintOut.aspx.designer.cs">
+      <DependentUpon>TaxInvoicePrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\TransferOrder\PickingTicketPrintOut.aspx.cs">
+      <DependentUpon>PickingTicketPrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\TransferOrder\PickingTicketPrintOut.aspx.designer.cs">
+      <DependentUpon>PickingTicketPrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\VendorReturn\VendorReturnPrintOut.aspx.cs">
+      <DependentUpon>VendorReturnPrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\VendorReturn\VendorReturnPrintOut.aspx.designer.cs">
+      <DependentUpon>VendorReturnPrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\WorkOrder\WorkOrderPrintOutStruk.aspx.cs">
+      <DependentUpon>WorkOrderPrintOutStruk.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\WorkOrder\WorkOrderPrintOutStruk.aspx.designer.cs">
+      <DependentUpon>WorkOrderPrintOutStruk.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\WorkOrder\WorkOrderPrintOutLetter.aspx.cs">
+      <DependentUpon>WorkOrderPrintOutLetter.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\WorkOrder\WorkOrderPrintOutLetter.aspx.designer.cs">
+      <DependentUpon>WorkOrderPrintOutLetter.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintOut\WorkOrder\WorkOrderPrintOut.aspx.cs">
+      <DependentUpon>WorkOrderPrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PrintOut\WorkOrder\WorkOrderPrintOut.aspx.designer.cs">
+      <DependentUpon>WorkOrderPrintOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ProfileCommon.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Report\Accounting\AccountTransaction.aspx.cs">
+      <DependentUpon>AccountTransaction.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Accounting\AccountTransaction.aspx.designer.cs">
+      <DependentUpon>AccountTransaction.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Accounting\GeneralJournal.aspx.cs">
+      <DependentUpon>GeneralJournal.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Accounting\GeneralJournal.aspx.designer.cs">
+      <DependentUpon>GeneralJournal.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Accounting\IncomeExpense.aspx.cs">
+      <DependentUpon>IncomeExpense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Accounting\IncomeExpense.aspx.designer.cs">
+      <DependentUpon>IncomeExpense.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Accounting\ProfitAndLoss.aspx.cs">
+      <DependentUpon>ProfitAndLoss.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Accounting\ProfitAndLoss.aspx.designer.cs">
+      <DependentUpon>ProfitAndLoss.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Accounting\TrialBalance.aspx.cs">
+      <DependentUpon>TrialBalance.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Accounting\TrialBalance.aspx.designer.cs">
+      <DependentUpon>TrialBalance.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\AssemblyBuild\ReportHpp.aspx.cs">
+      <DependentUpon>ReportHpp.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\AssemblyBuild\ReportHpp.aspx.designer.cs">
+      <DependentUpon>ReportHpp.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Attendance\AttendanceDetailReport.aspx.cs">
+      <DependentUpon>AttendanceDetailReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Attendance\AttendanceDetailReport.aspx.designer.cs">
+      <DependentUpon>AttendanceDetailReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Attendance\AttendanceReport.aspx.cs">
+      <DependentUpon>AttendanceReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Attendance\AttendanceReport.aspx.designer.cs">
+      <DependentUpon>AttendanceReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\CreditMemo\CreditMemoByItemReport.aspx.cs">
+      <DependentUpon>CreditMemoByItemReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\CreditMemo\CreditMemoByItemReport.aspx.designer.cs">
+      <DependentUpon>CreditMemoByItemReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\DeliveryOrder\FulfillmentByItemSummary.aspx.cs">
+      <DependentUpon>FulfillmentByItemSummary.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\DeliveryOrder\FulfillmentByItemSummary.aspx.designer.cs">
+      <DependentUpon>FulfillmentByItemSummary.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\DeliveryOrder\FulfillmentByItemDetail.aspx.cs">
+      <DependentUpon>FulfillmentByItemDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\DeliveryOrder\FulfillmentByItemDetail.aspx.designer.cs">
+      <DependentUpon>FulfillmentByItemDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\DeliveryOrder\DeliveryOrderDetailReport.aspx.cs">
+      <DependentUpon>DeliveryOrderDetailReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\DeliveryOrder\DeliveryOrderDetailReport.aspx.designer.cs">
+      <DependentUpon>DeliveryOrderDetailReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\DeliveryOrder\DeliveryOrderReport.aspx.cs">
+      <DependentUpon>DeliveryOrderReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\DeliveryOrder\DeliveryOrderReport.aspx.designer.cs">
+      <DependentUpon>DeliveryOrderReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\DeliveryOrder\FulfilmentReport.aspx.cs">
+      <DependentUpon>FulfilmentReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\DeliveryOrder\FulfilmentReport.aspx.designer.cs">
+      <DependentUpon>FulfilmentReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\GoodsReturnedByCustomer\GoodsReturnedByCustomer.aspx.cs">
+      <DependentUpon>GoodsReturnedByCustomer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\GoodsReturnedByCustomer\GoodsReturnedByCustomer.aspx.designer.cs">
+      <DependentUpon>GoodsReturnedByCustomer.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\GoodsSoldByCustomer\GoodsSoldByCustomer.aspx.cs">
+      <DependentUpon>GoodsSoldByCustomer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\GoodsSoldByCustomer\GoodsSoldByCustomer.aspx.designer.cs">
+      <DependentUpon>GoodsSoldByCustomer.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\GoodsSoldByProduct\GoodsSoldByProduct.aspx.cs">
+      <DependentUpon>GoodsSoldByProduct.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\GoodsSoldByProduct\GoodsSoldByProduct.aspx.designer.cs">
+      <DependentUpon>GoodsSoldByProduct.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoicePaymentDetail.aspx.cs">
+      <DependentUpon>InvoicePaymentDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoicePaymentDetail.aspx.designer.cs">
+      <DependentUpon>InvoicePaymentDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceMonthlySummary.aspx.cs">
+      <DependentUpon>InvoiceMonthlySummary.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceMonthlySummary.aspx.designer.cs">
+      <DependentUpon>InvoiceMonthlySummary.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceByItemSum.aspx.cs">
+      <DependentUpon>InvoiceByItemSum.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceByItemSum.aspx.designer.cs">
+      <DependentUpon>InvoiceByItemSum.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceBySalesRepDetail.aspx.cs">
+      <DependentUpon>InvoiceBySalesRepDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceBySalesRepDetail.aspx.designer.cs">
+      <DependentUpon>InvoiceBySalesRepDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceBySalesRepSum.aspx.cs">
+      <DependentUpon>InvoiceBySalesRepSum.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceBySalesRepSum.aspx.designer.cs">
+      <DependentUpon>InvoiceBySalesRepSum.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceCreditMemo.aspx.cs">
+      <DependentUpon>InvoiceCreditMemo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceCreditMemo.aspx.designer.cs">
+      <DependentUpon>InvoiceCreditMemo.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceMonthly.aspx.cs">
+      <DependentUpon>InvoiceMonthly.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceMonthly.aspx.designer.cs">
+      <DependentUpon>InvoiceMonthly.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoicePaymentSummary.aspx.cs">
+      <DependentUpon>InvoicePaymentSummary.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoicePaymentSummary.aspx.designer.cs">
+      <DependentUpon>InvoicePaymentSummary.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceReport.aspx.cs">
+      <DependentUpon>InvoiceReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceReport.aspx.designer.cs">
+      <DependentUpon>InvoiceReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceAgingReport.aspx.cs">
+      <DependentUpon>InvoiceAgingReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Invoice\InvoiceAgingReport.aspx.designer.cs">
+      <DependentUpon>InvoiceAgingReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Invoice\ReportBonus.aspx.cs">
+      <DependentUpon>ReportBonus.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Invoice\ReportBonus.aspx.designer.cs">
+      <DependentUpon>ReportBonus.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Invoice\ReportOverdue.aspx.cs">
+      <DependentUpon>ReportOverdue.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Invoice\ReportOverdue.aspx.designer.cs">
+      <DependentUpon>ReportOverdue.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Invoice\SalesOrderBySalesRepSumNoCustomer.aspx.cs">
+      <DependentUpon>SalesOrderBySalesRepSumNoCustomer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Invoice\SalesOrderBySalesRepSumNoCustomer.aspx.designer.cs">
+      <DependentUpon>SalesOrderBySalesRepSumNoCustomer.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Invoice\SalesReport.aspx.cs">
+      <DependentUpon>SalesReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Invoice\SalesReport.aspx.designer.cs">
+      <DependentUpon>SalesReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Payment\PaymentBillReport.aspx.cs">
+      <DependentUpon>PaymentBillReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Payment\PaymentBillReport.aspx.designer.cs">
+      <DependentUpon>PaymentBillReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Payment\PaymentInvoiceReport.aspx.cs">
+      <DependentUpon>PaymentInvoiceReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Payment\PaymentInvoiceReport.aspx.designer.cs">
+      <DependentUpon>PaymentInvoiceReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Payment\PaymentReport.aspx.cs">
+      <DependentUpon>PaymentReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Payment\PaymentReport.aspx.designer.cs">
+      <DependentUpon>PaymentReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Product\ProductReport.aspx.cs">
+      <DependentUpon>ProductReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Product\ProductReport.aspx.designer.cs">
+      <DependentUpon>ProductReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\PurchaseBill\PurchaseBillAgingReport.aspx.cs">
+      <DependentUpon>PurchaseBillAgingReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\PurchaseBill\PurchaseBillAgingReport.aspx.designer.cs">
+      <DependentUpon>PurchaseBillAgingReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\PurchaseBill\PurchaseBillOverdueReport.aspx.cs">
+      <DependentUpon>PurchaseBillOverdueReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\PurchaseBill\PurchaseBillOverdueReport.aspx.designer.cs">
+      <DependentUpon>PurchaseBillOverdueReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\PurchaseBill\PurchaseBillReport.aspx.cs">
+      <DependentUpon>PurchaseBillReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\PurchaseBill\PurchaseBillReport.aspx.designer.cs">
+      <DependentUpon>PurchaseBillReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\PurchaseOrder\PurchaseOrderReport.aspx.cs">
+      <DependentUpon>PurchaseOrderReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\PurchaseOrder\PurchaseOrderReport.aspx.designer.cs">
+      <DependentUpon>PurchaseOrderReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\ReportHelper.cs" />
+    <Compile Include="Report\SalesOrder\SalesOrderDetailReport.aspx.cs">
+      <DependentUpon>SalesOrderDetailReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\SalesOrder\SalesOrderDetailReport.aspx.designer.cs">
+      <DependentUpon>SalesOrderDetailReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\SalesOrder\SalesOrderReport.aspx.cs">
+      <DependentUpon>SalesOrderReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\SalesOrder\SalesOrderReport.aspx.designer.cs">
+      <DependentUpon>SalesOrderReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Site.Master.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Site.Master.designer.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Stock\StockReport.aspx.cs">
+      <DependentUpon>StockReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Stock\StockReport.aspx.designer.cs">
+      <DependentUpon>StockReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Stock\TransactionStockReport.aspx.cs">
+      <DependentUpon>TransactionStockReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Stock\TransactionStockReport.aspx.designer.cs">
+      <DependentUpon>TransactionStockReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ViewEngines\ListViewEngine.cs" />
+    <Compile Include="ViewEngines\MasterViewEngine.cs" />
+    <Compile Include="ViewEngines\SettingViewEngine.cs" />
+    <Compile Include="WebService.asmx.cs">
+      <DependentUpon>WebService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Data\Templates\BookingSalesHeaderTemplate.txt" />
+    <Content Include="App_Data\Templates\BookingSalesFooterTemplate.txt" />
+    <Content Include="App_Data\Templates\PurchaseOrderFooterTemplate.txt" />
+    <Content Include="App_Data\Templates\PurchaseOrderHeaderTemplate.txt" />
+    <Content Include="App_Data\Templates\SalesOrderFooterTemplate.txt" />
+    <Content Include="App_Data\Templates\SalesOrderHeaderTemplate.txt" />
+    <Content Include="CheckEmail.aspx" />
+    <Content Include="Content\caret.png" />
+    <Content Include="Content\Icons\add.png" />
+    <Content Include="Content\Icons\approve.png" />
+    <Content Include="Content\Icons\backToList.png" />
+    <Content Include="Content\Icons\calendar.png" />
+    <Content Include="Content\Icons\cancel.png" />
+    <Content Include="Content\Icons\createAnother.png" />
+    <Content Include="Content\Icons\createDocument.png" />
+    <Content Include="Content\Icons\delete.png" />
+    <Content Include="Content\Icons\details.png" />
+    <Content Include="Content\Icons\edit.png" />
+    <Content Include="Content\Icons\FilterBackground.png" />
+    <Content Include="Content\Icons\find.png" />
+    <Content Include="Content\Icons\print.png" />
+    <Content Include="Content\Icons\reopen.png" />
+    <Content Include="Content\Icons\save.png" />
+    <Content Include="Content\Icons\submit.png" />
+    <Content Include="Content\jquery.dataTables.min.css" />
+    <Content Include="Content\jquery\jquery-ui.css" />
+    <Content Include="Content\Menu.css" />
+    <Content Include="Content\menu.png" />
+    <Content Include="Content\PagedList.css" />
+    <Content Include="Content\Style.css" />
+    <Content Include="Content\style\add.png" />
+    <Content Include="Content\style\cancel.png" />
+    <Content Include="Content\style\delete.png" />
+    <Content Include="Content\style\details.png" />
+    <Content Include="Content\style\find.png" />
+    <Content Include="Content\style\save.png" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\themes\base\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\base\jquery.ui.accordion.css" />
+    <Content Include="Content\themes\base\jquery.ui.all.css" />
+    <Content Include="Content\themes\base\jquery.ui.autocomplete.css" />
+    <Content Include="Content\themes\base\jquery.ui.base.css" />
+    <Content Include="Content\themes\base\jquery.ui.button.css" />
+    <Content Include="Content\themes\base\jquery.ui.core.css" />
+    <Content Include="Content\themes\base\jquery.ui.datepicker.css" />
+    <Content Include="Content\themes\base\jquery.ui.dialog.css" />
+    <Content Include="Content\themes\base\jquery.ui.progressbar.css" />
+    <Content Include="Content\themes\base\jquery.ui.resizable.css" />
+    <Content Include="Content\themes\base\jquery.ui.selectable.css" />
+    <Content Include="Content\themes\base\jquery.ui.slider.css" />
+    <Content Include="Content\themes\base\jquery.ui.tabs.css" />
+    <Content Include="Content\themes\base\jquery.ui.theme.css" />
+    <Content Include="Content\UI.css" />
+    <Content Include="PostingUlang.aspx" />
+    <Content Include="GenericFilter.ascx" />
+    <Content Include="GenericFilterField.ascx" />
+    <Content Include="Global.asax" />
+    <Content Include="ImportData.aspx" />
+    <Content Include="PrintOut\Allowance\AllowancePrintOut.aspx" />
+    <Content Include="PrintOut\BookingSales\BookingSalesPrintOut.aspx" />
+    <Content Include="PrintOut\Invoice\InvoiceExcelPrintOut.aspx" />
+    <Content Include="PrintOut\TaxInvoice\TaxInvoiceExcelPrintOut.aspx" />
+    <Content Include="PrintOut\TransferDelivery\TransferDeliveryPrintOut.aspx" />
+    <Content Include="PrintOut\DeliveryOrder\DeliveryOrderPrintOut.aspx" />
+    <Content Include="PrintOut\IncomeExpense\IncomeExpensePrintout.aspx" />
+    <Content Include="PrintOut\Invoice\InvoicePrintOut.aspx" />
+    <Content Include="PrintOut\MultipleInvoicing\MultipleInvoicingPrintOut.aspx" />
+    <Content Include="PrintOut\PurchaseOrder\PurchaseOrderPrintOut.aspx" />
+    <Content Include="PrintOut\SalesOrder\PickingTicketPrintOut.aspx" />
+    <Content Include="PrintOut\SalesOrder\SalesOrderPrintOut.aspx" />
+    <Content Include="PrintOut\TaxInvoice\TaxInvoicePrintOut.aspx" />
+    <Content Include="PrintOut\TransferOrder\PickingTicketPrintOut.aspx" />
+    <Content Include="PrintOut\VendorReturn\VendorReturnPrintOut.aspx" />
+    <Content Include="PrintOut\WorkOrder\WorkOrderPrintOutStruk.aspx" />
+    <Content Include="PrintOut\WorkOrder\WorkOrderPrintOutLetter.aspx" />
+    <Content Include="PrintOut\WorkOrder\WorkOrderPrintOut.aspx" />
+    <Content Include="Report\Accounting\AccountTransaction.aspx" />
+    <Content Include="Report\Accounting\GeneralJournal.aspx" />
+    <Content Include="Report\Accounting\IncomeExpense.aspx" />
+    <Content Include="Report\Accounting\ProfitAndLoss.aspx" />
+    <Content Include="Report\Accounting\ReportXML\AccountTransaction.xml" />
+    <Content Include="Report\Accounting\ReportXML\GeneralJournal.xml" />
+    <Content Include="Report\Accounting\ReportXML\TrialBalance.xml" />
+    <Content Include="Report\Accounting\TrialBalance.aspx" />
+    <Content Include="Report\AssemblyBuild\ReportHpp.aspx" />
+    <Content Include="Report\Attendance\AttendanceDetailReport.aspx" />
+    <Content Include="Report\Attendance\AttendanceReport.aspx" />
+    <Content Include="Report\Attendance\ReportXML\AttendanceDetail.xml" />
+    <Content Include="Report\CreditMemo\CreditMemoByItemReport.aspx" />
+    <Content Include="Report\DeliveryOrder\FulfillmentByItemSummary.aspx" />
+    <Content Include="Report\DeliveryOrder\FulfillmentByItemDetail.aspx" />
+    <Content Include="Report\DeliveryOrder\DeliveryOrderDetailReport.aspx" />
+    <Content Include="Report\DeliveryOrder\DeliveryOrderReport.aspx" />
+    <Content Include="Report\DeliveryOrder\FulfilmentReport.aspx" />
+    <Content Include="Report\DeliveryOrder\ReportXML\DeliveryOrderDetail.xml" />
+    <Content Include="Report\GoodsReturnedByCustomer\GoodsReturnedByCustomer.aspx" />
+    <Content Include="Report\GoodsSoldByCustomer\GoodsSoldByCustomer.aspx" />
+    <Content Include="Report\GoodsSoldByProduct\GoodsSoldByProduct.aspx" />
+    <Content Include="Report\Invoice\InvoicePaymentDetail.aspx" />
+    <Content Include="Report\Invoice\InvoiceMonthlySummary.aspx" />
+    <Content Include="Report\Invoice\InvoiceByItemSum.aspx" />
+    <Content Include="Report\Invoice\InvoiceBySalesRepDetail.aspx" />
+    <Content Include="Report\Invoice\InvoiceBySalesRepSum.aspx" />
+    <Content Include="Report\Invoice\InvoiceCreditMemo.aspx" />
+    <Content Include="Report\Invoice\InvoiceMonthly.aspx" />
+    <Content Include="Report\Invoice\InvoicePaymentSummary.aspx" />
+    <Content Include="Report\Invoice\InvoiceReport.aspx" />
+    <Content Include="Report\Invoice\InvoiceAgingReport.aspx" />
+    <Content Include="Report\Invoice\ReportBonus.aspx" />
+    <Content Include="Report\Invoice\ReportOverdue.aspx" />
+    <Content Include="Report\Invoice\ReportXML\SalesReport.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Report\Invoice\ReportXML\Invoice.xml" />
+    <Content Include="Report\Invoice\SalesOrderBySalesRepSumNoCustomer.aspx" />
+    <Content Include="Report\Invoice\SalesReport.aspx" />
+    <Content Include="Report\Payment\PaymentBillReport.aspx" />
+    <Content Include="Report\Payment\PaymentInvoiceReport.aspx" />
+    <Content Include="Report\Payment\PaymentReport.aspx" />
+    <Content Include="Report\Payment\ReportXML\Payment.xml" />
+    <Content Include="Report\Product\ProductReport.aspx" />
+    <Content Include="Report\PurchaseBill\PurchaseBillAgingReport.aspx" />
+    <Content Include="Report\PurchaseBill\PurchaseBillOverdueReport.aspx" />
+    <Content Include="Report\PurchaseBill\PurchaseBillReport.aspx" />
+    <Content Include="Report\PurchaseBill\ReportXML\PurchaseBillOverdue.xml" />
+    <Content Include="Report\PurchaseOrder\PurchaseOrderReport.aspx" />
+    <Content Include="Report\PurchaseOrder\ReportXML\PurchaseOrder.xml" />
+    <Content Include="Report\SalesOrder\SalesOrderDetailReport.aspx" />
+    <Content Include="Report\SalesOrder\SalesOrderReport.aspx" />
+    <Content Include="Report\SalesOrder\ReportXML\SalesOrder.xml" />
+    <Content Include="Report\SalesOrder\ReportXML\SalesOrderDetail.xml" />
+    <Content Include="Report\Stock\StockReport.aspx" />
+    <Content Include="Report\Stock\TransactionStockReport.aspx" />
+    <Content Include="Scripts\amcharts\amcharts.js" />
+    <Content Include="Scripts\amcharts\exporting\amexport.js" />
+    <Content Include="Scripts\amcharts\exporting\canvg.js" />
+    <Content Include="Scripts\amcharts\exporting\filesaver.js" />
+    <Content Include="Scripts\amcharts\exporting\jspdf.js" />
+    <Content Include="Scripts\amcharts\exporting\jspdf.plugin.addimage.js" />
+    <Content Include="Scripts\amcharts\exporting\rgbcolor.js" />
+    <Content Include="Scripts\amcharts\funnel.js" />
+    <Content Include="Scripts\amcharts\gauge.js" />
+    <Content Include="Scripts\amcharts\images\dragIcon.gif" />
+    <Content Include="Scripts\amcharts\images\dragIconBlack.gif" />
+    <Content Include="Scripts\amcharts\images\dragIconH.gif" />
+    <Content Include="Scripts\amcharts\images\dragIconHBlack.gif" />
+    <Content Include="Scripts\amcharts\images\export.png" />
+    <Content Include="Scripts\amcharts\images\exportWhite.png" />
+    <Content Include="Scripts\amcharts\images\lens.png" />
+    <Content Include="Scripts\amcharts\images\lensWhite.png" />
+    <Content Include="Scripts\amcharts\lang\az.js" />
+    <Content Include="Scripts\amcharts\lang\bg.js" />
+    <Content Include="Scripts\amcharts\lang\de.js" />
+    <Content Include="Scripts\amcharts\lang\es.js" />
+    <Content Include="Scripts\amcharts\lang\fi.js" />
+    <Content Include="Scripts\amcharts\lang\fo.js" />
+    <Content Include="Scripts\amcharts\lang\fr.js" />
+    <Content Include="Scripts\amcharts\lang\hr.js" />
+    <Content Include="Scripts\amcharts\lang\hu.js" />
+    <Content Include="Scripts\amcharts\lang\id.js" />
+    <Content Include="Scripts\amcharts\lang\is.js" />
+    <Content Include="Scripts\amcharts\lang\it.js" />
+    <Content Include="Scripts\amcharts\lang\lt.js" />
+    <Content Include="Scripts\amcharts\lang\lv.js" />
+    <Content Include="Scripts\amcharts\lang\mk.js" />
+    <Content Include="Scripts\amcharts\lang\mn.js" />
+    <Content Include="Scripts\amcharts\lang\mt.js" />
+    <Content Include="Scripts\amcharts\lang\nl.js" />
+    <Content Include="Scripts\amcharts\lang\no.js" />
+    <Content Include="Scripts\amcharts\lang\pl.js" />
+    <Content Include="Scripts\amcharts\lang\pt.js" />
+    <Content Include="Scripts\amcharts\lang\ro.js" />
+    <Content Include="Scripts\amcharts\lang\ru.js" />
+    <Content Include="Scripts\amcharts\lang\rw.js" />
+    <Content Include="Scripts\amcharts\lang\sk.js" />
+    <Content Include="Scripts\amcharts\lang\so.js" />
+    <Content Include="Scripts\amcharts\lang\th.js" />
+    <Content Include="Scripts\amcharts\lang\tr.js" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern1.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern10.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern11.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern12.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern13.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern14.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern15.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern16.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern17.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern18.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern19.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern2.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern20.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern21.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern3.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern4.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern5.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern6.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern7.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern8.png" />
+    <Content Include="Scripts\amcharts\patterns\black\pattern9.png" />
+    <Content Include="Scripts\amcharts\patterns\chalk\pattern1.jpg" />
+    <Content Include="Scripts\amcharts\patterns\chalk\pattern1r.jpg" />
+    <Content Include="Scripts\amcharts\patterns\chalk\pattern2.jpg" />
+    <Content Include="Scripts\amcharts\patterns\chalk\pattern3.jpg" />
+    <Content Include="Scripts\amcharts\patterns\chalk\pattern4.jpg" />
+    <Content Include="Scripts\amcharts\patterns\chalk\pattern5.jpg" />
+    <Content Include="Scripts\amcharts\patterns\chalk\pattern6.jpg" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern1.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern10.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern11.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern12.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern13.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern14.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern15.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern16.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern17.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern18.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern19.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern2.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern20.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern21.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern3.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern4.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern5.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern6.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern7.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern8.png" />
+    <Content Include="Scripts\amcharts\patterns\white\pattern9.png" />
+    <Content Include="Scripts\amcharts\pie.js" />
+    <Content Include="Scripts\amcharts\radar.js" />
+    <Content Include="Scripts\amcharts\serial.js" />
+    <Content Include="Scripts\amcharts\style.css" />
+    <Content Include="Scripts\amcharts\themes\black.js" />
+    <Content Include="Scripts\amcharts\themes\chalk.js" />
+    <Content Include="Scripts\amcharts\themes\dark.js" />
+    <Content Include="Scripts\amcharts\themes\light.js" />
+    <Content Include="Scripts\amcharts\themes\patterns.js" />
+    <Content Include="Scripts\amcharts\xy.js" />
+    <Content Include="Scripts\global.js" />
+    <Content Include="Scripts\index.js" />
+    <Content Include="Scripts\jquery-1.4.4-vsdoc.js" />
+    <Content Include="Scripts\jquery-1.4.4.js" />
+    <Content Include="Scripts\jquery-1.4.4.min.js" />
+    <Content Include="Scripts\jquery-1.5.1-vsdoc.js" />
+    <Content Include="Scripts\jquery-1.5.1.js" />
+    <Content Include="Scripts\jquery-1.5.1.min.js" />
+    <Content Include="Scripts\jquery-1.5.2.min.js" />
+    <Content Include="Scripts\jquery-1.9.1.js" />
+    <Content Include="Scripts\jquery-ui-1.8.11.js" />
+    <Content Include="Scripts\jquery-ui-1.8.11.min.js" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-bg_flat_55_fbec88_40x100.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-bg_glass_75_d0e5f5_1x400.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-bg_glass_85_dfeffc_1x400.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-bg_gloss-wave_55_5c9ccc_500x100.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-bg_inset-hard_100_f5f8f9_1x100.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-bg_inset-hard_100_fcfdfd_1x100.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-icons_217bc0_256x240.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-icons_469bdd_256x240.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-icons_6da8d5_256x240.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-icons_d8e7f3_256x240.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\images\ui-icons_f9bd01_256x240.png" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\css\redmond\jquery-ui-1.8.16.custom.css" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\js\jquery-1.6.2.min.js" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom\js\jquery-ui-1.8.16.custom.min.js" />
+    <Content Include="Scripts\jquery-ui.js" />
+    <Content Include="Scripts\jquery-ui.min.js" />
+    <Content Include="Scripts\jquery.numberformatter-1.2.3.jsmin.js" />
+    <Content Include="Scripts\jquery.numeric.js" />
+    <Content Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\jsExtension.js" />
+    <Content Include="Scripts\jshashtable-2.1.js" />
+    <Content Include="Scripts\menu.js" />
+    <Content Include="Scripts\menucss\IndicatorContainer.js" />
+    <Content Include="Scripts\miceBooking.js" />
+    <Content Include="Scripts\miceTechnicalities.js" />
+    <Content Include="Scripts\modernizr-1.7.js" />
+    <Content Include="Scripts\modernizr-1.7.min.js" />
+    <Content Include="Scripts\Notification\formNotification.js" />
+    <Content Include="Scripts\Notification\notification.js" />
+    <Content Include="Scripts\noty\jquery-1.7.2.min.js" />
+    <Content Include="Scripts\noty\jquery.noty.js" />
+    <Content Include="Scripts\noty\layouts\bottom.js" />
+    <Content Include="Scripts\noty\layouts\bottomCenter.js" />
+    <Content Include="Scripts\noty\layouts\bottomLeft.js" />
+    <Content Include="Scripts\noty\layouts\bottomRight.js" />
+    <Content Include="Scripts\noty\layouts\center.js" />
+    <Content Include="Scripts\noty\layouts\centerLeft.js" />
+    <Content Include="Scripts\noty\layouts\centerRight.js" />
+    <Content Include="Scripts\noty\layouts\inline.js" />
+    <Content Include="Scripts\noty\layouts\top.js" />
+    <Content Include="Scripts\noty\layouts\topCenter.js" />
+    <Content Include="Scripts\noty\layouts\topLeft.js" />
+    <Content Include="Scripts\noty\layouts\topRight.js" />
+    <Content Include="Scripts\noty\packaged\jquery.noty.packaged.js" />
+    <Content Include="Scripts\noty\packaged\jquery.noty.packaged.min.js" />
+    <Content Include="Scripts\noty\promise.js" />
+    <Content Include="Scripts\noty\themes\default.js" />
+    <Content Include="Scripts\psi\JQueryRTablePagination.min.js" />
+    <Content Include="Scripts\psi\psiMVCFix.js" />
+    <Content Include="Scripts\Transaction\ApplyCreditMemo.js" />
+    <Content Include="Scripts\Transaction\BookingOrder.js" />
+    <Content Include="Scripts\Transaction\BookingSales.js" />
+    <Content Include="Scripts\Transaction\CashSales.js" />
+    <Content Include="Scripts\Transaction\ResiBill.js" />
+    <Content Include="Scripts\Transaction\ResiPayment.js" />
+    <Content Include="Scripts\Transaction\Resi.js" />
+    <Content Include="Scripts\Transaction\MakeMultiPay.js" />
+    <Content Include="Scripts\Transaction\CustomerReturn.js" />
+    <Content Include="Scripts\Transaction\DeliveryOrder.js" />
+    <Content Include="Scripts\Transaction\InventoryAdjustment.js" />
+    <Content Include="Scripts\Transaction\MakeMultiPaySales.js" />
+    <Content Include="Scripts\Transaction\MultipleInvoicing.js" />
+    <Content Include="Scripts\Transaction\PurchaseBill.js" />
+    <Content Include="Scripts\Transaction\PurchaseDelivery.js" />
+    <Content Include="Scripts\Transaction\PurchaseOrder.js" />
+    <Content Include="Scripts\Transaction\SalesInvoice.js" />
+    <Content Include="Scripts\Transaction\SalesOrder.js" />
+    <Content Include="Scripts\Transaction\TransferOrder.js" />
+    <Content Include="Scripts\Transaction\VendorReturn.js" />
+    <Content Include="Scripts\UI.js" />
+    <Content Include="Styles\Images\calendar.png" />
+    <Content Include="Styles\Images\collapse_blue.jpg" />
+    <Content Include="Styles\Images\duplicate.png" />
+    <Content Include="Styles\Images\expand_blue.jpg" />
+    <Content Include="Styles\Images\filterBackground.png" />
+    <Content Include="Styles\Site.css" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Content\Site.css" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\MicrosoftAjax.js" />
+    <Content Include="Scripts\MicrosoftAjax.debug.js" />
+    <Content Include="Scripts\MicrosoftMvcAjax.js" />
+    <Content Include="Scripts\MicrosoftMvcAjax.debug.js" />
+    <Content Include="Scripts\MicrosoftMvcValidation.js" />
+    <Content Include="Scripts\MicrosoftMvcValidation.debug.js" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Home\About.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\_LogOnPartial.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Web.config" />
+    <Content Include="WebService.asmx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="License\" />
+    <Folder Include="TempReport\" />
+    <Folder Include="Uploads\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ABCAPOS.BF\ABCAPOS.BF.csproj">
+      <Project>{710f5aa8-af98-47eb-badd-2f4d16ff2732}</Project>
+      <Name>ABCAPOS.BF</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ABCAPOS.DA\ABCAPOS.DA.csproj">
+      <Project>{36740731-8C87-42E4-A623-EA450A7DB818}</Project>
+      <Name>ABCAPOS.DA</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ABCAPOS.EDM\ABCAPOS.EDM.csproj">
+      <Project>{D8263B1A-A382-4A90-A9B3-85743194E807}</Project>
+      <Name>ABCAPOS.EDM</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ABCAPOS.Models\ABCAPOS.Models.csproj">
+      <Project>{D9FD2576-30D7-4347-A469-68E50335C957}</Project>
+      <Name>ABCAPOS.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ABCAPOS.ReportEDS\ABCAPOS.ReportEDS.csproj">
+      <Project>{7EADA648-3B96-4473-9239-945CD0ABAEFB}</Project>
+      <Name>ABCAPOS.ReportEDS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ABCAPOS.Util\ABCAPOS.Util.csproj">
+      <Project>{5CFC4A51-316A-418E-B7BF-7D9A2DEA59E7}</Project>
+      <Name>ABCAPOS.Util</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Data\Templates\Template Faktur Pajak.xls" />
+    <Content Include="App_Data\Templates\Template Invoice.xls" />
+    <None Include="Content\Icons\Thumbs.db" />
+    <Content Include="Views\Master\Role\Create.cshtml" />
+    <Content Include="Views\Master\Role\CreateRole.cshtml" />
+    <Content Include="Views\Master\Role\Detail.cshtml" />
+    <Content Include="Views\Master\Role\Index.cshtml" />
+    <Content Include="Views\Master\Role\Update.cshtml" />
+    <Content Include="Views\Master\Role\UpdateRole.cshtml" />
+    <Content Include="Views\Master\User\Create.cshtml" />
+    <Content Include="Views\Master\User\Detail.cshtml" />
+    <Content Include="Views\Master\User\Index.cshtml" />
+    <Content Include="Views\Master\User\Logon.cshtml" />
+    <Content Include="Views\Master\User\Update.cshtml" />
+    <Content Include="Views\Master\Product\Create.cshtml" />
+    <Content Include="Views\Master\Product\Detail.cshtml" />
+    <Content Include="Views\Master\Product\Index.cshtml" />
+    <Content Include="Views\Master\Product\Update.cshtml" />
+    <Content Include="Views\Master\Warehouse\Create.cshtml" />
+    <Content Include="Views\Master\Warehouse\Update.cshtml" />
+    <Content Include="Views\Master\Warehouse\Detail.cshtml" />
+    <Content Include="Views\Master\Warehouse\Index.cshtml" />
+    <Content Include="Views\Master\Customer\Create.cshtml" />
+    <Content Include="Views\Master\Customer\Detail.cshtml" />
+    <Content Include="Views\Master\Customer\Index.cshtml" />
+    <Content Include="Views\Master\Customer\Update.cshtml" />
+    <Content Include="Views\Master\Salesman\Create.cshtml" />
+    <Content Include="Views\Master\Salesman\CreateSalesman.cshtml" />
+    <Content Include="Views\Master\Salesman\Detail.cshtml" />
+    <Content Include="Views\Master\Salesman\Index.cshtml" />
+    <Content Include="Views\Master\Salesman\Update.cshtml" />
+    <Content Include="Views\Master\Salesman\UpdateSalesman.cshtml" />
+    <Content Include="Views\Master\Vendor\Create.cshtml" />
+    <Content Include="Views\Master\Vendor\Detail.cshtml" />
+    <Content Include="Views\Master\Vendor\Index.cshtml" />
+    <Content Include="Views\Master\Vendor\Update.cshtml" />
+    <Content Include="Views\Master\PaymentMethod\Create.cshtml" />
+    <Content Include="Views\Master\PaymentMethod\Detail.cshtml" />
+    <Content Include="Views\Master\PaymentMethod\Index.cshtml" />
+    <Content Include="Views\Master\PaymentMethod\Update.cshtml" />
+    <Content Include="Views\Master\Account\Create.cshtml" />
+    <Content Include="Views\Master\Account\Detail.cshtml" />
+    <Content Include="Views\Master\Account\Index.cshtml" />
+    <Content Include="Views\Master\Account\Update.cshtml" />
+    <Content Include="Views\Setting\CompanySetting\Detail.cshtml" />
+    <Content Include="Views\Setting\CompanySetting\Update.cshtml" />
+    <Content Include="Views\Setting\PrefixSetting\Detail.cshtml" />
+    <Content Include="Views\Setting\PrefixSetting\Update.cshtml" />
+    <Content Include="Views\Shared\Setting\CompanySetting\Form.cshtml" />
+    <Content Include="Views\Shared\Setting\PrefixSetting\Form.cshtml" />
+    <Content Include="Views\SalesOrder\Create.cshtml" />
+    <Content Include="Views\SalesOrder\Detail.cshtml" />
+    <Content Include="Views\SalesOrder\Update.cshtml" />
+    <Content Include="Views\SalesOrder\Index.cshtml" />
+    <Content Include="Views\Shared\SalesOrder\Form.cshtml" />
+    <Content Include="Views\Shared\SalesOrder\IndexGrid.cshtml" />
+    <Content Include="Views\List\UncreatedDO\Index.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedDO\IndexGrid.cshtml" />
+    <Content Include="Views\DeliveryOrder\Create.cshtml" />
+    <Content Include="Views\DeliveryOrder\Update.cshtml" />
+    <Content Include="Views\DeliveryOrder\Detail.cshtml" />
+    <Content Include="Views\DeliveryOrder\Index.cshtml" />
+    <Content Include="Views\Shared\DeliveryOrder\Form.cshtml" />
+    <Content Include="Views\Shared\DeliveryOrder\IndexGrid.cshtml" />
+    <Content Include="Views\Invoice\Detail.cshtml" />
+    <Content Include="Views\Invoice\Index.cshtml" />
+    <Content Include="Views\Invoice\Update.cshtml" />
+    <Content Include="Views\Payment\Create.cshtml" />
+    <Content Include="Views\Payment\Detail.cshtml" />
+    <Content Include="Views\Payment\Index.cshtml" />
+    <Content Include="Views\Payment\Update.cshtml" />
+    <Content Include="Views\Shared\Invoice\Form.cshtml" />
+    <Content Include="Views\Shared\Invoice\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Payment\Form.cshtml" />
+    <Content Include="Views\Shared\Payment\IndexGrid.cshtml" />
+    <Content Include="Views\Master\CustomerGroup\Create.cshtml" />
+    <Content Include="Views\Master\CustomerGroup\Detail.cshtml" />
+    <Content Include="Views\Master\CustomerGroup\Index.cshtml" />
+    <Content Include="Views\Master\CustomerGroup\Update.cshtml" />
+    <Content Include="Views\List\UncreatedPayment\Index.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedPayment\IndexGrid.cshtml" />
+    <Content Include="Report\Site.Master" />
+    <Content Include="PrintOut\Site.Master" />
+    <None Include="Properties\PublishProfiles\Profile1.pubxml" />
+    <Content Include="Scripts\jquery.dataTables.min.js" />
+    <None Include="Styles\vssver2.scc" />
+    <Content Include="Styles\Web.config" />
+    <Content Include="Views\SalesOrder\VoidRemarks.cshtml" />
+    <Content Include="Views\Master\AnnualVAT\Create.cshtml" />
+    <Content Include="Views\Master\AnnualVAT\Detail.cshtml" />
+    <Content Include="Views\Master\AnnualVAT\Index.cshtml" />
+    <Content Include="Views\Master\AnnualVAT\Update.cshtml" />
+    <Content Include="Views\Master\Staff\Create.cshtml" />
+    <Content Include="Views\Master\Staff\Detail.cshtml" />
+    <Content Include="Views\Master\Staff\Index.cshtml" />
+    <Content Include="Views\Master\Staff\Update.cshtml" />
+    <Content Include="Views\Accounting\Create.cshtml" />
+    <Content Include="Views\Accounting\Detail.cshtml" />
+    <Content Include="Views\Accounting\Index.cshtml" />
+    <Content Include="Views\Accounting\Update.cshtml" />
+    <Content Include="Views\Accounting\VoidRemarks.cshtml" />
+    <Content Include="Views\Allowance\Create.cshtml" />
+    <Content Include="Views\Allowance\Detail.cshtml" />
+    <Content Include="Views\Allowance\Index.cshtml" />
+    <Content Include="Views\Allowance\Update.cshtml" />
+    <Content Include="Views\Allowance\VoidRemarks.cshtml" />
+    <Content Include="Views\Attendance\Create.cshtml" />
+    <Content Include="Views\Attendance\Detail.cshtml" />
+    <Content Include="Views\Attendance\Index.cshtml" />
+    <Content Include="Views\Attendance\Update.cshtml" />
+    <Content Include="Views\Shared\Accounting\Form.cshtml" />
+    <Content Include="Views\Shared\Accounting\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Allowance\Form.cshtml" />
+    <Content Include="Views\Shared\Allowance\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Attendance\Form.cshtml" />
+    <Content Include="Views\Shared\Attendance\IndexGrid.cshtml" />
+    <Content Include="Views\Master\PPh21Expense\Create.cshtml" />
+    <Content Include="Views\Master\PPh21Expense\Detail.cshtml" />
+    <Content Include="Views\Master\PPh21Expense\Index.cshtml" />
+    <Content Include="Views\Master\PPh21Expense\Update.cshtml" />
+    <Content Include="Views\Setting\AttendanceSetting\Detail.cshtml" />
+    <Content Include="Views\Setting\AttendanceSetting\Update.cshtml" />
+    <Content Include="Views\Shared\Setting\AttendanceSetting\Form.cshtml" />
+    <Content Include="Views\Shared\IncomeBank\Form.cshtml" />
+    <Content Include="Views\Shared\IncomeBank\IndexGrid.cshtml" />
+    <Content Include="Views\IncomeBank\Create.cshtml" />
+    <Content Include="Views\IncomeBank\Detail.cshtml" />
+    <Content Include="Views\IncomeBank\Update.cshtml" />
+    <Content Include="Views\IncomeBank\Index.cshtml" />
+    <Content Include="Views\IncomeBank\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\ExpenseBank\Form.cshtml" />
+    <Content Include="Views\Shared\ExpenseBank\IndexGrid.cshtml" />
+    <Content Include="Views\ExpenseBank\Create.cshtml" />
+    <Content Include="Views\ExpenseBank\Detail.cshtml" />
+    <Content Include="Views\ExpenseBank\Index.cshtml" />
+    <Content Include="Views\ExpenseBank\Update.cshtml" />
+    <Content Include="Views\ExpenseBank\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\CashInBank\Form.cshtml" />
+    <Content Include="Views\Shared\CashInBank\IndexGrid.cshtml" />
+    <Content Include="Views\CashInBank\Create.cshtml" />
+    <Content Include="Views\CashInBank\Detail.cshtml" />
+    <Content Include="Views\CashInBank\Index.cshtml" />
+    <Content Include="Views\CashInBank\Update.cshtml" />
+    <Content Include="Views\CashInBank\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\CashOutBank\Form.cshtml" />
+    <Content Include="Views\Shared\CashOutBank\IndexGrid.cshtml" />
+    <Content Include="Views\CashOutBank\Create.cshtml" />
+    <Content Include="Views\CashOutBank\Detail.cshtml" />
+    <Content Include="Views\CashOutBank\Index.cshtml" />
+    <Content Include="Views\CashOutBank\Update.cshtml" />
+    <Content Include="Views\CashOutBank\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\PurchaseOrder\Form.cshtml" />
+    <Content Include="Views\Shared\PurchaseOrder\IndexGrid.cshtml" />
+    <Content Include="Views\PurchaseOrder\Create.cshtml" />
+    <Content Include="Views\PurchaseOrder\Detail.cshtml" />
+    <Content Include="Views\PurchaseOrder\Index.cshtml" />
+    <Content Include="Views\PurchaseOrder\Update.cshtml" />
+    <Content Include="Views\PurchaseOrder\VoidRemarks.cshtml" />
+    <Content Include="Views\Master\SupplierGroup\Create.cshtml" />
+    <Content Include="Views\Master\SupplierGroup\Detail.cshtml" />
+    <Content Include="Views\Master\SupplierGroup\Index.cshtml" />
+    <Content Include="Views\Master\SupplierGroup\Update.cshtml" />
+    <Content Include="Views\Master\Supplier\Create.cshtml" />
+    <Content Include="Views\Master\Supplier\Detail.cshtml" />
+    <Content Include="Views\Master\Supplier\Index.cshtml" />
+    <Content Include="Views\Master\Supplier\Update.cshtml" />
+    <Content Include="Views\Shared\PurchasePayment\Form.cshtml" />
+    <Content Include="Views\Shared\PurchasePayment\IndexGrid.cshtml" />
+    <Content Include="Views\PurchasePayment\Create.cshtml" />
+    <Content Include="Views\PurchasePayment\Detail.cshtml" />
+    <Content Include="Views\PurchasePayment\Index.cshtml" />
+    <Content Include="Views\PurchasePayment\Update.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedPurchasePayment\IndexGrid.cshtml" />
+    <Content Include="Views\List\UncreatedPurchasePayment\Index.cshtml" />
+    <Content Include="Views\Payment\VoidRemarks.cshtml" />
+    <Content Include="Views\PurchasePayment\VoidRemarks.cshtml" />
+    <Content Include="Views\Master\Department\Create.cshtml" />
+    <Content Include="Views\Master\Department\Detail.cshtml" />
+    <Content Include="Views\Master\Department\Index.cshtml" />
+    <Content Include="Views\Master\Department\Update.cshtml" />
+    <Content Include="Views\PurchaseDelivery\Create.cshtml" />
+    <Content Include="Views\PurchaseDelivery\Detail.cshtml" />
+    <Content Include="Views\PurchaseDelivery\Index.cshtml" />
+    <Content Include="Views\PurchaseDelivery\Update.cshtml" />
+    <Content Include="Views\PurchaseDelivery\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\PurchaseDelivery\Form.cshtml" />
+    <Content Include="Views\Shared\PurchaseDelivery\IndexGrid.cshtml" />
+    <Content Include="Views\List\UncreatedPurchaseDelivery\Index.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedPurchaseDelivery\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedPurchaseBill\IndexGrid.cshtml" />
+    <Content Include="Views\List\UncreatedPurchaseBill\Index.cshtml" />
+    <Content Include="Views\Shared\PurchaseBill\Form.cshtml" />
+    <Content Include="Views\Shared\PurchaseBill\IndexGrid.cshtml" />
+    <Content Include="Views\PurchaseBill\Create.cshtml" />
+    <Content Include="Views\PurchaseBill\Detail.cshtml" />
+    <Content Include="Views\PurchaseBill\Index.cshtml" />
+    <Content Include="Views\PurchaseBill\Update.cshtml" />
+    <Content Include="Views\PurchaseBill\VoidRemarks.cshtml" />
+    <Content Include="Views\PurchaseReturn\Create.cshtml" />
+    <Content Include="Views\PurchaseReturn\Detail.cshtml" />
+    <Content Include="Views\PurchaseReturn\Index.cshtml" />
+    <Content Include="Views\PurchaseReturn\Update.cshtml" />
+    <Content Include="Views\PurchaseReturn\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\PurchaseReturn\Form.cshtml" />
+    <Content Include="Views\Shared\PurchaseReturn\IndexGrid.cshtml" />
+    <Content Include="Views\DeliveryOrder\VoidRemarks.cshtml" />
+    <Content Include="Views\Invoice\Create.cshtml" />
+    <Content Include="Views\Invoice\VoidRemarks.cshtml" />
+    <Content Include="Views\TransferOrder\Create.cshtml" />
+    <Content Include="Views\TransferOrder\Detail.cshtml" />
+    <Content Include="Views\TransferOrder\Index.cshtml" />
+    <Content Include="Views\TransferOrder\Update.cshtml" />
+    <Content Include="Views\Shared\TransferOrder\Form.cshtml" />
+    <Content Include="Views\Shared\TransferOrder\IndexGrid.cshtml" />
+    <Content Include="Views\TransferDelivery\Create.cshtml" />
+    <Content Include="Views\TransferDelivery\Detail.cshtml" />
+    <Content Include="Views\TransferDelivery\Index.cshtml" />
+    <Content Include="Views\TransferDelivery\Update.cshtml" />
+    <Content Include="Views\Shared\TransferDelivery\Form.cshtml" />
+    <Content Include="Views\Shared\TransferDelivery\IndexGrid.cshtml" />
+    <Content Include="Views\List\UncreatedTransferDelivery\Index.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedTransferDelivery\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\InventoryAdjustment\Form.cshtml" />
+    <Content Include="Views\Shared\InventoryAdjustment\IndexGrid.cshtml" />
+    <Content Include="Views\InventoryAdjustment\Create.cshtml" />
+    <Content Include="Views\InventoryAdjustment\Detail.cshtml" />
+    <Content Include="Views\InventoryAdjustment\Index.cshtml" />
+    <Content Include="Views\InventoryAdjustment\Update.cshtml" />
+    <Content Include="Views\Master\Unit\Create.cshtml" />
+    <Content Include="Views\Master\Unit\Detail.cshtml" />
+    <Content Include="Views\Master\Unit\Index.cshtml" />
+    <Content Include="Views\Master\Unit\Update.cshtml" />
+    <Content Include="Views\Shared\InventoryAdjustment\FormDetail.cshtml" />
+    <Content Include="Views\Shared\MultipleInvoicing\Form.cshtml" />
+    <Content Include="Views\Shared\MultipleInvoicing\IndexGrid.cshtml" />
+    <Content Include="Views\MultipleInvoicing\Create.cshtml" />
+    <Content Include="Views\MultipleInvoicing\Detail.cshtml" />
+    <Content Include="Views\MultipleInvoicing\Index.cshtml" />
+    <Content Include="Views\MultipleInvoicing\Update.cshtml" />
+    <Content Include="Views\MultipleInvoicing\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedInvoice\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\TransferReceipt\Form.cshtml" />
+    <Content Include="Views\Shared\TransferReceipt\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedTransferReceipt\IndexGrid.cshtml" />
+    <Content Include="Views\List\UncreatedTransferReceipt\Index.cshtml" />
+    <Content Include="Views\TransferReceipt\Create.cshtml" />
+    <Content Include="Views\TransferReceipt\Detail.cshtml" />
+    <Content Include="Views\TransferReceipt\Index.cshtml" />
+    <Content Include="Views\TransferReceipt\Update.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedMultipleInvoicing\IndexGrid.cshtml" />
+    <Content Include="Views\List\UncreatedInvoice\Index.cshtml" />
+    <Content Include="Views\List\UncreatedMultipleInvoicing\Index.cshtml" />
+    <Content Include="Views\CustomerReturn\Create.cshtml" />
+    <Content Include="Views\CustomerReturn\Detail.cshtml" />
+    <Content Include="Views\CustomerReturn\Index.cshtml" />
+    <Content Include="Views\CustomerReturn\Update.cshtml" />
+    <Content Include="Views\CustomerReturn\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\CustomerReturn\Form.cshtml" />
+    <Content Include="Views\Shared\CustomerReturn\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\VendorReturn\Form.cshtml" />
+    <Content Include="Views\Shared\VendorReturn\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\VendorReturnDelivery\Form.cshtml" />
+    <Content Include="Views\Shared\VendorReturnDelivery\IndexGrid.cshtml" />
+    <Content Include="Views\VendorReturn\Create.cshtml" />
+    <Content Include="Views\VendorReturn\Detail.cshtml" />
+    <Content Include="Views\VendorReturn\Index.cshtml" />
+    <Content Include="Views\VendorReturn\Update.cshtml" />
+    <Content Include="Views\VendorReturnDelivery\Create.cshtml" />
+    <Content Include="Views\VendorReturnDelivery\Detail.cshtml" />
+    <Content Include="Views\VendorReturnDelivery\Index.cshtml" />
+    <Content Include="Views\VendorReturnDelivery\Update.cshtml" />
+    <Content Include="Views\VendorReturnDelivery\VoidRemarks.cshtml" />
+    <Content Include="Views\List\UncreatedVendorReturnDelivery\Index.cshtml" />
+    <Content Include="Views\BillCredit\Create.cshtml" />
+    <Content Include="Views\BillCredit\Detail.cshtml" />
+    <Content Include="Views\BillCredit\Index.cshtml" />
+    <Content Include="Views\BillCredit\Update.cshtml" />
+    <Content Include="Views\CreditMemo\Create.cshtml" />
+    <Content Include="Views\CreditMemo\Detail.cshtml" />
+    <Content Include="Views\CreditMemo\Index.cshtml" />
+    <Content Include="Views\CreditMemo\Update.cshtml" />
+    <Content Include="Views\CreditMemo\VoidRemarks.cshtml" />
+    <Content Include="Views\List\UncreatedBillCredit\Index.cshtml" />
+    <Content Include="Views\List\UncreatedReturnReceipt\Index.cshtml" />
+    <Content Include="Views\ReturnReceipt\Create.cshtml" />
+    <Content Include="Views\ReturnReceipt\Detail.cshtml" />
+    <Content Include="Views\ReturnReceipt\Index.cshtml" />
+    <Content Include="Views\ReturnReceipt\Update.cshtml" />
+    <Content Include="Views\ReturnReceipt\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\BillCredit\Form.cshtml" />
+    <Content Include="Views\Shared\BillCredit\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\CreditMemo\Form.cshtml" />
+    <Content Include="Views\Shared\CreditMemo\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedBillCredit\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedReturnReceipt\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedVendorReturnDelivery\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\ReturnReceipt\Form.cshtml" />
+    <Content Include="Views\Shared\ReturnReceipt\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\ApplyBillCredit\Form.cshtml" />
+    <Content Include="Views\Shared\ApplyBillCredit\IndexGrid.cshtml" />
+    <Content Include="Views\ApplyBillCredit\Create.cshtml" />
+    <Content Include="Views\ApplyBillCredit\Detail.cshtml" />
+    <Content Include="Views\ApplyBillCredit\Index.cshtml" />
+    <Content Include="Views\ApplyBillCredit\Update.cshtml" />
+    <Content Include="Views\Shared\ApplyCreditMemo\Form.cshtml" />
+    <Content Include="Views\Shared\ApplyCreditMemo\IndexGrid.cshtml" />
+    <Content Include="Views\ApplyCreditMemo\Create.cshtml" />
+    <Content Include="Views\ApplyCreditMemo\Detail.cshtml" />
+    <Content Include="Views\ApplyCreditMemo\Index.cshtml" />
+    <Content Include="Views\ApplyCreditMemo\Update.cshtml" />
+    <Content Include="Views\MakeMultiPay\Create.cshtml" />
+    <Content Include="Views\MakeMultiPay\Detail.cshtml" />
+    <Content Include="Views\MakeMultiPay\Index.cshtml" />
+    <Content Include="Views\MakeMultiPay\Update.cshtml" />
+    <Content Include="Views\Shared\MakeMultiPay\Form.cshtml" />
+    <Content Include="Views\Shared\MakeMultiPay\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedMakeMultiPay\IndexGrid.cshtml" />
+    <Content Include="Views\List\UncreatedMakeMultiPay\Index.cshtml" />
+    <Content Include="Views\List\UncreatedMakeMultiPaySales\Index.cshtml" />
+    <Content Include="Views\Shared\MakeMultiPaySales\Form.cshtml" />
+    <Content Include="Views\Shared\MakeMultiPaySales\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedMakeMultiPaySales\IndexGrid.cshtml" />
+    <Content Include="Views\CashSales\Create.cshtml" />
+    <Content Include="Views\CashSales\Detail.cshtml" />
+    <Content Include="Views\CashSales\Index.cshtml" />
+    <Content Include="Views\CashSales\Update.cshtml" />
+    <Content Include="Views\CashSales\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\CashSales\Form.cshtml" />
+    <Content Include="Views\Shared\CashSales\IndexGrid.cshtml" />
+    <Content Include="Views\HomeCustomer\Index.cshtml" />
+    <Content Include="Views\HomeProduct\Index.cshtml" />
+    <Content Include="Views\Shared\BookingOrder\Form.cshtml" />
+    <Content Include="Views\Shared\BookingOrder\IndexGrid.cshtml" />
+    <Content Include="Views\BookingOrder\Create.cshtml" />
+    <Content Include="Views\BookingOrder\Detail.cshtml" />
+    <Content Include="Views\BookingOrder\Index.cshtml" />
+    <Content Include="Views\BookingOrder\Update.cshtml" />
+    <Content Include="Views\BookingOrder\VoidRemarks.cshtml" />
+    <Content Include="Views\BookingSales\Create.cshtml" />
+    <Content Include="Views\BookingSales\Detail.cshtml" />
+    <Content Include="Views\BookingSales\Index.cshtml" />
+    <Content Include="Views\BookingSales\Update.cshtml" />
+    <Content Include="Views\BookingSales\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\BookingSales\Form.cshtml" />
+    <Content Include="Views\Shared\BookingSales\IndexGrid.cshtml" />
+    <Content Include="Views\TransferReceipt\VoidRemarks.cshtml" />
+    <Content Include="Views\ApplyCreditMemo\VoidRemarks.cshtml" />
+    <Content Include="Views\TransferDelivery\VoidRemarks.cshtml" />
+    <Content Include="Views\TransferOrder\VoidRemarks.cshtml" />
+    <Content Include="Views\AccountConfiguration\Create.cshtml" />
+    <Content Include="Views\AccountConfiguration\Detail.cshtml" />
+    <Content Include="Views\AccountConfiguration\Index.cshtml" />
+    <Content Include="Views\AccountConfiguration\Update.cshtml" />
+    <Content Include="Views\Shared\AccountConfiguration\Form.cshtml" />
+    <Content Include="Views\Shared\AccountConfiguration\IndexGrid.cshtml" />
+    <Content Include="Views\Master\AccountCategory\Create.cshtml" />
+    <Content Include="Views\Master\AccountCategory\Detail.cshtml" />
+    <Content Include="Views\Master\AccountCategory\Index.cshtml" />
+    <Content Include="Views\Master\AccountCategory\Update.cshtml" />
+    <Content Include="Views\Accounting\UpdateAccounting.cshtml" />
+    <Content Include="Views\Accounting\CreateAccounting.cshtml" />
+    <Content Include="Views\Master\Currency\Create.cshtml" />
+    <Content Include="Views\Master\Currency\Detail.cshtml" />
+    <Content Include="Views\Master\Currency\Index.cshtml" />
+    <Content Include="Views\Master\Currency\Update.cshtml" />
+    <Content Include="Views\Master\CurrencyDate\Create.cshtml" />
+    <Content Include="Views\Master\CurrencyDate\Detail.cshtml" />
+    <Content Include="Views\Master\CurrencyDate\Update.cshtml" />
+    <Content Include="Views\ListPendingWorkOrder\Index.cshtml" />
+    <Content Include="Views\WorkOrder\Create.cshtml" />
+    <Content Include="Views\WorkOrder\Detail.cshtml" />
+    <Content Include="Views\WorkOrder\Index.cshtml" />
+    <Content Include="Views\WorkOrder\Update.cshtml" />
+    <Content Include="Views\WorkOrder\VoidRemarks.cshtml" />
+    <Content Include="Views\AssemblyBuild\Create.cshtml" />
+    <Content Include="Views\AssemblyBuild\Detail.cshtml" />
+    <Content Include="Views\AssemblyBuild\Index.cshtml" />
+    <Content Include="Views\AssemblyBuild\Update.cshtml" />
+    <Content Include="Views\AssemblyBuild\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\AssemblyBuild\Form.cshtml" />
+    <Content Include="Views\Shared\AssemblyBuild\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedBuild\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\ListPendingWorkOrder\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\WorkOrder\Form.cshtml" />
+    <Content Include="Views\Shared\WorkOrder\IndexGrid.cshtml" />
+    <Content Include="Views\InventoryAdjustment\VoidRemarks.cshtml" />
+    <Content Include="Views\MakeMultiPay\VoidRemarks.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Master\TermsOfPayment\Create.cshtml" />
+    <Content Include="Views\Master\TermsOfPayment\Detail.cshtml" />
+    <Content Include="Views\Master\TermsOfPayment\Index.cshtml" />
+    <Content Include="Views\Master\TermsOfPayment\Update.cshtml" />
+    <Content Include="Views\Master\BinNumber\Create.cshtml" />
+    <Content Include="Views\Master\BinNumber\Detail.cshtml" />
+    <Content Include="Views\Master\BinNumber\Index.cshtml" />
+    <Content Include="Views\Master\BinNumber\Update.cshtml" />
+    <Content Include="Views\AssemblyUnBuild\Create.cshtml" />
+    <Content Include="Views\AssemblyUnBuild\Detail.cshtml" />
+    <Content Include="Views\AssemblyUnBuild\Index.cshtml" />
+    <Content Include="Views\AssemblyUnBuild\Update.cshtml" />
+    <Content Include="Views\AssemblyUnBuild\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\AssemblyUnBuild\Form.cshtml" />
+    <Content Include="Views\Shared\AssemblyUnBuild\IndexGrid.cshtml" />
+    <Content Include="Views\StockMovement\Index.cshtml" />
+    <Content Include="Views\Master\Expedition\Create.cshtml" />
+    <Content Include="Views\Master\Expedition\Detail.cshtml" />
+    <Content Include="Views\Master\Expedition\Index.cshtml" />
+    <Content Include="Views\Master\Expedition\Update.cshtml" />
+    <Content Include="Views\AveragePaymentOverDue\Index.cshtml" />
+    <Content Include="Views\Shared\AveragePaymentOverDue\IndexGrid.cshtml" />
+    <Content Include="Views\Resi\Create.cshtml" />
+    <Content Include="Views\Resi\Detail.cshtml" />
+    <Content Include="Views\Resi\Index.cshtml" />
+    <Content Include="Views\Resi\Update.cshtml" />
+    <Content Include="Views\Resi\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\Resi\Form.cshtml" />
+    <Content Include="Views\Shared\Resi\IndexGrid.cshtml" />
+    <Content Include="Views\List\UncreatedBuild\Index.cshtml" />
+    <Content Include="Views\List\UncreatedResiPayment\Index.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedResiPayment\IndexGrid.cshtml" />
+    <Content Include="Views\ResiPayment\Create.cshtml" />
+    <Content Include="Views\ResiPayment\Detail.cshtml" />
+    <Content Include="Views\ResiPayment\Index.cshtml" />
+    <Content Include="Views\ResiPayment\Update.cshtml" />
+    <Content Include="Views\ResiPayment\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\ResiPayment\Form.cshtml" />
+    <Content Include="Views\Shared\ResiPayment\IndexGrid.cshtml" />
+    <Content Include="Views\VendorReturn\VoidRemarks.cshtml" />
+    <Content Include="Views\BillCredit\VoidRemarks.cshtml" />
+    <Content Include="Views\ApplyBillCredit\VoidRemarks.cshtml" />
+    <Content Include="Views\ResiBill\Create.cshtml" />
+    <Content Include="Views\ResiBill\Detail.cshtml" />
+    <Content Include="Views\ResiBill\Index.cshtml" />
+    <Content Include="Views\ResiBill\Update.cshtml" />
+    <Content Include="Views\ResiBill\VoidRemarks.cshtml" />
+    <Content Include="Views\Shared\ResiBill\Form.cshtml" />
+    <Content Include="Views\Shared\ResiBill\IndexGrid.cshtml" />
+    <Content Include="Views\List\UncreatedResiBill\Index.cshtml" />
+    <Content Include="Views\Shared\List\UncreatedResiBill\IndexGrid.cshtml" />
+    <Content Include="Views\ReportViewer\Index.cshtml" />
+    <Content Include="Views\ReportViewer\PopUp.cshtml" />
+    <Content Include="Views\MakeMultiPaySales\Create.cshtml" />
+    <Content Include="Views\MakeMultiPaySales\Detail.cshtml" />
+    <Content Include="Views\MakeMultiPaySales\Index.cshtml" />
+    <Content Include="Views\MakeMultiPaySales\Update.cshtml" />
+    <Content Include="Views\Shared\Master\AccountCategory\Form.cshtml" />
+    <Content Include="Views\Shared\Master\AccountCategory\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\Account\Form.cshtml" />
+    <Content Include="Views\Shared\Master\Account\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\AnnualVAT\Form.cshtml" />
+    <Content Include="Views\Shared\Master\AnnualVAT\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\BinNumber\Form.cshtml" />
+    <Content Include="Views\Shared\Master\BinNumber\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\CurrencyDate\Form.cshtml" />
+    <Content Include="Views\Shared\Master\Currency\Form.cshtml" />
+    <Content Include="Views\Shared\Master\Currency\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\CustomerGroup\Form.cshtml" />
+    <Content Include="Views\Shared\Master\CustomerGroup\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\Customer\Form.cshtml" />
+    <Content Include="Views\Shared\Master\Customer\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\Department\Form.cshtml" />
+    <Content Include="Views\Shared\Master\Department\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\Expedition\Form.cshtml" />
+    <Content Include="Views\Shared\Master\Expedition\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\PaymentMethod\Form.cshtml" />
+    <Content Include="Views\Shared\Master\PaymentMethod\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\PPh21Expense\Form.cshtml" />
+    <Content Include="Views\Shared\Master\PPh21Expense\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\Product\Form.cshtml" />
+    <Content Include="Views\Shared\Master\Product\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\Role\Form.cshtml" />
+    <Content Include="Views\Shared\Master\Role\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\Salesman\Form.cshtml" />
+    <Content Include="Views\Shared\Master\Salesman\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\Staff\Form.cshtml" />
+    <Content Include="Views\Shared\Master\Staff\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\SupplierGroup\Form.cshtml" />
+    <Content Include="Views\Shared\Master\SupplierGroup\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\Supplier\Form.cshtml" />
+    <Content Include="Views\Shared\Master\Supplier\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\TermsOfPayment\Form.cshtml" />
+    <Content Include="Views\Shared\Master\TermsOfPayment\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\Unit\Form.cshtml" />
+    <Content Include="Views\Shared\Master\Unit\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\User\Form.cshtml" />
+    <Content Include="Views\Shared\Master\User\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\Vendor\Form.cshtml" />
+    <Content Include="Views\Shared\Master\Vendor\IndexGrid.cshtml" />
+    <Content Include="Views\Shared\Master\Warehouse\Form.cshtml" />
+    <Content Include="Views\Shared\Master\Warehouse\IndexGrid.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="PrintOut\Allowance\UserControls\Allowance.rdlc" />
+    <EmbeddedResource Include="PrintOut\BookingSales\UserControls\BookingSales.rdlc" />
+    <EmbeddedResource Include="PrintOut\Invoice\UserControls\Invoice.rdlc" />
+    <EmbeddedResource Include="PrintOut\TransferDelivery\UserControls\TransferDelivery.rdlc" />
+    <EmbeddedResource Include="PrintOut\DeliveryOrder\UserControls\DeliveryOrder.rdlc" />
+    <EmbeddedResource Include="PrintOut\IncomeExpense\UserControls\IncomeExpense.rdlc" />
+    <EmbeddedResource Include="PrintOut\IncomeExpense\UserControls\IncomeExpenseDetail.rdlc" />
+    <EmbeddedResource Include="PrintOut\MultipleInvoicing\UserControls\MultipleInvoicing.rdlc" />
+    <EmbeddedResource Include="PrintOut\MultipleInvoicing\UserControls\MultipleInvoicingDetail.rdlc" />
+    <EmbeddedResource Include="PrintOut\PurchaseOrder\UserControls\PurchaseOrder.rdlc" />
+    <EmbeddedResource Include="PrintOut\SalesOrder\UserControls\PickingTicket.rdlc" />
+    <EmbeddedResource Include="PrintOut\SalesOrder\UserControls\SalesOrder.rdlc" />
+    <EmbeddedResource Include="PrintOut\SalesOrder\UserControls\SalesOrderDetail.rdlc" />
+    <EmbeddedResource Include="PrintOut\TaxInvoice\UserControls\TaxInvoice.rdlc" />
+    <EmbeddedResource Include="PrintOut\TaxInvoice\UserControls\TaxInvoiceDetail.rdlc" />
+    <EmbeddedResource Include="PrintOut\TransferOrder\UserControls\PickingTicket.rdlc" />
+    <EmbeddedResource Include="PrintOut\VendorReturn\UserControls\VendorReturn.rdlc" />
+    <Content Include="Report\Accounting\UserControls\AccountTransaction.rdlc" />
+    <Content Include="Report\Accounting\UserControls\ProfitAndLoss.rdlc" />
+    <Content Include="Report\Accounting\UserControls\IncomeExpense.rdlc" />
+    <Content Include="Report\Accounting\UserControls\GeneralJournal.rdlc" />
+    <EmbeddedResource Include="PrintOut\WorkOrder\UserControls\WorkOrderLetter.rdlc" />
+    <EmbeddedResource Include="PrintOut\WorkOrder\UserControls\WorkOrder.rdlc" />
+    <EmbeddedResource Include="PrintOut\WorkOrder\UserControls\WorkOrderStruk.rdlc" />
+    <EmbeddedResource Include="Report\Accounting\UserControls\IncomeExpense1.rdlc" />
+    <EmbeddedResource Include="Report\Accounting\UserControls\ProfitAndLoss1.rdlc" />
+    <Content Include="Report\Accounting\UserControls\TrialBalance.rdlc" />
+    <EmbeddedResource Include="Report\AssemblyBuild\UserControls\ReportHpp.rdlc" />
+    <EmbeddedResource Include="Report\Attendance\UserControls\Attendance.rdlc" />
+    <EmbeddedResource Include="Report\Attendance\UserControls\AttendanceDetail.rdlc" />
+    <Content Include="Report\DeliveryOrder\UserControls\DeliveryOrderDetail.rdlc" />
+    <Content Include="Report\Invoice\UserControls\Invoice.rdlc" />
+    <Content Include="Report\Payment\UserControls\Payment.rdlc" />
+    <Content Include="Report\SalesOrder\UserControls\SalesOrderDetail.rdlc" />
+    <Content Include="Report\SalesOrder\UserControls\SalesOrder.rdlc" />
+    <Content Include="Report\Invoice\UserControls\InvoiceBySalesRepDetail.rdlc" />
+    <EmbeddedResource Include="Report\CreditMemo\UserControls\CreditMemoByItem.rdlc" />
+    <EmbeddedResource Include="Report\DeliveryOrder\UserControls\DeliveryOrder.rdlc" />
+    <Content Include="Report\Invoice\UserControls\ReportBonus.rdlc" />
+    <Content Include="Report\Invoice\UserControls\InvoiceMonthly.rdlc" />
+    <EmbeddedResource Include="Report\DeliveryOrder\UserControls\FulfillmentByItemSummary.rdlc" />
+    <EmbeddedResource Include="Report\DeliveryOrder\UserControls\Fulfilment.rdlc" />
+    <Content Include="Report\Invoice\UserControls\InvoiceCreditMemo.rdlc" />
+    <Content Include="Report\Invoice\UserControls\InvoiceMonthlySummary.rdlc" />
+    <EmbeddedResource Include="Report\DeliveryOrder\UserControls\FullfillmentByItemDetail.rdlc" />
+    <EmbeddedResource Include="Report\GoodsReturnedByCustomer\UserControls\GoodsReturnedByCustomer.rdlc" />
+    <EmbeddedResource Include="Report\GoodsSoldByCustomer\UserControls\GoodsSoldByCustomer.rdlc" />
+    <EmbeddedResource Include="Report\GoodsSoldByProduct\UserControls\GoodsSoldByProduct.rdlc" />
+    <EmbeddedResource Include="Report\Invoice\UserControls\InvoiceAging.rdlc" />
+    <EmbeddedResource Include="Report\Invoice\UserControls\InvoicePaymentDetail.rdlc" />
+    <EmbeddedResource Include="Report\Invoice\UserControls\InvoicePaymentSummary.rdlc" />
+    <EmbeddedResource Include="Report\Invoice\UserControls\SalesOrderBySalesRepSumNoCustomer.rdlc" />
+    <EmbeddedResource Include="Report\Invoice\UserControls\ReportOverdue.rdlc" />
+    <EmbeddedResource Include="Report\Invoice\UserControls\InvoiceByItemSum.rdlc" />
+    <EmbeddedResource Include="Report\Invoice\UserControls\InvoiceBySalesRepSum.rdlc" />
+    <Content Include="Report\Payment\UserControls\PaymentInvoice.rdlc" />
+    <Content Include="Report\Payment\UserControls\PaymentBill.rdlc" />
+    <EmbeddedResource Include="Report\Product\UserControls\Product.rdlc" />
+    <EmbeddedResource Include="Report\PurchaseBill\UserControls\PurchaseBillAging.rdlc" />
+    <EmbeddedResource Include="Report\PurchaseBill\UserControls\PurchaseBillOverdue.rdlc" />
+    <EmbeddedResource Include="Report\PurchaseBill\UserControls\PurchaseBill.rdlc" />
+    <Content Include="Report\PurchaseOrder\UserControls\PurchaseOrder.rdlc" />
+    <Content Include="Report\Stock\UserControls\Stock.rdlc" />
+    <Content Include="Report\Stock\UserControls\TransactionStock.rdlc" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>False</AutoAssignPort>
+          <DevelopmentServerPort>8007</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
+          </IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

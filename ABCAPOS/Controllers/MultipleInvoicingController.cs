@@ -1,0 +1,274 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Transactions;
+using ABCAPOS.Models;
+using MPL.MVC;
+using ABCAPOS.BF;
+using ABCAPOS.Util;
+
+namespace ABCAPOS.Controllers
+{
+    public class MultipleInvoicingController : MasterDetailController<MultipleInvoicingModel, MultipleInvoicingDetailModel>
+    {
+        private string ModuleID
+        {
+            get
+            {
+                return "Invoice";
+            }
+        }
+        private void SetViewBagDetailList(MultipleInvoicingModel header, List<MultipleInvoicingDetailModel> details)
+        {
+            int intCount = 0;
+            header.SalesOrderCodeList = "";
+            header.DeliveryOrderCodeList = "";
+            foreach (var detail in details)
+            {
+                var setComma = "";
+                if (intCount > 0)
+                    setComma = ", ";
+
+                if (!header.SalesOrderCodeList.Contains(detail.SalesOrderCode))
+                    header.SalesOrderCodeList += setComma + detail.SalesOrderCode;
+                if (!header.DeliveryOrderCodeList.Contains(detail.DeliveryOrderCodeList))
+                    header.DeliveryOrderCodeList += setComma + detail.DeliveryOrderCodeList;
+                intCount += 1;
+            }
+        }
+        private void SetViewBagPermission()
+        {
+            var roleDetails = new RoleBFC().RetrieveActions(MembershipHelper.GetRoleID(), ModuleID);
+
+            ViewBag.AllowEdit = roleDetails.Contains("Edit");
+            ViewBag.AllowCreate = roleDetails.Contains("Create");
+            ViewBag.AllowVoid = roleDetails.Contains("Void");
+        }
+        private void SetViewBagNotification()
+        {
+            if (TempData["SuccessNotification"] != null)
+                ViewBag.SuccessNotification = Convert.ToString(TempData["SuccessNotification"]);
+
+            if (!string.IsNullOrEmpty(Request.QueryString["errorMessage"]))
+                ViewBag.ErrorNotification = Convert.ToString(Request.QueryString["errorMessage"]);
+        }
+        private void countTotal(MultipleInvoicingModel header, List<MultipleInvoicingDetailModel> details)
+        {
+            header.SubTotal = details.Sum(p => p.Amount);
+            header.TaxValue = details.Sum(p => p.TaxAmount);
+            header.GrandTotal = details.Sum(p => p.GrandTotal);
+
+            var ItemDetails = new MultipleInvoicingBFC().RetrieveItemDetailsGroup(header.ID).OrderBy(p => p.ItemNo).ToList();
+            header.SubTotalItem = ItemDetails.Sum(p => p.TotalAmount);
+            header.TaxValueItem = ItemDetails.Sum(p => p.TotalPPN);
+            header.GrandTotalItem = ItemDetails.Sum(p => p.GrossAmount);
+        }
+        public override MPL.Business.IMasterDetailBFC<MultipleInvoicingModel, MultipleInvoicingDetailModel> GetBFC()
+        {
+            return new MultipleInvoicingBFC();
+        }
+        public override ActionResult Index(int? startIndex, int? amount, string sortParameter, MPL.MVC.GenericFilter filter)
+        {
+            SetViewBagPermission();
+
+            var invoiceCount = 0;
+            var invoiceList = new List<MultipleInvoicingModel>();
+
+            if (startIndex == null)
+                startIndex = 0;
+
+            if (amount == null)
+                amount = 20;
+
+            if (string.IsNullOrEmpty(sortParameter))
+                sortParameter = "";
+
+            //if (filter == null || filter.FilterFields.Count == 0)
+            //{
+            //    invoiceCount = new InvoiceBFC().RetrieveUnvoidCount(filter.GetSelectFilters());
+            //    invoiceList = new InvoiceBFC().RetrieveUnvoid((int)startIndex, (int)amount, sortParameter, filter.GetSelectFilters());
+            //}
+            //else
+            //{
+            invoiceCount = new MultipleInvoicingBFC().RetrieveCount(filter.GetSelectFilters());
+            invoiceList = new MultipleInvoicingBFC().Retrieve((int)startIndex, (int)amount, sortParameter, filter.GetSelectFilters());
+            //}
+
+            ViewBag.DataCount = invoiceCount;
+            ViewBag.PageSize = amount;
+            ViewBag.StartIndex = startIndex;
+            ViewBag.FilterFields = filter.FilterFields;
+            ViewBag.PageSeriesSize = GetPageSeriesSize();
+
+            return View(invoiceList);
+        }
+        protected override void PreCreateDisplay(MultipleInvoicingModel header, List<MultipleInvoicingDetailModel> details)
+        {
+            SetViewBagNotification();
+            new MultipleInvoicingBFC().SetDateFromDateTo(header);
+
+            var customerID = Convert.ToInt64(Request.QueryString["customerID"]);
+
+            var dateFrom = Request.QueryString["dateFrom"];
+            var dateTo = Request.QueryString["dateTo"];
+            var date = Request.QueryString["Date"]; 
+            //var populateItems = Request.QueryString["populateItems"];
+            header.Code = SystemConstants.autoGenerated;
+
+            new MultipleInvoicingBFC().CreateByCustomerID(header, customerID, dateFrom, dateTo, date);
+
+            //if (!string.IsNullOrEmpty(populateItems))
+            //    new MultipleInvoicingBFC().GetAndCreateMultipleInvoiceItem(header);
+
+            base.PreCreateDisplay(header, header.Details);
+        }
+        protected override void PreUpdateDisplay(MultipleInvoicingModel header, List<MultipleInvoicingDetailModel> details)
+        {
+            SetViewBagNotification();
+            SetViewBagPermission();
+
+            var customerID = Convert.ToInt64(Request.QueryString["customerID"]);
+            var dateFrom = Request.QueryString["dateFrom"];
+            var dateTo = Request.QueryString["dateTo"];
+
+            //var populateItems = Request.QueryString["populateItems"];
+
+            if (Request.QueryString["customerID"] != null)
+                new MultipleInvoicingBFC().UpdateByCustomerID(header, details, customerID, dateFrom, dateTo);
+            else
+                header.ItemDetails = new MultipleInvoicingBFC().RetrieveItemDetails(header.ID).OrderBy(p => p.ItemNo).ToList();
+
+            countTotal(header, details);
+            base.PreDetailDisplay(header, details);
+        }
+        protected override void PreDetailDisplay(MultipleInvoicingModel header, List<MultipleInvoicingDetailModel> details)
+        {
+            SetViewBagNotification();
+            SetViewBagPermission();
+            SetViewBagDetailList(header, details);
+
+            header.ItemDetails = new MultipleInvoicingBFC().RetrieveItemDetailsGroup(header.ID).OrderBy(p => p.ItemNo).ToList();
+            countTotal(header, details);
+            base.PreDetailDisplay(header, details);
+        }
+        protected override List<Button> GetAdditionalButtons(MultipleInvoicingModel header, List<MultipleInvoicingDetailModel> details, UIMode mode)
+        {
+            var list = new List<Button>();
+
+            if (mode == UIMode.Detail)
+            {
+                var print = new Button();
+                print.Text = "Print Invoice";
+                print.CssClass = "button";
+                print.ID = "btnPrint";
+                print.OnClick = String.Format("window.open('{0}');", Url.Action("PopUp", "ReportViewer",
+                    new { type = ReportViewerController.PrintOutType.Invoice, queryString = SystemConstants.str_MultipleInvoicingID + "=" + header.ID }));
+                print.Href = "#";
+                list.Add(print);
+
+                var taxInvoicePrint = new Button();
+                taxInvoicePrint.Text = "Print Faktur Pajak";
+                taxInvoicePrint.CssClass = "button";
+                taxInvoicePrint.ID = "btnPrintFakturPajak";
+                taxInvoicePrint.OnClick = String.Format("window.open('{0}');", Url.Action("PopUp", "ReportViewer",
+                    new { type = ReportViewerController.PrintOutType.TaxInvoice, queryString = SystemConstants.str_MultipleInvoicingID + "=" + header.ID }));
+                taxInvoicePrint.Href = "#";
+                list.Add(taxInvoicePrint);
+                //}
+
+            }
+
+            return list;
+        }
+        public ActionResult VoidRemarks(string key, bool voidFromIndex)
+        {
+            if (!string.IsNullOrEmpty(key))
+            {
+                var multipleInvoice = new MultipleInvoicingBFC().RetrieveByID(key);
+                ViewBag.VoidFromIndex = voidFromIndex;
+                return View(multipleInvoice);
+            }
+            return View();
+        }
+        [HttpPost, ValidateInput(false)]
+        public ActionResult CreateMultipleInvoicing(MultipleInvoicingModel obj, FormCollection col)
+        {
+            try
+            {
+
+                new MultipleInvoicingBFC().Validate(obj, obj.Details);
+
+                base.Create(obj);
+
+                TempData["SuccessNotification"] = "Document has been saved";
+
+                obj.ItemDetails = new MultipleInvoicingBFC().RetrieveItemDetailsGroup(obj.ID).OrderBy(p => p.ItemNo).ToList();
+                countTotal(obj, obj.Details);
+
+                return RedirectToAction("Detail", new { key = obj.ID });
+                //return RedirectToAction(View);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorNotification = ex.Message;
+                ViewBag.Mode = UIMode.Create;
+                SetViewBagPermission();
+
+                return RedirectToAction("Create", new { customerID = obj.CustomerID, errorMessage = ex.Message });
+            }
+
+        }
+        [HttpPost, ValidateInput(false)]
+        public ActionResult UpdateMultipleInvoicing(MultipleInvoicingModel header, List<MultipleInvoiceItemModel> itemDetails, FormCollection col)
+        {
+            try
+            {
+                if (itemDetails == null)
+                    itemDetails = new List<MultipleInvoiceItemModel>();
+
+                header.ItemDetails = itemDetails;
+
+                new MultipleInvoicingBFC().Validate(header, header.Details);
+
+                new MultipleInvoicingBFC().Update(header, header.Details, MembershipHelper.GetUserName());
+                //base.Update(header, col);
+
+                TempData["SuccessNotification"] = "Document has been saved";
+    
+                return RedirectToAction("Detail", new { key = header.ID });
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorNotification = ex.Message;
+                ViewBag.Mode = UIMode.Create;
+                SetViewBagPermission();
+
+                return RedirectToAction("Update", new { key = header.ID, errorMessage = ex.Message });
+            }
+        }
+        [HttpPost]
+        public ActionResult VoidRemarks(MultipleInvoicingModel header, FormCollection col)
+        {
+            var voidFromIndex = Convert.ToBoolean(col["hdnVoidFromIndex"]);
+            try
+            {
+                using (TransactionScope trans = new TransactionScope())
+                {
+                    new MultipleInvoicingBFC().Void(header, MembershipHelper.GetUserName());
+
+                    trans.Complete();
+                }
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                if (voidFromIndex)
+                    return RedirectToAction("Index");
+                else
+                    return RedirectToAction("Detail", new { key = header.ID, errorMessage = ex.Message });
+            }
+        }
+    }
+}

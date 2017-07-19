@@ -1,0 +1,228 @@
+﻿.displayGrid {
+    width: 100%;
+}
+
+    .displayGrid thead {
+        background-color: #837e7c;/*#8766ff;*/
+        text-align: center;
+        color: #ffffff;
+    }
+
+        .displayGrid thead a {
+            color: #ffffff;
+        }
+
+    /*.displayGrid tr.trEven {
+        background-color: #c2dcff;
+    }
+
+    .displayGrid tr.trOdd {
+        background-color: #ffffff;
+    }*/
+
+    .displayGrid tbody tr:nth-child(even) {
+        background-color: #DBDBDB;
+    }
+
+    .displayGrid tbody tr:nth-child(odd) {
+        background-color: #ffffff;
+    }
+
+.transactionGrid {
+    width: 100%;
+}
+
+    .transactionGrid thead {
+        background-color: #88BBFF;
+        color: #ffffff;
+        text-align: center;
+    }
+
+a.button {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.button {
+    -moz-box-shadow: 0px 1px 0px 0px #a9a5bd;
+    -webkit-box-shadow: 0px 1px 0px 0px #a9a5bd;
+    box-shadow: 0px 1px 0px 0px #a9a5bd;
+    background-color: #837e7c;/*#8766ff;*/
+    -webkit-border-top-left-radius: 12px;
+    -moz-border-radius-topleft: 12px;
+    border-top-left-radius: 12px;
+    -webkit-border-top-right-radius: 12px;
+    -moz-border-radius-topright: 12px;
+    border-top-right-radius: 12px;
+    -webkit-border-bottom-right-radius: 12px;
+    -moz-border-radius-bottomright: 12px;
+    border-bottom-right-radius: 12px;
+    -webkit-border-bottom-left-radius: 12px;
+    -moz-border-radius-bottomleft: 12px;
+    border-bottom-left-radius: 12px;
+    text-indent: 0px;
+    border: 1px solid #7D7D7D;
+    display: inline-block;
+    font-family: Trebuchet MS;
+    font-size: 15px;
+    font-weight: normal;
+    font-style: normal;
+    /* height + line-height = button height */
+    height: 25px;
+    line-height: 25px;
+    /*width:100px;*/
+    text-decoration: none;
+    text-align: center;
+    /*text-shadow:1px 1px 0px #000000;*/
+    padding: 2px 15px 2px 15px;
+}
+
+    .button:hover {
+        background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #B0B0B0), color-stop(1, #E0DDDA) );
+        background: -moz-linear-gradient( center top, #B0B0B0 5%, #E0DDDA 100% );
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#B0B0B0', endColorstr='#E0DDDA');
+        background-color: #b8a6ff;
+    }
+
+    .button:active {
+        position: relative;
+        top: 1px;
+    }
+
+.paging {
+    height: 15px;
+    padding: 5px 10px 5px 10px;
+}
+
+.imageButton {
+    border: none;
+    width: 16px;
+    height: 16px;
+    background-repeat: no-repeat;
+    text-indent: -9999px;
+    display: block;
+    overflow: hidden;
+}
+
+/*.button
+{   
+    background-color: #c2dcff;  
+    border: solid 1px #415D9B;
+    margin: 5px;
+    height: 18px;
+    float: left;
+    display: block;
+    padding: 5px 5px 2px 22px;
+    background-position: 5% 50%;
+    background-repeat: no-repeat;
+}
+.button:hover {
+    background-color: #88BBFF;
+}
+
+.button:active {
+    border-top: solid 1px black;
+}*/
+
+.add {
+    background-image: url('Icons/add.png');
+}
+
+.edit {
+    background-image: url('Icons/edit.png');
+}
+
+.save {
+    background-image: url('Icons/save.png');
+}
+
+.cancel {
+    background-image: url('Icons/cancel.png');
+}
+
+.delete {
+    background-image: url('Icons/delete.png');
+}
+
+.details {
+    background-image: url('Icons/details.png');
+}
+
+.date {
+    background-image: url('Icons/calendar.png');
+}
+
+.search {
+    background-image: url('Icons/find.png');
+}
+
+.clearSearch {
+    background-image: url('Icons/cancel.png');
+}
+
+.submit {
+    background-image: url('Icons/submit.png');
+}
+
+.approve {
+    background-image: url('Icons/approve.png');
+}
+
+.backToList {
+    background-image: url('Icons/backToList.png');
+}
+
+.print {
+    background-image: url('Icons/print.png');
+}
+
+.reopen {
+    background-image: url('Icons/reopen.png');
+}
+
+.createAnother {
+    background-image: url('Icons/createAnother.png');
+}
+
+
+td.iconContainer {
+    width: 16px;
+}
+
+.genericFilter {
+    width: 600px;
+}
+
+.genericFilterHeader {
+    width: 100%;
+    height: 27px;
+    color: White;
+    font-size: 12pt;
+    padding-top: 5px;
+    background: #837e7c;/*#8766ff;*/
+    /*background-image:url('Icons/FilterBackground.png');*/
+    vertical-align: middle;
+}
+
+.genericFilterTable {
+    width: 100%;
+    border: 0px solid #ffffff;
+}
+
+.plainLink a:link {
+    color: #696969;
+    text-decoration:none;
+}
+
+.plainLink a:visited {
+    color: #696969;
+}
+
+.plainLink a:hover {
+    color: #696969;
+    text-decoration: underline;
+}
+
+.plainLink a:active {
+    color: #12eb87;
+}

@@ -1,0 +1,207 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Helpers;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model RoleModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    var action = "";
+
+    if (mode == UIMode.Create)
+    {
+        action = "CreateRole";
+    }
+    else
+    {
+        action = "UpdateRole";
+    }
+
+    var radioIsActiveChk = "";
+    var radioIsNotActiveChk = "";
+
+    if (Model.IsActive)
+    {
+        radioIsActiveChk = "checked=\"checked\"";
+    }
+    else
+    {
+        radioIsNotActiveChk = "checked=\"checked\"";
+    }
+}
+@using (Html.BeginForm(action, "Role", FormMethod.Post, new { id = "EditForm" }))
+{
+    @Html.HiddenFor(p => p.ID)
+    <table class="basic">
+        <tr>
+            <td style="width: 150px">
+                Nama Peran <span class="warning">*</span>
+            </td>
+            <td class="separatorColumn">
+                :
+            </td>
+            <td>
+                @Html.TextBoxFor(p => p.Name)
+                @Html.ValidationMessageFor(p => p.Name)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Daftar Modul
+            </td>
+            <td>
+                :
+            </td>
+            <td>
+                <table class="basic">
+                    @foreach (var obj in ModuleHelper.ModuleList())
+                    {
+                        var chkViewID = "chkView" + obj.Key;
+                        var chkEditID = "chkEdit" + obj.Key;
+                        var chkCreateID = "chkCreate" + obj.Key;
+                        var chkVoidID = "chkVoid" + obj.Key;
+                        var chkFinishGood = "chkFG" + obj.Key;
+                        var chkALL = "chkALL" + obj.Key;
+                        
+                        var viewPermission = from i in Model.Details
+                                             where i.ModuleID == obj.Key && i.Action == "View"
+                                             select i;
+
+                        var editPermission = from i in Model.Details
+                                             where i.ModuleID == obj.Key && i.Action == "Edit"
+                                             select i;
+
+                        var createPermission = from i in Model.Details
+                                               where i.ModuleID == obj.Key && i.Action == "Create"
+                                               select i;
+
+                        var voidPermission = from i in Model.Details
+                                                where i.ModuleID == obj.Key && i.Action == "Void"
+                                                select i;
+
+                        var ViewFinishGood = from i in Model.Details
+                                             where i.ModuleID == obj.Key && i.Action == "ViewFinishGood"
+                                             select i;
+
+                        var ViewALL = from i in Model.Details
+                                      where i.ModuleID == obj.Key && i.Action == "ViewALL"
+                                      select i;
+
+                        var chkViewChecked = "";
+                        var chkEditChecked = "";
+                        var chkCreateChecked = "";
+                        var chkVoidChecked = "";
+                        var chkViewFGChecked = "";
+                        var chkViewALLChecked = "";
+                        
+                        if (viewPermission.FirstOrDefault() != null)
+                        {
+                            chkViewChecked = "checked=\"checked\"";
+                        }
+
+                        if (editPermission.FirstOrDefault() != null)
+                        {
+                            chkEditChecked = "checked=\"checked\"";
+                        }
+
+                        if (createPermission.FirstOrDefault() != null)
+                        {
+                            chkCreateChecked = "checked=\"checked\"";
+                        }
+
+                        if (voidPermission.FirstOrDefault() != null)
+                        {
+                            chkVoidChecked = "checked=\"checked\"";
+                        }
+
+                        if (ViewFinishGood.FirstOrDefault() != null)
+                        {
+                            chkViewFGChecked = "checked=\"checked\"";
+                        }
+
+                        if (ViewALL.FirstOrDefault() != null)
+                        {
+                            chkViewALLChecked = "checked=\"checked\"";
+                        }
+                        <tr>
+                            <td style="width: 250px">
+                                @obj.Value
+                            </td>
+                            <td style="width: 150px">
+                                @if (obj.Key != "CompanySetting" && obj.Key != "PrefixSetting")
+                                {
+                                    <input type="checkbox" id="@chkViewID" name="@chkViewID" value="true" @chkViewChecked />@Html.Raw("Lihat")
+                                }
+                            </td>
+                            <td style="width: 150px">
+                                @if (obj.Key != "CompanySetting" && obj.Key != "PrefixSetting" && obj.Key != "StockMovement" && obj.Key != "AveragePaymentOverDue" && obj.Key != "SalesOrderReport"
+                                    && obj.Key != "PurchaseOrderReport" && obj.Key != "PurchaseBillReport" && obj.Key != "ItemFulfillmentReport" && obj.Key != "InvoiceReport" && obj.Key != "PaymentReport"
+                                    && obj.Key != "ReportOverdue" && obj.Key != "ReportStock" && obj.Key != "CreditMemoByItemReport" && obj.Key != "ManufactureReport")
+                                {
+                                    <input type="checkbox" id="@chkCreateID" name="@chkCreateID" value="true" @chkCreateChecked />@Html.Raw("Buat Baru")
+                                }
+                            </td>
+                            <td style="width: 150px">
+                                 @if (obj.Key != "StockMovement" && obj.Key != "AveragePaymentOverDue" && obj.Key != "SalesOrderReport" && obj.Key != "PurchaseOrderReport"
+                                     && obj.Key != "PurchaseBillReport" && obj.Key != "ItemFulfillmentReport" && obj.Key != "InvoiceReport" && obj.Key != "PaymentReport"
+                                     && obj.Key != "ReportOverdue" && obj.Key != "ReportStock" && obj.Key != "CreditMemoByItemReport" && obj.Key != "ManufactureReport")
+                                 {
+                                    <input type="checkbox" id="@chkEditID" name="@chkEditID" value="true" @chkEditChecked />@Html.Raw("Edit")
+                                 }
+                               
+                            </td>
+                            <td style="width: 150px">
+                                @if (obj.Key == "PurchaseOrder" || obj.Key == "PurchaseDelivery" || obj.Key == "PurchaseBill" || obj.Key == "MakeMultiPay" || obj.Key == "PurchaseReturn" 
+                                    || obj.Key == "SalesOrder" || obj.Key == "DeliveryOrder" || obj.Key == "Invoice" || obj.Key == "Payment" || obj.Key == "CashSales"
+                                    || obj.Key == "MakeMultiPaySales" || obj.Key == "TransferOrder" || obj.Key == "TransferDelivery" || obj.Key == "TransferReceipt"
+                                    || obj.Key == "CreditMemo" || obj.Key == "ApplyCreditMemo" || obj.Key == "ApplyBillCredit" || obj.Key == "BillCredit"
+                                    || obj.Key == "CustomerReturn" || obj.Key == "ReturnReceipt" || obj.Key == "WorkOrder" || obj.Key == "AssemblyBuild" || obj.Key == "VendorReturn" 
+                                    || obj.Key == "VendorReturnDelivery" || obj.Key == "AssemblyUnBuild" || obj.Key == "Resi" || obj.Key == "ResiPayment" || obj.Key == "ResiBill")
+                                {
+                                    <input type="checkbox" id="@chkVoidID" name="@chkVoidID" value="true" @chkVoidChecked />@Html.Raw("Void")
+                                }
+                            </td>
+                            <td style="width: 150px">
+                                @if (obj.Key == "WorkOrder" || obj.Key == "AssemblyBuild" || obj.Key == "AssemblyUnBuild" || obj.Key == "Product")
+                                {
+                                    <input type="checkbox" id="@chkFinishGood" name="@chkFinishGood" value="true" @chkViewFGChecked />@Html.Raw("ViewFinishGood")
+                                }
+                            </td>
+                            <td style="width: 150px">
+                                @if (obj.Key == "WorkOrder" || obj.Key == "AssemblyBuild" || obj.Key == "AssemblyUnBuild" || obj.Key == "Product")
+                                {
+                                    <input type="checkbox" id="@chkALL" name="@chkALL" value="true" @chkViewALLChecked />@Html.Raw("ViewALL")
+                                }
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 150px">
+                Status
+            </td>
+            <td class="separatorColumn">
+                :
+            </td>
+            <td>
+                <input type="radio" id="IsActive_0" name="IsActive" value="true" @radioIsActiveChk />Aktif
+                <input type="radio" id="IsActive_1" name="IsActive" value="false" @radioIsNotActiveChk />Tidak
+                Aktif
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <table class="basic">
+                    <tr>
+                        <td>
+                            <a href="#" onclick="$('#EditForm').submit();" class="button">Simpan</a> <a href="@Url.Content("~/Role/Index")" class="button">
+                                Batal</a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+}

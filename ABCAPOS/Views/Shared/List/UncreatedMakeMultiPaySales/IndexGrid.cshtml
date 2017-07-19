@@ -1,0 +1,56 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<InvoiceModel>
+@{
+    var warehouseList = ViewBag.WarehouseList as IEnumerable<WarehouseModel>;
+    var ddlWarehouse = Util.GetDropDownOptions(warehouseList, "Name", "Name");
+    
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","INVOICE NUMBER"),
+        Html.LabelColumn("SalesOrderCode","SO NUMBER"),
+        Html.DateColumn("Date","DATE"),
+        Html.DateColumn("DueDate","DUE DATE"),
+        Html.LabelColumn("CustomerName","CUSTOMER"),
+        Html.DecimalColumn("GrandTotal","ORIG. AMT.", "",delegate(GridColumn col)
+        {
+            col.DetailFormat = "N0";
+        }),
+        Html.DecimalColumn("OutstandingAmount","OUTSTANDING AMT.", "",delegate(GridColumn col)
+        {
+            col.DetailFormat = "N0";
+        }),
+        Html.DecimalColumn("StatusDescription","STATUS", "",delegate(GridColumn col)
+        {
+            col.DetailFormat = "N0";
+        })
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("Tanggal Transaksi","Date"),
+        Html.GenericFilterTextBoxField("Invoice Number","Code"),
+        Html.GenericFilterTextBoxField("Sales Order Number","SalesOrderCode"),
+        Html.GenericFilterTextBoxField("Nama Customer","CustomerName"),
+        Html.GenericFilterDropDownField("Location", "WarehouseName", ddlWarehouse, typeof(string))
+    };
+
+    var createButton = new GridButtonColumn();
+    createButton.CssClass = "iconContainer";
+    createButton.ButtonCssClass = "add imageButton";
+    createButton.Href = Url.Content("~/MakeMultiPaySales/Create?invoiceID=@idPropertyValue");
+    createButton.IDPropertyName = "ID";
+    createButton.Text = "Buat Pembayaran";
+    
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(createButton);
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "UncreatedMakeMultiPaySales", "ID", "Code", null, delegate(object obj, UIMode mode)
+    {
+        return false;
+    }, delegate(IndexGridHelper helper)
+    {
+        helper.AddNewButton.Visible = false;
+    })

@@ -1,0 +1,52 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<InvoiceModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","NO TAGIHAN"),
+        Html.DateColumn("Date","DATE"),
+        Html.DateColumn("DueDate","DUE DATE"),
+        Html.LabelColumn("DeliveryOrderCode","SJ NO"),
+        Html.LabelColumn("CustomerName","CUSTOMER"),
+        Html.DecimalColumn("GrandTotal","AMOUNT", "",delegate(GridColumn col)
+        {
+            col.DetailFormat = "N0";
+        }),
+        Html.DecimalColumn("OutstandingAmount","OUTSTANDING AMOUNT", "",delegate(GridColumn col)
+        {
+            col.DetailFormat = "N0";
+        })
+    };
+
+    var customerGroupList = ViewBag.CustomerGroupList as List<CustomerGroupModel>;
+    var ddlCustomerGroup = Util.GetDropDownOptions(customerGroupList, "Name", "ID");
+    
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("TRANSACTION DATE","Date"),
+        Html.GenericFilterDateRangeField("DUE DATE","DueDate"),
+        Html.GenericFilterTextBoxField("NO TAGIHAN","Code"),
+        Html.GenericFilterTextBoxField("SJ NO","DeliveryOrderCode"),
+        Html.GenericFilterTextBoxField("CUSTOMER","CustomerName"),
+    };
+
+    var createButton = new GridButtonColumn();
+    createButton.CssClass = "iconContainer";
+    createButton.ButtonCssClass = "add imageButton";
+    createButton.Href = Url.Content("~/Payment/Create?invoiceID=@idPropertyValue");
+    createButton.IDPropertyName = "ID";
+    createButton.Text = "Buat Pembayaran";
+    
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(createButton);
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "UncreatedPayment", "ID", "Code", null, delegate(object obj, UIMode mode)
+    {
+        return false;
+    }, delegate(IndexGridHelper helper)
+    {
+        helper.AddNewButton.Visible = false;
+    })

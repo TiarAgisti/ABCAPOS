@@ -1,0 +1,46 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<ResiBillModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.DateColumn("Date","DATE"),
+        Html.LabelColumn("Code","RESI BILL"),
+        Html.LabelColumn("ExpeditionName","EXPEDITION"),
+        Html.DecimalColumn("TotalAmount","ORIG. AMT.", "",delegate(GridColumn col){
+            col.DetailFormat = "N0";
+        }),
+        Html.DecimalColumn("OutStandingAmount","OUTSTANDING AMT.", "",delegate(GridColumn col){
+            col.DetailFormat = "N0";
+        }),
+        Html.LabelColumn("StatusDesc","STATUS", "",delegate(GridColumn col){
+        }),
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("DATE","Date"),
+        Html.GenericFilterTextBoxField("RESI BILL","Code"),
+        Html.GenericFilterTextBoxField("CUSTOMER NAME","CustomerName"),
+        Html.GenericFilterTextBoxField("EXPEDITION","ExpeditionName"),
+    };
+
+    var createButton = new GridButtonColumn();
+    createButton.CssClass = "iconContainer";
+    createButton.ButtonCssClass = "add imageButton";
+    createButton.Href = Url.Content("~/ResiPayment/Create?resiBillID=@idPropertyValue");
+    createButton.IDPropertyName = "ID";
+    createButton.Text = "Buat Pembayaran";
+    
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(createButton);
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "UncreatedResiPayment", "ID", "Code", null, delegate(object obj, UIMode mode)
+    {
+        return false;
+    }, delegate(IndexGridHelper helper)
+    {
+        helper.AddNewButton.Visible = false;
+    })

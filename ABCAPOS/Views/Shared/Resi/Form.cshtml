@@ -1,0 +1,429 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model ResiModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+    ViewBag.ErrorMessage = "";
+
+    var action = "";
+
+    var warehouseList = ViewBag.WarehouseList as IEnumerable<WarehouseModel>;
+    var ddlWarehouseName = Util.GetDropDownOptions(warehouseList, "Name", "ID");
+
+
+    var populateDeliveryOrder = "<a href='#' onclick='populateDeliveryOrders()' class='button'>Get DO</a>&nbsp;";
+    //var populateItem = "<a href='#' id='populateItems' onclick='populateItems()' class='button'>Get Items</a><br/><br/>";
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.ExpeditionID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.CustomerID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.IsHasInvoice,""),
+        Html.FullRowFormFieldObj("<br /><b>Main Information</b><br/>","<br /><b>Primary Information</b><br/>","<br /><b>Primary Information</b><br/>"),
+        
+        Html.TextBoxFieldObjFor(p=>p.Code,"NO RESI", delegate(FormField f){
+            f.Attributes = " onblur=\"checkCode(" + Model.ID + ")\" ";
+            f.UpdateFieldType = FormFieldType.Label;
+            f.GenerateHiddenField = true;
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.ExpeditionName,"EXPEDITION", delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.Label;
+            f.Style = "width:400px";
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.CustomerName,"CUSTOMER", delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.Label;
+            f.Style = "width:400px";
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.BillingAddress1,"SHID ADD", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+        Html.DateFieldObjFor(p=>p.Date,"DATE", delegate(FormField f){
+            f.DetailFormat = "MM/dd/yyyy";
+            f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+            f.Style = "width:300px";
+            //f.UpdateFieldType = FormFieldType.Label;
+        }),
+        
+        Html.DateFieldObjFor(p=>p.DateFrom,"DATE FROM", delegate(FormField f){
+            f.DetailFormat = "MM/dd/yyyy";
+            f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+            f.Style = "width:300px";
+            f.UpdateFieldType = FormFieldType.Label;
+        }),
+        
+        Html.DateFieldObjFor(p=>p.DateTo,"DATE TO", delegate(FormField f){
+            f.DetailFormat = "MM/dd/yyyy";
+            f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+            f.Style = "width:300px";
+            f.UpdateFieldType = FormFieldType.Label;
+        }),
+        
+        Html.FullRowFormFieldObj(populateDeliveryOrder,populateDeliveryOrder,""),
+        
+        Html.DropDownFieldObjFor(p=>p.WarehouseID,"LOCATION",ddlWarehouseName, delegate(FormField f){
+            f.Style = "width:300px";
+            f.DetailFieldType = FormFieldType.None;
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.WarehouseName,"LOCATION", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.Remarks,"MEMO", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.SalesOrderCodeList, "REF SO", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.StatusDescription,"STATUS",delegate(FormField f){
+           f.CreateFieldType = f.UpdateFieldType = FormFieldType.None; 
+        }),
+       
+        Html.LabelFieldObjFor(p=>p.VoidRemarks,"VOID REMARKS",delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+           
+            if(string.IsNullOrEmpty(Model.VoidRemarks))
+            {
+                f.DetailFieldType = FormFieldType.None;
+            }
+        }),
+    };
+
+    //sub tab Delivery order
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("DeliveryOrderID","DeliveryOrder ID","",delegate(GridColumn g){
+             g.CreateColumnType = g.UpdateColumnType = g.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        
+        Html.HiddenFieldColumn("ItemNo"),
+        
+        Html.LabelColumn("DeliveryOrderCode","DELIVERY ORDER","",delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+        }),
+        
+        Html.LabelColumn("DeliveryOrderDate", "DATE TRANSACTION", "",delegate(GridColumn col){
+            col.DetailFormat = "MM/dd/yyyy";
+            col.CreateFormat = col.UpdateFormat = "MM/dd/yyyy";
+            col.GenerateHiddenField = true;
+        }),
+        
+        Html.LabelColumn("CustomerName", "CUSTOMER","",delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+        }),
+       
+    };
+
+    var addNewButton = new Button();
+    addNewButton.CssClass = "button";
+    addNewButton.Text = "Add";
+    addNewButton.OnClick = "addGrid1Row()";
+    addNewButton.ID = "btnAddNew";
+    addNewButton.Href = "#btnAddNew";
+    addNewButton.Visible = mode != UIMode.Detail;
+
+    var grid = new Grid();
+    grid.IncludeAddRowScript = true;
+    grid.IncludeDeleteRowButton = true;
+    grid.DefaultObject = new ResiDetailModel();
+    grid.Columns = gridColumns;
+    grid.ShowFooter = false;
+    //grid.Footers = gridFooters;
+    grid.AllowSorting = false;
+    grid.BelowButtons.Add(addNewButton);
+    //end sub tab delivery order
+    
+    //sub tab Items
+    var itemGridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("ItemNo"),
+        //Html.HiddenFieldColumn("ExpeditionItemNo"),
+        
+        Html.LabelColumn("ExpeditionItemNo", "UNIT NAME", "70px", delegate(GridColumn g){
+            g.CreateColumnType = g.UpdateColumnType = g.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        
+        Html.LabelColumn("UnitName", "UNIT NAME", "70px", delegate(GridColumn g){
+        }),
+        
+        Html.DecimalColumn("Qty", "QTY", "",delegate(GridColumn col){
+            col.ItemAttributes = " onchange=\"calc($(this).parent().parent().index())\" ";
+            //col.GenerateHiddenField = true;
+            col.DetailFormat = "N2";
+            col.CreateFormat = col.UpdateFormat = "F2";
+        }),
+        
+        Html.DecimalColumn("Price", "PRICE", "", delegate(GridColumn col)
+        {
+            col.ItemAttributes = " onchange=\"calc($(this).parent().parent().index())\" ";
+            col.DetailFormat = "N2";
+            col.CreateFormat = col.UpdateFormat = "F2";
+        }),
+        
+        Html.DecimalColumn("TotalAmount", "AMOUNT", "", delegate(GridColumn col)
+        {
+            col.CreateColumnType = col.UpdateColumnType = col.DetailColumnType = GridColumnType.Label;
+            col.DetailFormat = "N2";
+            col.CreateFormat = col.UpdateFormat = "F2";
+        }),
+    };
+
+    GridFooter.SetPropertyDelegate subTotalItemFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    GridFooter.SetPropertyDelegate taxItemFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+
+    GridFooter.SetPropertyDelegate grandTotalItemFooterDel = delegate(GridFooter f)
+    {
+        f.Attributes = "colspan = 2";
+    };
+    
+    var footerItemColumnStart = 1;
+
+    var subTotalItem = new GridFooter[]{
+        Html.EmptyFooterColumn(footerItemColumnStart),
+        Html.LabelFooterColumn("", "JUMLAH HARGA:", true, subTotalItemFooterDel),
+        Html.DecimalFooterColumn("txtGridTotalItem", Convert.ToDecimal(Model.SubTotal), delegate(GridFooter f){
+            f.ItemFormat = "N2";
+        }),
+    };
+
+    var grandTotalItem = new GridFooter[]{
+            Html.EmptyFooterColumn(footerItemColumnStart),
+            Html.LabelFooterColumn("","TOTAL HARGA:", true, grandTotalItemFooterDel),
+            Html.DecimalFooterColumn("txtGridGrandTotalItem", Convert.ToDecimal(Model.GrandTotal), delegate(GridFooter f){
+                f.ItemFormat = "N2";
+        })
+    };
+
+    var gridFooterItems = new List<GridFooter[]>();
+    gridFooterItems.Add(subTotalItem);
+    //gridFooterItems.Add(grandTotalItem);
+
+    var itemAddNewButton = new Button();
+    itemAddNewButton.CssClass = "button";
+    itemAddNewButton.Text = "Add";
+    itemAddNewButton.OnClick = "addItemGridRow()";
+    itemAddNewButton.ID = "btnAddNewItem";
+    itemAddNewButton.Href = "#btnAddNew";
+    itemAddNewButton.Visible = mode != UIMode.Detail;
+
+    var itemGrid = new Grid();
+    itemGrid.ID = "ItemGrid";
+    itemGrid.DataContainerName = "ResiPriceDetails";
+    itemGrid.IncludeAddRowScript = true;
+    itemGrid.IncludeDeleteRowButton = true;
+    itemGrid.DefaultObject = new ResiPriceDetailModel();
+    itemGrid.Columns = itemGridColumns;
+    itemGrid.ShowFooter = true;
+    itemGrid.Footers = gridFooterItems;
+    itemGrid.AllowSorting = false;
+    itemGrid.BelowButtons.Add(itemAddNewButton);
+    //end sub tab Items
+    
+    //add sub tab Bill
+    var billGridColumns = new List<GridColumn>()
+    {
+        //Html.HiddenFieldColumn("ResiPaymentID"),
+        Html.LabelColumn("HeaderID","Resi Bill ID","",delegate(GridColumn g){
+             g.CreateColumnType = g.UpdateColumnType = g.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        
+        Html.LabelColumn("ResiBillCode","RESI BILL NUMBER"),
+        Html.LabelColumn("ResiBillDate","RESI BILL DATE","",delegate(GridColumn g){
+            g.DetailFormat = "MM/dd/yyyyy";
+        }),
+        Html.LabelColumn("Amount","AMOUNT","",delegate(GridColumn g){
+            g.DetailFormat = "N2";
+        }),
+    };
+
+    var billGrid = new Grid();
+    billGrid.ID = "billGrid";
+    billGrid.DataContainerName = "ResiBillDetails";
+    billGrid.IncludeAddRowScript = false;
+    billGrid.IncludeDeleteRowButton = false;
+    billGrid.Columns = billGridColumns;
+    billGrid.ShowFooter = false;
+    billGrid.AllowSorting = false;
+    //end sub tab Bill
+    
+    //sub tab Invoice resi
+    var invoiceGridColumns = new List<GridColumn>()
+    {
+        //Html.HiddenFieldColumn("InvoiceID"),
+        Html.LabelColumn("InvoiceID","Invoice ID","",delegate(GridColumn g){
+             g.CreateColumnType = g.UpdateColumnType = g.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("InvoiceCode","INVOICE CODE"),
+        Html.LabelColumn("InvoiceDate","INVOICE DATE","",delegate(GridColumn g){
+            g.DetailFormat = "MM/dd/yyyyy";
+        }),
+        Html.LabelColumn("Amount","SHIPPING AMOUNT","",delegate(GridColumn g){
+            g.DetailFormat = "N2";
+        }),
+    };
+
+    var invoiceGrid = new Grid();
+    invoiceGrid.ID = "invoiceGrid";
+    invoiceGrid.DataContainerName = "InvoiceResiDetails";
+    invoiceGrid.IncludeAddRowScript = false;
+    invoiceGrid.IncludeDeleteRowButton = false;
+    invoiceGrid.Columns = invoiceGridColumns;
+    invoiceGrid.ShowFooter = false;
+    invoiceGrid.AllowSorting = false;
+    // end sub tab Invoice resi
+    
+    var form = new Form();
+    form.Fields = formFields;
+
+    TabbedGrid tabbedGrid = new TabbedGrid();
+
+    tabbedGrid.AddGrid("Item", itemGrid, Model.ResiPriceDetails);
+    
+    if(mode == UIMode.Detail)
+    {
+        tabbedGrid.AddGrid("Resi Bill", billGrid, ViewBag.ResiBillDetail);
+        tabbedGrid.AddGrid("Invoice", invoiceGrid, ViewBag.InvoiceResi);    
+    }
+
+    var billButton = new Button();
+    billButton.CssClass = "button";
+    billButton.Text = "Bill Resi";
+    billButton.Href = Url.Content("~/ResiBill/Create?ResiID=" + Model.ID);
+    billButton.Visible = mode == UIMode.Detail &&
+        Model.Status == (int)ResiStatus.PendingBilling;
+    
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.initNumeric = function () {
+            $(".decimalNumeric").numeric({
+                decimal: "."
+            });
+            $(".decimalNumeric").focus(function () {
+                var temp = $(this);
+                setTimeout(function () {
+                    temp.select();
+                }, 100);
+            });
+            $(".integerNumeric").numeric(false, function () { this.value = ""; this.focus(); });
+        }
+
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+
+        $("#btnVoid").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                .addClass("dialog")
+                .attr("id", $(this).attr("data-dialog-id"))
+                .appendTo("body").dialog({
+                    title: "Void Remarks",
+                    close: function () {
+                        $(this).remove();
+                    },
+                    modal: true,
+                    height: 180,
+                    width: 700,
+                    left: 0
+                }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+
+        var action = $("#hdnAction").val();
+        var mode = $("#hdnMode").val();
+
+        $("[id='btnAddNew']").hide();
+        $("[id='btnAddNewItem']").hide();
+
+        $("[name='lnkAddNewGrid1']").hide();
+        $("[name='lnkAddNewItemGrid']").hide();
+
+        if (mode == 'Detail') {
+            AddUrlDeliveryOrder();
+            AddUrlPayment();
+            AddUrlInvoice();
+        }
+    });
+</script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/Transaction/Resi.js")"></script>
+<input type="hidden" id="hdnAction" value="@action" />
+<input type="hidden" id="hdnMode" value="@mode" />
+@Html.AutoCompleteScript("initExpeditionAutoComplete", "txtExpeditionName", Url.Content("~/WebService.asmx/RetrieveExpeditionByKey"), "",
+                Url.Content("~/WebService.asmx/RetrieveExpedition"), "expeditionName", "Code", "Name", "onSelectExpedition", 50, 500)
+@Html.AutoCompleteScript("initCustomerAutoComplete", "txtCustomerName", Url.Content("~/WebService.asmx/RetrieveCustomerByKey"), "",
+                Url.Content("~/WebService.asmx/RetrieveCustomer"), "customerName", "Code", "Name", "onSelectCustomer", 50, 500)
+@Html.MasterDetailForm(form, grid, Model, Model.Details, mode, "Resi", "ID", delegate(MasterDetailFormHelper helper)
+{
+    helper.DetailGridTitle = "Delivery Order";
+    helper.TabbedGrid = tabbedGrid;
+    helper.CreateAnotherButton.Visible = false;
+    helper.EditButton.Visible = false;
+        
+    if (mode == UIMode.Detail)
+    {
+        helper.VoidButton.Href = Url.Content("~/Resi/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+        helper.VoidButton.OnClick = "";
+        helper.VoidButton.ID = "btnVoid";
+        helper.BackToListButton.Href = Url.Content("~/Resi");
+        helper.Buttons.Add(billButton);
+
+        if (!Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.CreateAnotherButton.Visible = false;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = helper.CreateAnotherButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+        }
+        else
+        {
+            //helper.EditButton.Visible = mode == UIMode.Detail && Model.Status != (int)MPL.DocumentStatus.Void;
+            helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+            if (Model.Status == (int)ResiStatus.Void)
+            {
+                helper.EditButton.Visible = false;
+            }
+            else if (Model.Status == (int)ResiStatus.FullBilling)
+            {
+                helper.EditButton.Visible = false;
+            }
+        }
+            
+        if (!Convert.ToBoolean(ViewBag.AllowVoid))
+        {
+            helper.ApproveButton.Visible = false;
+            helper.VoidButton.Visible = false;
+        }
+        else
+        {
+            helper.VoidButton.Visible = mode == UIMode.Detail && Model.Status != (int)ResiStatus.Void;
+            helper.ApproveButton.Visible = mode == UIMode.Detail && Model.Status == (int)ResiStatus.New;
+        }
+            
+        helper.CopyTransactionButton.Visible = false;
+    }
+})

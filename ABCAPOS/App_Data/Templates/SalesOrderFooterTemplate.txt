@@ -1,0 +1,16 @@
+﻿
+<tr><td valign="top" style="border-width:0" align="right" colspan="4">Jumlah Harga</td><td valign="top" style="border-width:0" align="right" nowrap>{0}</td><td valign="top" style="border-width:0"></td></tr><tr><td valign="top" style="border-width:0" align="right" colspan="4">Pajak</td><td valign="top" style="border-width:0" align="right" nowrap>{1}</td><td valign="top" style="border-width:0"></td></tr><tr><td valign="top" style="font-weight:bold;border-width:0" align="right" colspan="4">Total</td><td valign="top" style="border-width:0" align="right" nowrap>Rp{2}</td><td valign="top" style="border-width:0"></td></tr></tbody></table>
+<table align="center" border="0" cellpadding="3" cellspacing="1" width="100%"><tbody><tr bgcolor="#FFFFFF"> </tr></tbody></table>
+<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" style="border-collapse:collapse"> </table>
+<table align="center" border="0" cellpadding="3" cellspacing="1" width="100%"><tbody><tr bgcolor="#FFFFFF"> </tr></tbody></table>
+
+</div>
+<div marginwidth="1" marginheight="1">
+</div>
+
+</div></div>
+
+</div></blockquote></div></div></div>
+
+    </body>
+    </html>

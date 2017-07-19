@@ -1,0 +1,109 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<PaymentModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("SalesOrderID","Sales Order ID","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("SalesOrderTitle","Judul Sales Order","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("InvoiceID","Invoice ID","",delegate(GridColumn col){
+            col.DetailColumnType = GridColumnType.HiddenField;
+        }),
+        Html.LabelColumn("Code","PAYMENT NUMBER","80px"),
+        Html.DateColumn("Date","DATE"),
+        Html.LabelColumn("InvoiceCode","NO TAGIHAN","80px"),
+        Html.LabelColumn("SalesOrderCode","NO SO","80px"),
+        Html.LabelColumn("CustomerName","CUSTOMER"),
+        Html.DecimalColumn("Amount","AMOUNT", "",delegate(GridColumn col){
+            col.DetailFormat = "N0";
+        }),
+        //Html.LabelColumn("StatusDescription","Status", "",delegate(GridColumn col){
+        //    col.SortField = "Status";
+        //})
+    };
+
+    var statusList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)MPL.DocumentStatus.New), Text = MPL.DocumentStatus.New.ToString() },
+        new DropDownOption(){ Value = Convert.ToString((int)MPL.DocumentStatus.Approved), Text = MPL.DocumentStatus.Approved.ToString() },
+        new DropDownOption(){ Value = Convert.ToString((int)MPL.DocumentStatus.Void), Text = MPL.DocumentStatus.Void.ToString() },
+    };
+
+    var customerGroupList = ViewBag.CustomerGroupList as List<CustomerGroupModel>;
+    var ddlCustomerGroup = Util.GetDropDownOptions(customerGroupList, "Name", "ID");
+    
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("TRANSACTION DATE","Date"),
+        Html.GenericFilterTextBoxField("PAYMENT NUMBER","Code"),
+        Html.GenericFilterTextBoxField("NO TAGIHAN","InvoiceCode"),
+        Html.GenericFilterTextBoxField("CUSTOMER","CustomerName"),
+        //Html.GenericFilterDropDownField("Grup Pelanggan","CustomerGroupID", ddlCustomerGroup,typeof(long)),
+        //Html.GenericFilterDropDownField("Status","Status",statusList,typeof(int))
+    };
+
+    var voidButton = new GridButtonColumn();
+    voidButton.CssClass = "iconContainer";
+    voidButton.ButtonCssClass = "cancel imageButton";
+    voidButton.Href = Url.Content("~/PurchaseOrder/VoidRemarks?key=@idPropertyValue&voidFromIndex=true");
+    voidButton.IDPropertyName = "ID";
+    voidButton.ShowDelegate = delegate(object obj, UIMode mode)
+    {
+        var PurchaseOrder = obj as PurchaseOrderModel;
+
+        if (PurchaseOrder.Status != (int)InvoiceStatus.Void)
+            return true;
+
+        return false;
+    };
+    voidButton.Text = "Void";
+    
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+}
+<script type="text/javascript">
+    $(function () {
+        addTooltip();
+    });
+
+    function addTooltip() {
+        var noOfRows = $("#Grid1 tbody tr").length;
+
+        for (x = 0; x < noOfRows; x++) {
+            var salesOrderID = $("#Details_" + x + "_SalesOrderID").val();
+            var salesOrderCode = $("#Details_" + x + "_SalesOrderCode").text();
+            var salesOrderTitle = $("#Details_" + x + "_SalesOrderTitle").val();
+
+            var invoiceID = $("#Details_" + x + "_InvoiceID").val();
+            var invoiceCode = $("#Details_" + x + "_InvoiceCode").text();
+
+            var salesOrderLink = "/SalesOrder/Detail?key=" + salesOrderID;
+            var invoiceLink = "/Invoice/Detail?key=" + invoiceID;
+
+            $("#Details_" + x + "_SalesOrderCode").replaceWith('<a href="' + salesOrderLink + '" title="' + salesOrderTitle + '">' + salesOrderCode + '</a>');
+            $("#Details_" + x + "_InvoiceCode").replaceWith('<a href="' + invoiceLink + '">' + invoiceCode + '</a>');
+        }
+    }
+</script>
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "Payment", "ID", "Code", null, delegate(object obj, UIMode mode)
+    {
+        return false;
+    }, delegate(IndexGridHelper helper)
+    {
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.AddNewButton.Visible = true;
+        }
+        else
+        {
+            helper.AddNewButton.Visible = false;
+        }
+        
+        helper.AddNewButton.Href = Url.Content("~/UncreatedPayment");
+    })

@@ -1,0 +1,48 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<AccountModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","Kode","80px"),
+        Html.LabelColumn("UserCode","Kode Akun","80px"),
+        Html.LabelColumn("Name","Nama Akun"),
+        Html.LabelColumn("Description","Keterangan"),
+        Html.LabelColumn("IsActiveDescription","Status", "100px",delegate(GridColumn col){
+            col.SortField = "IsActive";
+        })
+    };
+
+    var statusList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString(true), Text = "Aktif" },
+        new DropDownOption(){ Value = Convert.ToString(false), Text = "Tidak Aktif" },
+    };
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("Kode","Code"),
+        Html.GenericFilterTextBoxField("Kode Akun","UserCode"),
+        Html.GenericFilterTextBoxField("Nama Akun","Name"),
+        Html.GenericFilterTextBoxField("Keterangan","Description"),
+        Html.GenericFilterDropDownField("Status","IsActive",statusList,typeof(bool))
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.DefaultObject = new CustomerModel();
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "Account", "ID", "Name", null, delegate(object obj, UIMode mode)
+    {
+        return false;
+    }, delegate(IndexGridHelper helper)
+    {
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.AddNewButton.Visible = true;
+        }
+        else
+        {
+            helper.AddNewButton.Visible = false;
+        }
+    })

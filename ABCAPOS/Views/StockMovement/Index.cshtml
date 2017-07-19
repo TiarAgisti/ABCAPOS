@@ -1,0 +1,150 @@
+﻿@{
+    ViewBag.Title = "Stock Movement";
+}
+
+<h2>Stock Movement</h2>
+@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<StockMovementModel>
+@{
+    var dataCount = (int)ViewBag.DataCount;
+    var pageSize = (int)ViewBag.PageSize;
+    var startIndex = (int)ViewBag.StartIndex;
+    var selectedPage = startIndex / pageSize + 1;
+    var pageAmount = (dataCount / 20);
+
+    if (dataCount % 20 != 0)
+    {
+        pageAmount += 1;
+    }
+
+    var statement = string.Format("Page: {0} of {1}", selectedPage, pageAmount);
+
+    var transactionType = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)TransactionType.ALL), Text = "ALL Transaction" },
+        new DropDownOption(){ Value = Convert.ToString((int)TransactionType.AssemblyBuild), Text = "Build" },
+        new DropDownOption(){ Value = Convert.ToString((int)TransactionType.AssemblyUnBuild), Text = "UnBuild" },
+        new DropDownOption(){ Value = Convert.ToString((int)TransactionType.CashSales), Text = "Cash Sales" },
+        new DropDownOption(){ Value = Convert.ToString((int)TransactionType.DeliveryOrder), Text = "Item Fulfillment" },
+        new DropDownOption(){ Value = Convert.ToString((int)TransactionType.InventoryAdjustment), Text = "Inventory Adjustment" },
+        new DropDownOption(){ Value = Convert.ToString((int)TransactionType.PurchaseDelivery), Text = "Item Receipt" },
+        new DropDownOption(){ Value = Convert.ToString((int)TransactionType.ReturnReceipt), Text = "Return Receipt" },
+        new DropDownOption(){ Value = Convert.ToString((int)TransactionType.TransferDelivery), Text = "Transfer Delivery" },
+        new DropDownOption(){ Value = Convert.ToString((int)TransactionType.TransferReceipts), Text = "Transfer Receipt" },
+        new DropDownOption(){ Value = Convert.ToString((int)TransactionType.VendorReturnDelivery), Text = "Vendor Return Delivery" },
+    };
+
+    var stockGridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("TransactionCode", "TRANSACTION CODE", "150px"),
+        Html.DateColumn("Date", "TRANSACTION DATE", "150px"),
+        Html.LabelColumn("DocumentType", "TRANSACTION TYPE", ""),
+        Html.DecimalColumn("BeginningQty", "BEGINNING QTY", "200px"),
+        Html.DecimalColumn("MovingInQty", "MOVING IN QTY", "200px"),
+        Html.DecimalColumn("MovingOutQty", "MOVING OUT QTY", "200px"),
+        Html.DecimalColumn("EndingQty", "ENDING QTY", "200px"),
+    };
+
+    var stockDetailButton = new GridButtonColumn();
+    stockDetailButton.CssClass = "iconContainer";
+    stockDetailButton.ButtonCssClass = "details imageButton";
+    stockDetailButton.Href = Url.Content("~/@idPropertyValue");
+    stockDetailButton.IDPropertyName = "Url";
+    stockDetailButton.Text = "Detail";
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("Produk","ProductID"),
+        Html.GenericFilterDropDownField("Transaction Type","Type", transactionType, typeof(int)),
+        Html.GenericFilterDateRangeField("Date","Date"),
+        //Html.GenericFilterDateField("Date To","Date"),
+    };
+
+    //var detailButton = new GridButtonColumn();
+    //detailButton.CssClass = "iconContainer";
+    //detailButton.ButtonCssClass = "details imageButton";
+    //detailButton.Href = Url.Content("~/PurchaseBill/Detail?key=@idPropertyValue");
+    //detailButton.IDPropertyName = "ID";
+    //detailButton.ShowDelegate = delegate(object obj, UIMode mode)
+    //{
+    //    var bill = obj as PurchaseBillModel;
+
+    //    return true;
+    //};
+    //detailButton.Text = "Detail";
+
+    var grid = new Grid();
+    grid.Columns = stockGridColumns;
+    grid.AllowSorting = false;
+    grid.Buttons.Add(stockDetailButton);
+    
+}
+<script>
+    function PSIInitDatePicker() {
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+        window.initDatePicker();
+    }
+function initAutoComplete(textBoxID) {
+    $("#" + textBoxID).autocomplete({ source: function (request, response) {
+        $.ajax({
+            url: "/WebService.asmx/RetrieveAllProductsByKey",
+            data: "{ 'q': '" + request.term + "', 'limit': '50'}",
+            dataType: "json",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataFilter: function (data) { return data; },
+            success: function (data) {
+                response($.map(data.d, function (item) {
+                    var labelText = item.Code + ' - ' + item.ProductName;
+                    return {
+                        label: labelText,
+                        value: item.BarCode
+                    }
+                }))
+            }
+        });
+    },
+        minLength: 1,
+        open: function (event, ui) {
+            $(this).autocomplete("widget").css({
+                "width": 500
+            });
+        },
+        select: function (event, ui) {
+            $.ajax({
+                url: '/WebService.asmx/RetrieveProductByCode',
+                data: "{ 'productCode' : '" + ui.item.value.substring(0,ui.item.value.indexOf('-')-1) + "' }",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    $("#filter_FilterFields_0_Value").val(data.d.Code);
+                }
+            });
+        }
+    });
+}
+
+$(document).ready(function () {
+    initAutoComplete("filter_FilterFields_0_Value");
+    PSIInitDatePicker();
+});
+    </script>
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "StockMovement", "TransactionID", "TransactionCode", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    helper.AddNewButton.Visible = false;
+})
+<br />
+@statement

@@ -1,0 +1,132 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model StaffModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    //var roleRadio = new List<RadioOption>()
+    //{
+    //    new RadioOption(){ Value = (int)StaffType.Courier,Text = "Kurir", ReadOnly = mode == UIMode.Detail},
+    //    new RadioOption(){ Value = (int)StaffType.Operator,Text = "Operator", ReadOnly = mode == UIMode.Detail},
+    //    new RadioOption(){ Value = (int)StaffType.Others,Text = "Others", ReadOnly = mode == UIMode.Detail},
+    //};
+
+    var userList = ViewBag.UserList as IEnumerable<UserModel>;
+    var ddlUserName = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = "", Text ="" }
+    };
+    ddlUserName.AddRange(Util.GetDropDownOptions(userList, "UserID", "UserID"));
+    
+    
+    var yesNoRadio = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = true,Text = "Active", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = false,Text = "Not Active", ReadOnly = mode == UIMode.Detail},
+    };
+
+    var IsSalesRepRadio = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = true,Text = "Yes", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = false,Text = "No", ReadOnly = mode == UIMode.Detail},
+    };
+    
+    var supervisorList = ViewBag.SupervisorList as IEnumerable<StaffModel>;
+    var ddlsupervisor = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)0), Text ="" }
+    };
+    ddlsupervisor.AddRange(Util.GetDropDownOptions(supervisorList, "Name", "ID"));
+
+    var departmentList = ViewBag.DepartmentList as IEnumerable<DepartmentModel>;
+    var ddlDepartment = new List<DropDownOption>()
+    {
+        new DropDownOption(){Value = Convert.ToString((int)0), Text = "" }
+    };
+    ddlDepartment.AddRange(Util.GetDropDownOptions(departmentList, "DepartmentDesc", "ID"));
+
+    var locationList = ViewBag.LocationList as IEnumerable<WarehouseModel>;
+    var ddlLocation = new List<DropDownOption>()
+    {
+        new DropDownOption(){Value = Convert.ToString((int)0), Text = "" }
+    };
+    ddlLocation.AddRange(Util.GetDropDownOptions(locationList, "Name", "ID"));
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        
+        Html.TextBoxFieldObjFor(p=>p.Name,"Name", delegate(FormField f){
+            f.Style = "width:400px";
+            f.UpdateFieldType = FormFieldType.Label;
+            f.GenerateHiddenField = true;
+        }),
+        
+        //Html.RadioButtonFieldObjFor(p=>p.RoleID,"Role", roleRadio),
+        Html.RadioButtonFieldObjFor(p=>p.IsActive,"Status", yesNoRadio),
+        Html.TextBoxFieldObjFor(p=>p.JobTitle,"Job Title"),
+        //Html.TextBoxFieldObjFor(p=>p.Supervisor,"Supervisor"),
+        
+        Html.DropDownFieldObjFor(p=>p.SupervisorID, "SUPERVISOR", ddlsupervisor,  delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        Html.LabelFieldObjFor(p=>p.SupervisorName, "SUPERVISOR", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+            
+        Html.TextBoxFieldObjFor(p=>p.Phone,"Phone"),
+        Html.TextBoxFieldObjFor(p=>p.Email,"Email"),
+        Html.DropDownFieldObjFor(p=>p.DepartmentID,"DEPARTMENT", ddlDepartment, delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.DepartmentName, "DEPARTMENT", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+        Html.DropDownFieldObjFor(p=>p.WarehouseID,"LOCATION", ddlLocation, delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        Html.LabelFieldObjFor(p=>p.WarehouseName, "LOCATION", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+
+        Html.DropDownFieldObjFor(p=>p.UserName,"USERNAME", ddlUserName, delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.UserName, "USERNAME", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),      
+        
+        Html.RadioButtonFieldObjFor(p=>p.IsSalesRep,"Sales Rep", IsSalesRepRadio),
+        
+        
+    };
+
+    var form = new Form();
+    form.Fields = formFields;
+
+}
+@Html.MasterForm(form, Model, mode, "Staff", "ID", delegate(MasterFormHelper<StaffModel> helper)
+{
+    if (mode == UIMode.Detail)
+    {
+        if (!Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.CreateAnotherButton.Visible = false;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = false;
+        }
+
+        helper.DeleteButton.Visible = false;
+    }
+})

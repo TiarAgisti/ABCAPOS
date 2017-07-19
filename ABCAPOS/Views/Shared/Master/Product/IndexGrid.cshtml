@@ -1,0 +1,64 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model List<ProductModel>
+@{
+    
+   
+    
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("ID","INTERNAL ID"),
+        Html.LabelColumn("Code", "NAME"),
+        Html.LabelColumn("ItemProduct", "ITEM PRODUCT"),
+        Html.LabelColumn("ItemBrand", "ITEM BRAND"),
+        Html.LabelColumn("Type", "TYPE"),
+        Html.LabelColumn("GroupWarna", "GROUP WARNA"),
+        
+        Html.LabelColumn("ProductName","DISPLAY NAME"),
+        //Html.DecimalColumn("StockQty","STOCK"),
+        //Html.LabelColumn("Description", "DESCRIPTION"),
+        Html.LabelColumn("SellingPrice", "BASE PRICE","80px", delegate(GridColumn col){
+            col.DetailFormat = "N2";
+        }),
+        //Html.LabelColumn("IsActiveDescription","Status", "",delegate(GridColumn col){
+        //    col.SortField = "IsActive";
+        //})
+    };
+
+    var ItemTypeList = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)ItemTypeProduct.RawMaterial), Text = "Raw Material" },
+        new DropDownOption(){ Value = Convert.ToString((int)ItemTypeProduct.Supporting), Text = "Supporting" },
+        new DropDownOption(){ Value = Convert.ToString((int)ItemTypeProduct.BarangSetengahJadi), Text = "Barang Setengah Jadi" },
+        new DropDownOption(){ Value = Convert.ToString((int)ItemTypeProduct.FinishGood), Text = "Finish Good" },
+        new DropDownOption(){ Value = Convert.ToString((int)ItemTypeProduct.NonInventory), Text = "Non Inventory" },
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("ID Produk","Code"),
+        Html.GenericFilterTextBoxField("Kode Produk","Barcode"),
+        Html.GenericFilterTextBoxField("Nama Produk","ProductName"),
+        Html.GenericFilterDropDownField("Item Type","ItemTypeID",ItemTypeList,typeof(int))
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.DefaultObject = new CustomerModel();
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "Product", "ID", "Name", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    if (Convert.ToBoolean(ViewBag.AllowCreate))
+    {
+        helper.AddNewButton.Visible = true;
+    }
+    else
+    {
+        helper.AddNewButton.Visible = false;
+    }
+})

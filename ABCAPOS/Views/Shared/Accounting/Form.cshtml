@@ -1,0 +1,313 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model AccountingModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    string dateEditor = Convert.ToString(ViewBag.DateList);
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        
+        Html.TextBoxFieldObjFor(p=>p.Code,"Kode"),
+        
+        Html.TextBoxFieldObjFor(p=>p.Description,"Keterangan", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        
+        Html.FullRowFormFieldObj(dateEditor,dateEditor,""),
+        Html.LabelFieldObjFor(p=>p.DateDescription,"Tanggal",delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+    };
+
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("AccountID"),
+        Html.TextBoxColumn("AccountUserCode","Kode Akun","115px",delegate(GridColumn col){
+            col.ItemAttributes = " onchange=\"onSelectIncomeMPL($(this).parent().parent().index())\" ";
+            col.InitAutoCompleteFunctionName = "initCreditAutoComplete";
+        }),
+        Html.DateColumn("Date","Tanggal","125px"),
+        Html.LabelColumn("AccountDescription","Keterangan Akun"),
+        Html.TextBoxColumn("DocumentNo","No Dokumen"),
+        Html.DecimalColumn("Amount","Jumlah"),
+        Html.TextBoxColumn("Remarks","Keterangan"),
+    };
+
+    var addNewButton = new Button();
+    addNewButton.CssClass = "button";
+    addNewButton.Text = "Buat Baru";
+    addNewButton.OnClick = "addGrid1Row()";
+    addNewButton.ID = "btnAddNew";
+    addNewButton.Href = "#btnAddNew";
+    addNewButton.Visible = mode != UIMode.Detail;
+
+    var grid = new Grid();
+    grid.IncludeAddRowScript = true;
+    grid.IncludeDeleteRowButton = true;
+    grid.DefaultObject = new IncomeAccountingDetailModel();
+    grid.Columns = gridColumns;
+    grid.ShowFooter = true;
+    grid.AllowSorting = false;
+    grid.BelowButtons.Add(addNewButton);
+
+    var expenseGridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("AccountID"),
+        Html.TextBoxColumn("AccountUserCode","Kode Akun","115px",delegate(GridColumn col){
+            col.ItemAttributes = " onchange=\"onSelectExpenseMPL($(this).parent().parent().index())\" ";
+            col.InitAutoCompleteFunctionName = "initDebitAutoComplete";
+        }),
+        Html.DateColumn("Date","Tanggal","125px"),
+        Html.LabelColumn("AccountDescription","Keterangan Akun"),
+        Html.TextBoxColumn("DocumentNo","No Dokumen"),
+        Html.DecimalColumn("Amount","Jumlah"),
+        Html.TextBoxColumn("Remarks","Keterangan"),
+    };
+
+    var expenseAddNewButton = new Button();
+    expenseAddNewButton.CssClass = "button";
+    expenseAddNewButton.Text = "Buat Baru";
+    expenseAddNewButton.OnClick = "addExpenseGridRow()";
+    expenseAddNewButton.ID = "btnAddNewExpense";
+    expenseAddNewButton.Href = "#btnAddNew";
+    expenseAddNewButton.Visible = mode != UIMode.Detail;
+
+    var expenseGrid = new Grid();
+    expenseGrid.ID = "ExpenseGrid";
+    expenseGrid.DataContainerName = "Expenses";
+    expenseGrid.IncludeAddRowScript = true;
+    expenseGrid.IncludeDeleteRowButton = true;
+    expenseGrid.DefaultObject = new ExpenseAccountingDetailModel();
+    expenseGrid.Columns = expenseGridColumns;
+    expenseGrid.ShowFooter = true;
+    expenseGrid.AllowSorting = false;
+    expenseGrid.BelowButtons.Add(expenseAddNewButton);
+
+    var form = new Form();
+    form.Fields = formFields;
+
+    TabbedGrid tabbedGrid = new TabbedGrid();
+    tabbedGrid.AddGrid("Kredit", expenseGrid, Model.Expenses);
+
+    var creditTextBoxName = "Details_@index_AccountUserCode";
+    var debitTextBoxName = "Expenses_@index_AccountUserCode";
+    var debitServiceUrl = Url.Content("~/WebService.asmx/RetrieveDebitAccount");
+    var creditServiceUrl = Url.Content("~/WebService.asmx/RetrieveCreditAccount");
+    var retrieveSingleUrl = Url.Content("~/WebService.asmx/RetrieveAccount");
+
+}
+<script type="text/javascript">
+    $(function () {
+        changeFormAction();
+
+        $("[name='lnkAddNewGrid1']").hide();
+        $("[name='lnkAddNewExpenseGrid']").hide();
+
+        resizeGrid1Template();
+        resizeExpenseGridTemplate();
+
+        resizeGrid1();
+        resizeExpenseGrid();
+
+        setPopUpForm();
+        initDecimal();
+    });
+
+    function initDecimal()
+    {
+        window.initNumeric = function () {
+            $(".decimalNumeric").numeric({
+                decimal: "."
+            });
+            $(".decimalNumeric").focus(function () {
+                var temp = $(this);
+                setTimeout(function () {
+                    temp.select();
+                }, 100);
+            });
+        }
+
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+    }
+
+    function setPopUpForm() {
+        $("#btnVoid").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                .addClass("dialog")
+                .attr("id", $(this).attr("data-dialog-id"))
+                .appendTo("body").dialog({
+                    title: $(this).attr("Alasan Void"),
+                    close: function () {
+                        $(this).remove();
+                    },
+                    modal: true,
+                    height: 180,
+                    width: 700,
+                    left: 0
+                }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+    }
+
+    function changeFormAction() {
+        var mode = $("#hdnMode").val();
+
+        if (mode === "Create")
+            $("#Form1").attr("action", "/Accounting/CreateAccounting");
+        else
+            $("#Form1").attr("action", "/Accounting/UpdateAccounting");
+    }
+
+    function resizeGrid1Template() {
+        var template = $("#Grid1Template").val();
+
+        template = template.replace("style='width:99%;text-align:right;' class='datepicker'", "style='width:70%;text-align:right;' class='datepicker'");
+
+        $("#Grid1Template").val(template);
+    }
+
+    function resizeExpenseGridTemplate() {
+        var template = $("#ExpenseGridTemplate").val();
+
+        template = template.replace("style='width:99%;text-align:right;' class='datepicker'", "style='width:70%;text-align:right;' class='datepicker'");
+
+        $("#ExpenseGridTemplate").val(template);
+    }
+
+    function resizeGrid1() {
+        var rowCount = $('#Grid1 tbody tr').length;
+
+        for (x = 0; x < rowCount; x++) {
+            $("#Details_" + x + "_Date").attr('style', 'width:70%;text-align:right;');
+        }
+    }
+
+    function resizeExpenseGrid() {
+        var rowCount = $('#ExpenseGrid tbody tr').length;
+
+        for (x = 0; x < rowCount; x++) {
+            $("#Expenses_" + x + "_Date").attr('style', 'width:70%;text-align:right;');
+        }
+    }
+
+    function onSelectCreditAccount(data, index) {
+        $("#Details_" + index + "_AccountID").val(data.ID);
+        $("#Details_" + index + "_AccountDescription").text(data.Description);
+    }
+
+    function onSelectDebitAccount(data, index) {
+        $("#Expenses_" + index + "_AccountID").val(data.ID);
+        $("#Expenses_" + index + "_AccountDescription").text(data.Description);
+    }
+
+    function onSelectIncomeMPL(index) {
+        function accountListener(data) {
+            if (data.d != null) {
+                onSelectCreditAccount(data.d, index);
+            }
+            else {
+                //alert('One or more compulsary field is empty or invalid (Credit).');
+            }
+        }
+        var Code = $("#Details_" + index + "_AccountUserCode").val();
+        sendJSON("/WebService.asmx/RetrieveAccount", { "accountCode": Code }, accountListener);
+    }
+
+    function onSelectExpenseMPL(index) {
+        function accountListener(data) {
+            if (data.d != null) {
+                onSelectDebitAccount(data.d, index);
+            }
+            else {
+                //alert('One or more compulsary field is empty or invalid (Debit).');
+            }
+        }
+        var Code = $("#Expenses_" + index + "_AccountUserCode").val();
+        sendJSON("/WebService.asmx/RetrieveAccount", { "accountCode": Code }, accountListener);
+    }
+
+    function sendJSON(url, data, callback, overrideMethod, failCallback) {
+        var method = "GET";
+        var dataString = null;
+        if (data != null) {
+            method = "POST";
+            dataString = JSON.stringify(data)
+        }
+        if (overrideMethod != null) {
+            method = overrideMethod;
+        }
+        return jQuery.ajax({
+            'type': method,
+            'url': url,
+            'contentType': 'application/json',
+            'data': dataString,
+            'dataType': 'json',
+            //'timeout': 3000,
+            'success': callback,
+            'error': function () {
+                if (failCallback != null) {
+                    failCallback();
+                }
+            },
+            statusCode: {
+                401: function () {
+                    //kickUser();
+                }
+            }
+        });
+    }
+</script>
+<input type="hidden" id="hdnMode" value="@mode" />
+@Html.GridAutoCompleteScript("initCreditAutoComplete", "Grid1", creditTextBoxName, debitServiceUrl, null, retrieveSingleUrl,
+                                         "accountName", "", "Code", "FullDescription", "onSelectCreditAccount", 50, 500)
+@Html.GridAutoCompleteScript("initDebitAutoComplete", "ExpenseGrid", debitTextBoxName, creditServiceUrl, null, retrieveSingleUrl,
+                                                 "accountName", "", "Code", "FullDescription", "onSelectDebitAccount", 50, 500)
+@Html.MasterDetailForm(form, grid, Model, Model.Details, mode, "Accounting", "ID", delegate(MasterDetailFormHelper helper)
+    {
+        helper.TabbedGrid = tabbedGrid;
+        helper.DetailGridTitle = "Debit";
+
+        if (mode == UIMode.Detail)
+        {
+            helper.VoidButton.Href = Url.Content("~/Accounting/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+            helper.VoidButton.OnClick = "";
+            helper.VoidButton.ID = "btnVoid";
+
+            //helper.ApproveButton.Visible = mode == UIMode.Detail && Model.Status == (int)MPL.DocumentStatus.New && Convert.ToBoolean(ViewBag.SPKClosed);
+            helper.ApproveButton.Visible = false;
+            helper.ApproveButton.Text = "Kembali";
+            helper.ApproveButton.OnClick = "return confirm('Apakah Anda yakin dokumen ini sudah kembali?');";
+
+            if (!Convert.ToBoolean(ViewBag.AllowCreate))
+            {
+                helper.CreateAnotherButton.Visible = false;
+            }
+
+            if (!Convert.ToBoolean(ViewBag.AllowEdit))
+            {
+                helper.EditButton.Visible = helper.CreateAnotherButton.Visible = helper.VoidButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+            }
+            else
+            {
+                helper.CopyTransactionButton.Visible = false;
+                helper.EditButton.Visible = mode == UIMode.Detail && Model.Status != (int)MPL.DocumentStatus.Void;
+                helper.VoidButton.Visible = mode == UIMode.Detail && Model.Status != (int)MPL.DocumentStatus.Void;
+                helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = false;
+            }
+        }
+    })

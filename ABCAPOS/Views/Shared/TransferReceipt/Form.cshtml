@@ -1,0 +1,262 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model TransferReceiptModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+    ViewBag.ErrorMessage = "";
+
+    var binList = ViewBag.BinList as IEnumerable<BinModel>;
+    var ddlBin = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)0), Text ="" }
+    };
+    ddlBin.AddRange(Util.GetDropDownOptions(binList, "Name", "ID"));
+    
+    var departmentList = ViewBag.DepartmentList as IEnumerable<DepartmentModel>;
+    var ddlDepartment = new List<DropDownOption>()
+    {
+        new DropDownOption(){ Value = Convert.ToString((int)0), Text ="" }
+    };
+    ddlDepartment.AddRange(Util.GetDropDownOptions(departmentList, "DepartmentDesc", "ID"));
+
+    
+    var yesNoRadio = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = true,Text = "YES", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = false,Text = "NO", ReadOnly = mode == UIMode.Detail},
+    };
+        
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.StaffID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.Status,""),
+        Html.HiddenFieldFieldObjFor(p=>p.ToWarehouseID, ""),
+        Html.HiddenFieldFieldObjFor(p=>p.FromWarehouseID, ""),
+       
+        Html.LabelFieldObjFor(p=>p.TransferOrderID,"", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = f.DetailFieldType = FormFieldType.HiddenField;
+        }),
+        
+        Html.FullRowFormFieldObj("<br /><b>Primary Information</b><br/>","<br /><b>Primary Information</b><br/>","<br /><b>Primary Information</b><br/>"),
+        Html.DualColumnFormFieldObj(
+            Html.LabelFieldObjFor(p=>p.Code,"REFERENCE #", delegate(FormField f){
+                f.UpdateFieldType = FormFieldType.Label;
+                f.GenerateHiddenField = true;
+                f.Style = "width:300px";
+            }),
+            Html.TextBoxFieldObjFor(p=>p.SupplierRef,"SJ REFERENCE NUMBER", delegate(FormField f){
+                f.Style = "width:300px";  
+            }), 20
+        ),
+        Html.DualColumnFormFieldObj(
+            Html.LabelFieldObjFor(p=>p.TransferOrderCode,"TRANSFER ORDER NO", delegate(FormField f){
+                f.Style = "width:300px";
+            }),
+            Html.DateFieldObjFor(p=>p.Date,"DATE", delegate(FormField f){
+                f.DetailFormat = "MM/dd/yyyy";
+                f.CreateFormat = f.UpdateFormat = "MM/dd/yyyy";
+                f.Style = "width:300px";
+            }), 20
+        ),
+
+        Html.TextBoxFieldObjFor(p=>p.Memo,"MEMO", delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        
+        // TODO: fix posting Period
+        //Html.TextBoxFieldObjFor(p=>p.PostingPeriod, "POSTING PERIOD", delegate(FormField f){
+        //    f.Style = "width:300px";
+        //}),
+        
+        Html.FullRowFormFieldObj("<br /><b>Classifications</b><br/>","<br /><b>Classifications</b><br/>","<br /><b>Classifications</b><br/>"),
+        
+        Html.TextBoxFieldObjFor(p=>p.StaffName,"EMPLOYEE", delegate(FormField f){
+                f.Style = "width:300px";
+        }),
+
+        Html.DropDownFieldObjFor(p=>p.DepartmentID,"DEPARTMENT",ddlDepartment, delegate(FormField f){
+                f.Style = "width:300px";
+        }),
+        
+                
+        Html.LabelFieldObjFor(p=>p.FromWarehouseName,"FROM LOCATION", delegate(FormField f)
+        {
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.VoidRemarks,"VOID REMARKS", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+            
+            if(string.IsNullOrEmpty(Model.VoidRemarks))
+            {
+                f.DetailFieldType = FormFieldType.None;
+            }
+        }),
+    };
+
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.HiddenFieldColumn("ProductID"),
+        Html.HiddenFieldColumn("TransferOrderItemNo"),
+        Html.HiddenFieldColumn("StockQtyHidden"),
+        Html.HiddenFieldColumn("ConversionID"),
+        Html.HiddenFieldColumn("UnitRate"),
+        Html.HiddenFieldColumn("ItemNo"),
+        
+        Html.LabelColumn("ProductCode","ITEM*","110px"),
+        Html.LabelColumn("ProductName", "NAMA BARANG","",delegate(GridColumn col){
+            col.GenerateHiddenField = true;
+        }),
+        Html.DecimalColumn("QtyShipped", "REMAINING", "100px", delegate(GridColumn col){
+            col.CreateFormat = col.UpdateFormat = "F0";
+            col.DetailFormat = "N0";
+            col.CreateColumnType = GridColumnType.Label;
+            col.UpdateColumnType = col.DetailColumnType = GridColumnType.None;
+        }),
+        Html.DecimalColumn("Quantity", "JMLH TERIMA", "100px",delegate(GridColumn col){
+            col.DetailFormat = "N0";
+            col.CreateFormat = col.UpdateFormat = "F0";
+        }),
+        Html.LabelColumn("StockQty", "ON HAND", "100px",delegate(GridColumn col){
+            col.DetailFormat = "N0";
+            col.CreateFormat = col.UpdateFormat = "F0";
+        }),
+        
+        Html.LabelColumn("ConversionName", "UNITS", "100px", delegate(GridColumn col){
+        }),
+        
+        Html.DropDownColumn("BinID", "BIN NUMBER",ddlBin, "100px", delegate(GridColumn col)
+        {
+            col.DetailColumnType = GridColumnType.None;
+            col.ItemAttributes = " onmouseover=\"trimBin($(this).parent().parent().index(), " + Model.ToWarehouseID.ToString() + ")\" ";
+        }),
+        Html.LabelColumn("BinNumber", "BIN NUMBER","100px", delegate(GridColumn col)
+        {
+            col.UpdateColumnType = col.CreateColumnType = GridColumnType.None;
+        }),
+        
+        Html.LabelColumn("ToWarehouseName", "TO LOCATION", "110px", delegate(GridColumn col){
+        }),
+    };
+    
+    var grid = new Grid();
+    grid.IncludeAddRowScript = false;
+    grid.IncludeDeleteRowButton = true;
+    grid.DefaultObject = new TransferReceiptDetailModel();
+    grid.Columns = gridColumns;
+    grid.ShowFooter = false;
+    grid.AllowSorting = false;
+
+    var form = new Form();
+    form.Fields = formFields;
+
+    var textBoxName = "Details_@index_BinNumber";
+    var serviceUrl = Url.Content("~/WebService.asmx/RetrieveBinByKey");
+    var retrieveSingleUrl = Url.Content("~/WebService.asmx/RetrieveBin");
+    
+    TabbedGrid tabbedGrid = new TabbedGrid();
+}
+<script type="text/javascript">
+    $(function () {
+        $("#btnVoid").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                .addClass("dialog")
+                .attr("id", $(this).attr("data-dialog-id"))
+                .appendTo("body").dialog({
+                    title: "Void Remarks",
+                    close: function () {
+                        $(this).remove();
+                    },
+                    modal: true,
+                    height: 180,
+                    width: 700,
+                    left: 0
+                }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+
+        addSalesUrl();
+    });
+
+    function addSalesUrl() {
+        var mode = $("#hdnMode").val();
+
+        if (mode == "Detail" || mode=="Create") {
+            var soID = $("#hdnTransferOrderID").val();
+            var soCode = $("#lblTransferOrderCode").text();
+
+            var soLink = "/TransferOrder/Detail?key=" + soID;
+            $("#lblTransferOrderCode").replaceWith('<a href="' + soLink + '">' + soCode + '</a>');
+        }
+    }
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.initDatePicker = function () {
+            $("input.datepicker").datepicker({
+                dateFormat: 'mm/dd/yy', showOn: 'both', buttonImage: '/Content/Icons/calendar.png',
+                buttonImageOnly: true
+            });
+            $('img.ui-datepicker-trigger').css({ 'margin-left': '2px' });
+        }
+    });
+</script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/Transaction/TransferOrder.js")"></script>
+<input type="hidden" id="hdnMode" value="@ViewBag.Mode" />
+@Html.AutoCompleteScript("initEmployeeAutoComplete", "txtStaffName", Url.Content("~/WebService.asmx/RetrieveEmployeeByKey"), "",
+        Url.Content("~/WebService.asmx/RetrieveEmployee"), "employeeName", "Name", "RoleDescription", "onSelectEmployee", 50, 500)
+@Html.GridAutoCompleteScript("initProductAutoComplete", 
+"Grid1", textBoxName, serviceUrl,  
+",'warehouseID':'\"+getDOWarehouseID()+\"'", 
+retrieveSingleUrl,"binName", 
+",'warehouseID':'\"+getDOWarehouseID()+\"'", 
+"Name", "Memo", 
+"onSelectBin", 50, 500)
+@Html.MasterDetailForm(form, grid, Model, Model.Details, mode, "TransferReceipt", "ID", delegate(MasterDetailFormHelper helper)
+{
+    helper.DetailGridTitle = "Item";
+    helper.TabbedGrid = tabbedGrid;
+    helper.CreateAnotherButton.Visible = false;
+    helper.ApproveButton.Visible = false;
+    
+    if (mode == UIMode.Detail)
+    {
+        helper.CreateAnotherButton.Href = Url.Content("~/UncreatedTransferReceipt");
+
+        helper.VoidButton.Href = Url.Content("~/TransferReceipt/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+        helper.VoidButton.OnClick = "";
+        helper.VoidButton.ID = "btnVoid";
+        
+        if (!Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.CreateAnotherButton.Visible = false;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = helper.ApproveButton.Visible = false;
+        }
+        else
+        {
+
+            helper.EditButton.Visible = true;
+            helper.DeleteButton.Visible = helper.SubmitButton.Visible = helper.CancelSubmitButton.Visible = false;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowVoid))
+        {
+            helper.VoidButton.Visible = false;
+        }
+        else
+        {
+            helper.VoidButton.Visible = mode == UIMode.Detail && Model.Status != (int)DeliveryOrderStatus.Void;
+        }
+    }
+})

@@ -1,0 +1,56 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Util;
+@using ABCAPOS.Models;
+@model List<ExpeditionModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","EXPEDITION CODE"),
+        Html.LabelColumn("Name","EXPEDITION NAME"),
+        Html.LabelColumn("CompanyName","COMPANY NAME"),
+        Html.LabelColumn("Address","ADDRESS"),
+        Html.LabelColumn("Notes","NOTES"),
+        Html.LabelColumn("IsActiveDescription","IS ACTIVE"),
+    };
+    
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("EXPEDITION CODE","Code"),
+        Html.GenericFilterTextBoxField("EXPEDITION NAME","Name"),
+        Html.GenericFilterTextBoxField("COMPANY NAME","CompanyName"),
+    };
+
+    var detailButton = new GridButtonColumn();
+    detailButton.CssClass = "iconContainer";
+    detailButton.ButtonCssClass = "details imageButton";
+    detailButton.Href = Url.Content("~/Expedition/Detail?key=@idPropertyValue");
+    detailButton.IDPropertyName = "ID";
+    detailButton.Text = "Detail";
+
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(detailButton);
+}
+<script type="text/javascript">
+    
+</script>
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "Expedition", "ID", "Code", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+    {
+        if (Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.AddNewButton.Visible = true;
+        }
+        else
+        {
+            helper.AddNewButton.Visible = false;
+        }
+        helper.AddNewButton.Visible = true;
+        helper.AddNewButton.Href = Url.Content("~/Expedition/Create");
+        
+    })
+@*@statement*@

@@ -1,0 +1,38 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<SalesmanModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","Kode"),
+        Html.LabelColumn("Name","Nama Sales"),
+        //Html.LabelColumn("IsActiveDescription","Status", "",delegate(GridColumn col){
+        //    col.SortField = "IsActive";
+        //})
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("Kode","Code"),
+        Html.GenericFilterTextBoxField("Nama Sales","Name")
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.DefaultObject = new SalesmanModel();
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "Salesman", "ID", "Name", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    if (Convert.ToBoolean(ViewBag.AllowCreate))
+    {
+        helper.AddNewButton.Visible = true;
+    }
+    else
+    {
+        helper.AddNewButton.Visible = false;
+    }
+})

@@ -1,0 +1,117 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model VendorModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    var radioList = new List<RadioOption>()
+    {
+        new RadioOption(){ Value = true,Text = "Active", ReadOnly = mode == UIMode.Detail},
+        new RadioOption(){ Value = false,Text = "Not Active", ReadOnly = mode == UIMode.Detail},
+    };
+
+    var termsList = ViewBag.TermsList as IEnumerable<TermsOfPaymentModel>;
+    var ddlTerms = new List<DropDownOption>()
+    {
+        new DropDownOption(){Value = Convert.ToString((int)0), Text = ""}
+    };
+    ddlTerms.AddRange(Util.GetDropDownOptions(termsList, "Name", "ID"));
+
+    var rateList = ViewBag.RateList as IEnumerable<RateModel>;
+    var ddlRate = new List<DropDownOption>()
+    {
+        new DropDownOption(){Value = Convert.ToString((int)0), Text = ""}
+    };
+    ddlRate.AddRange(Util.GetDropDownOptions(rateList, "Name", "ID"));
+    
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.LabelFieldObjFor(p=>p.Code,"VENDOR ID", delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.Label;
+            f.GenerateHiddenField = true;
+        }),
+        Html.TextBoxFieldObjFor(p=>p.Name,"NAME", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        Html.TextBoxFieldObjFor(p=>p.WebAddress, "WEB ADDRESS", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        Html.TextBoxFieldObjFor(p=>p.Category,"CATEGORY"),
+        Html.RadioButtonFieldObjFor(p=>p.IsActive, "ACTIVE", radioList),
+        //Html.TextBoxFieldObjFor(p=>p.Duplicate,"Duplicate", delegate(FormField f){
+        //    f.Style = "width:400px";
+        //}),
+        //Html.TextBoxFieldObjFor(p=>p.FirstName,"First Name", delegate(FormField f){
+        //    f.Style = "width:400px";
+        //}),
+        //Html.TextBoxFieldObjFor(p=>p.LastName,"Last Name", delegate(FormField f){
+        //    f.Style = "width:400px";
+        //}),
+        
+        Html.TextBoxFieldObjFor(p=>p.Email,"EMAIL"),
+        Html.TextBoxFieldObjFor(p=>p.Phone,"PHONE"),
+        Html.TextBoxFieldObjFor(p=>p.Fax,"FAX"),
+        Html.TextAreaFieldObjFor(p=>p.Address,"ADDRESS", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+        //Html.TextBoxFieldObjFor(p=>p.City,"City"),
+        
+        Html.TextBoxFieldObjFor(p=>p.ContactPerson,"CONTACT PERSON"),
+        Html.TextAreaFieldObjFor(p=>p.BillingAddress,"BILLING ADDRESS", delegate(FormField f){
+            f.Style = "width:400px";
+        }),
+
+        //Html.TextBoxFieldObjFor(p=>p.Account,"ACCOUNT"),
+        Html.DropDownFieldObjFor(p=>p.TermsID,"TERMS", ddlTerms, delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        Html.LabelFieldObjFor(p=>p.TermsName, "TERMS", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.CreditLimit, "CREDIT LIMIT", 
+            delegate(FormField f){
+                f.CreateFormat = f.UpdateFormat = f.DetailFormat = "N0";
+            }),
+        Html.LabelFieldObjFor(p=>p.Balance, "BALANCE", 
+            delegate(FormField f){
+                f.CreateFormat = f.UpdateFormat = f.DetailFormat = "N0";
+            }),
+        Html.LabelFieldObjFor(p=>p.UnbilledOrders, "UNBILLED ORDERS", 
+            delegate(FormField f){
+                f.CreateFormat = f.UpdateFormat = f.DetailFormat = "N0";
+            }),
+        
+        Html.DropDownFieldObjFor(p=>p.CurrencyID,"CURRENCY", ddlRate, delegate(FormField f){
+            f.Style = "width:300px";
+        }),
+        Html.LabelFieldObjFor(p=>p.CurrencyName, "CURRENCY", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+        }),
+        
+        Html.TextBoxFieldObjFor(p=>p.TaxNumber,"NPWP"),
+    };
+
+    var form = new Form();
+    form.Fields = formFields;
+
+}
+@Html.MasterForm(form, Model, mode, "Vendor", "ID", delegate(MasterFormHelper<VendorModel> helper)
+{
+    if (mode == UIMode.Detail)
+    {
+        if (!Convert.ToBoolean(ViewBag.AllowCreate))
+        {
+            helper.CreateAnotherButton.Visible = false;
+        }
+
+        if (!Convert.ToBoolean(ViewBag.AllowEdit))
+        {
+            helper.EditButton.Visible = helper.DeleteButton.Visible = false;
+        }
+    }
+})

@@ -1,0 +1,44 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<SalesOrderModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","SO NO", "120px", delegate(GridColumn col)
+        {
+            col.Style = "text-align:center;width:120px;";
+        }),
+        Html.DateColumn("Date","DATE", "", delegate(GridColumn col)
+        {
+            col.Style = "text-align:center;width:80px;";
+        }),
+        Html.LabelColumn("CustomerName","CUSTOMER"),
+        Html.LabelColumn("StatusDescription","Status", "",delegate(GridColumn col){
+            col.SortField = "Status";
+        })
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterDateRangeField("TRANSACTION DATE","Date"),
+        //Html.GenericFilterTextBoxField("PO Number","PurchaseOrderCode"),
+        Html.GenericFilterTextBoxField("SO NUMBER","Code"),
+        Html.GenericFilterTextBoxField("CUSTOMER","CustomerName"),
+    };
+
+    var createButton = new GridButtonColumn();
+    createButton.CssClass = "iconContainer";
+    createButton.ButtonCssClass = "add imageButton";
+    createButton.Href = Url.Content("~/Invoice/Create?salesOrderID=@idPropertyValue");
+    createButton.IDPropertyName = "ID";
+    createButton.Text = "Create";
+    
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+    grid.Buttons.Add(createButton);
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "UncreatedInvoice", "ID", "Name", null,null,delegate(IndexGridHelper helper){
+    helper.AddNewButton.Visible = false;
+}
+)

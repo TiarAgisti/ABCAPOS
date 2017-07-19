@@ -1,0 +1,16 @@
+﻿<Report Title="Laporan Jurnal Umum">
+  <Columns>
+    <Column Field="Date" HeaderText="Tanggal" Width=".8"/>
+    <Column Field="AccountUserCode" HeaderText="Kode Akun" Width=".8"/>
+    <Column Field="AccountDescription" HeaderText="Nama Akun" Width="1"/>
+    <Column Field="DebitAmount" HeaderText="Debet" Width=".8"/>
+    <Column Field="CreditAmount" HeaderText="Kredit" Width=".8"/>
+    <Column Field="Remarks" HeaderText="Keterangan" Width="1"/>
+  </Columns>
+  <Footers>
+    <Footer Label="Total" LabelSpan="3" 
+            Content="=SUM(Fields!DebitAmount.Value)"
+            Content2="=SUM(Fields!CreditAmount.Value)"
+            Content3=""/>
+  </Footers>
+</Report>

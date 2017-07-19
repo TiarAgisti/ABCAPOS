@@ -1,0 +1,184 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Helpers;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model RoleModel
+@{
+    ViewBag.Title = "Otorisasi Modul";
+}
+<h2>
+    Otorisasi Modul</h2>
+<table class="basic">
+    <tr>
+        <td style="width: 150px">
+            Nama Peran <span class="warning">*</span>
+        </td>
+        <td class="separatorColumn">
+            :
+        </td>
+        <td>
+            @Model.Name
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Daftar Modul
+        </td>
+        <td>
+            :
+        </td>
+        <td>
+            <table class="basic">
+                @foreach (var obj in ModuleHelper.ModuleList())
+                {
+                    var chkViewID = "chkView" + obj.Key;
+                    var chkEditID = "chkEdit" + obj.Key;
+                    var chkCreateID = "chkCreate" + obj.Key;
+                    var chkVoidID = "chkVoid" + obj.Key;
+                    var chkFinishGood = "chkFG" + obj.Key;
+                    var chkALL = "chkALL" + obj.Key;
+                    
+                    var viewPermission = from i in Model.Details
+                                         where i.ModuleID == obj.Key && i.Action == "View"
+                                         select i;
+
+                    var editPermission = from i in Model.Details
+                                         where i.ModuleID == obj.Key && i.Action == "Edit"
+                                         select i;
+
+                    var createPermission = from i in Model.Details
+                                           where i.ModuleID == obj.Key && i.Action == "Create"
+                                           select i;
+
+                    var voidPermission = from i in Model.Details
+                                         where i.ModuleID == obj.Key && i.Action == "Void"
+                                         select i;
+
+                    var ViewFinishGood = from i in Model.Details
+                                         where i.ModuleID == obj.Key && i.Action == "ViewFinishGood"
+                                         select i;
+
+                    var ViewALL = from i in Model.Details
+                                         where i.ModuleID == obj.Key && i.Action == "ViewALL"
+                                         select i;
+
+                    var chkViewChecked = "";
+                    var chkEditChecked = "";
+                    var chkCreateChecked = "";
+                    var chkVoidChecked = "";
+                    var chkViewFGChecked = "";
+                    var chkViewALLChecked = "";
+                    
+                    if (viewPermission.FirstOrDefault() != null)
+                    {
+                        chkViewChecked = "checked=\"checked\"";
+                    }
+
+                    if (editPermission.FirstOrDefault() != null)
+                    {
+                        chkEditChecked = "checked=\"checked\"";
+                    }
+
+                    if (createPermission.FirstOrDefault() != null)
+                    {
+                        chkCreateChecked = "checked=\"checked\"";
+                    }
+                    
+                    if (voidPermission.FirstOrDefault() != null)
+                    {
+                        chkVoidChecked = "checked=\"checked\"";
+                    }
+
+                    if (ViewFinishGood.FirstOrDefault() != null)
+                    {
+                        chkViewFGChecked = "checked=\"checked\"";
+                    }
+
+                    if (ViewALL.FirstOrDefault() != null)
+                    {
+                        chkViewALLChecked = "checked=\"checked\"";
+                    }
+                    <tr>
+                        <td style="width: 250px">
+                            @obj.Value
+                        </td>
+                        <td style="width: 150px">
+                            @if (obj.Key != "CompanySetting" && obj.Key != "PrefixSetting")
+                            {
+                                <input disabled="disabled" type="checkbox" id="@chkViewID" name="@chkViewID" value="true" @chkViewChecked />@Html.Raw("Lihat")
+                            }
+                        </td>
+                        <td style="width: 150px">
+                            @if (obj.Key != "CompanySetting" && obj.Key != "PrefixSetting" && obj.Key != "StockMovement" && obj.Key != "AveragePaymentOverDue" && obj.Key != "SalesOrderReport"
+                                && obj.Key != "PurchaseOrderReport" && obj.Key != "PurchaseBillReport" && obj.Key != "ItemFulfillmentReport" && obj.Key != "InvoiceReport" && obj.Key != "PaymentReport"
+                                && obj.Key != "ReportOverdue" && obj.Key != "ReportStock" && obj.Key != "CreditMemoByItemReport" && obj.Key != "ManufactureReport")
+                            {
+                                <input disabled="disabled" type="checkbox" id="@chkCreateID" name="@chkCreateID" value="true" @chkCreateChecked />@Html.Raw("Buat Baru")
+                            }
+                        </td>
+                        <td style="width: 150px">
+                             @if (obj.Key != "StockMovement" && obj.Key !="AveragePaymentOverDue" && obj.Key != "SalesOrderReport" && obj.Key != "PurchaseOrderReport"
+                                  && obj.Key != "PurchaseBillReport" && obj.Key != "ItemFulfillmentReport" && obj.Key != "InvoiceReport" && obj.Key != "PaymentReport"
+                                  && obj.Key != "ReportOverdue" && obj.Key != "ReportStock" && obj.Key != "CreditMemoByItemReport" && obj.Key != "ManufactureReport")
+                             {
+                                  <input disabled="disabled" type="checkbox" id="@chkEditID" name="@chkEditID" value="true" @chkEditChecked />@Html.Raw("Edit")
+                             }
+                        </td>
+                        <td style="width: 150px">
+                            @if (obj.Key == "PurchaseOrder" || obj.Key == "PurchaseDelivery" || obj.Key == "PurchaseBill" || obj.Key == "MakeMultiPay" || obj.Key == "PurchaseReturn" 
+                                || obj.Key == "SalesOrder" || obj.Key == "DeliveryOrder" || obj.Key == "Invoice" || obj.Key == "Payment" || obj.Key == "CashSales"
+                                || obj.Key == "MakeMultiPaySales" || obj.Key == "TransferOrder" || obj.Key == "TransferDelivery" || obj.Key == "TransferReceipt"
+                                || obj.Key == "CreditMemo" || obj.Key == "ApplyCreditMemo" || obj.Key == "ApplyBillCredit" || obj.Key == "BillCredit"
+                                || obj.Key == "CustomerReturn" || obj.Key == "ReturnReceipt" || obj.Key == "WorkOrder" || obj.Key == "AssemblyBuild" || obj.Key == "VendorReturn"
+                                || obj.Key == "VendorReturnDelivery" || obj.Key == "AssemblyUnBuild" || obj.Key == "Resi" || obj.Key == "ResiPayment" || obj.Key == "ResiBill")
+                            {
+                                <input disabled="disabled" type="checkbox" id="@chkVoidID" name="@chkVoidID" value="true" @chkVoidChecked />@Html.Raw("Void")
+                            }
+                        </td>
+                         <td style="width: 150px">
+                            @if (obj.Key == "WorkOrder" || obj.Key == "AssemblyBuild" || obj.Key == "AssemblyUnBuild" || obj.Key == "Product")
+                            {
+                                <input disabled="disabled" type="checkbox" id="@chkFinishGood" name="@chkFinishGood" value="true" @chkViewFGChecked />@Html.Raw("ViewFinishGood")
+                            }
+                        </td>
+                        <td style="width: 150px">
+                            @if (obj.Key == "WorkOrder" || obj.Key == "AssemblyBuild" || obj.Key == "AssemblyUnBuild" || obj.Key == "Product")
+                            {
+                                <input disabled="disabled" type="checkbox" id="@chkALL" name="@chkALL" value="true" @chkViewALLChecked />@Html.Raw("ViewALL")
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 150px">
+            Status
+        </td>
+        <td class="separatorColumn">
+            :
+        </td>
+        <td>
+            @Model.IsActiveDescription
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <table class="basic">
+                <tr>
+                    <td>
+                        @if (Convert.ToBoolean(ViewBag.AllowEdit))
+                        {
+                            <a href="@Url.Content("~/Role/Update?Key=" + Model.ID)" class="button">Ubah</a>
+@*<a href="@Url.Content("~/Role/Delete?Key=" + Model.ID)" onclick="return confirm('Apakah Anda yakin ingin menghapus peran ini?');" class="button">
+                                Hapus</a>*@
+                            <a href="@Url.Content("~/Role/Create")" class="button">Buat Baru</a>
+                        }
+                        <a href="@Url.Content("~/Role/Index")" class="button">Kembali ke Daftar</a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,172 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@using ABCAPOS.Util;
+@model PurchasePaymentModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,""),
+        Html.HiddenFieldFieldObjFor(p=>p.Status,""),
+        Html.HiddenFieldFieldObjFor(p=>p.PaymentMethodID, ""),
+        Html.HiddenFieldFieldObjFor(p=>p.CurrencyID, ""),
+        Html.HiddenFieldFieldObjFor(p=>p.WarehouseID, ""),
+        
+        Html.LabelFieldObjFor(p=>p.PurchaseOrderID,"", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = f.DetailFieldType = FormFieldType.HiddenField;
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.PurchaseBillID,"", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = f.DetailFieldType = FormFieldType.HiddenField;
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.Code,"BILL PAYMENT NUMBER", delegate(FormField f){
+            f.UpdateFieldType = FormFieldType.Label;
+            f.GenerateHiddenField = true;
+        }),
+        
+        Html.LabelFieldObjFor(p=>p.PurchaseBillCode,"BILL NUMBER"),
+        
+        Html.LabelFieldObjFor(p=>p.VendorName,"VENDOR"),
+        Html.LabelFieldObjFor(p=>p.POSupplierNo,"SUPPLIER INV NO"),
+        Html.LabelFieldObjFor(p=>p.CurrencyName,"CURRENCY", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.Label;
+            f.GenerateHiddenField = true;
+        }),
+        Html.DecimalFieldObjFor(p=>p.ExchangeRate,"Kurs / Rate", delegate(FormField f){
+            f.CreateFieldType = f.UpdateFieldType = f.DetailFieldType = FormFieldType.Label;
+            f.CreateFormat = f.UpdateFormat = f.DetailFormat = "N0";
+        }),
+         Html.DateFieldObjFor(p=>p.Date,"DATE", delegate(FormField f){
+                f.DetailFormat = "dd/MM/yyyy";
+                f.CreateFormat = f.UpdateFormat = "dd/MM/yyyy";
+         }),
+         Html.DateFieldObjFor(p=>p.DueDate,"DUE DATE", delegate(FormField f){
+                f.DetailFormat = "dd/MM/yyyy";
+                f.CreateFormat = f.UpdateFormat = "dd/MM/yyyy";
+                f.CreateFieldType = f.UpdateFieldType = f.DetailFieldType = FormFieldType.Label;
+            }),
+         
+         Html.DecimalFieldObjFor(p=>p.PurchaseBillAmount,"ORIGINAL AMOUNT", delegate(FormField f){
+             f.CreateFieldType = f.UpdateFieldType = FormFieldType.Label;
+             f.CreateFormat = f.UpdateFormat = f.DetailFormat = "N2";
+         }),
+         Html.DecimalFieldObjFor(p=>p.SisaAmount,"AMOUNT DUE", delegate(FormField f){
+             f.CreateFieldType = FormFieldType.Label;
+             //f.DetailFieldType = FormFieldType.None;
+             f.CreateFormat = f.UpdateFormat = f.DetailFormat = "N2";
+         }),
+        Html.DecimalFieldObjFor(p=>p.OutstandingAmount,"AMOUNT DUE", delegate(FormField f){
+             f.UpdateFieldType = FormFieldType.Label;
+             f.CreateFieldType = f.DetailFieldType = FormFieldType.None;
+             f.CreateFormat = f.UpdateFormat = f.DetailFormat = "N2";
+         }),
+         Html.DecimalFieldObjFor(p=>p.Amount,"PAYMENT AMOUNT", delegate(FormField f){
+             f.CreateFormat = f.UpdateFormat = "F2";
+            f.DetailFormat = "N2";
+         }),
+        //Html.TextAreaFieldObjFor(p=>p.Remarks,"Keterangan", delegate(FormField f){
+        //    f.Style = "width:400px";
+        //}),
+        
+        //Html.LabelFieldObjFor(p=>p.StatusDescription,"Status"),
+        
+        Html.LabelFieldObjFor(p=>p.VoidRemarks,"VOID REMARKS", delegate(FormField f)
+        {
+            f.CreateFieldType = f.UpdateFieldType = FormFieldType.None;
+            
+            if(string.IsNullOrEmpty(Model.VoidRemarks))
+            {
+                f.DetailFieldType = FormFieldType.None;
+            }
+        }),
+    };
+
+    var form = new Form();
+    form.Fields = formFields;
+
+    //var approveButton = new Button();
+    //approveButton.Text = "Setujui";
+    //approveButton.CssClass = "button";
+    //approveButton.Href = Url.Content("~/PurchasePayment/Approve?key=" + Model.ID);
+    //approveButton.Visible = mode == UIMode.Detail && Model.Status == (int)MPL.DocumentStatus.New;
+    //approveButton.OnClick = "return confirm('Apakah Anda yakin ingin menyetujui dokumen ini?');";
+
+    var voidButton = new Button();
+    voidButton.Text = "Void";
+    voidButton.ID = "btnVoid";
+    voidButton.CssClass = "button";
+    voidButton.Href = Url.Content("~/PurchasePayment/VoidRemarks?key=" + Model.ID + "&voidFromIndex=false");
+    voidButton.Visible = mode == UIMode.Detail && Model.Status != (int)MPL.DocumentStatus.Void;
+}
+<script type="text/javascript">
+    $(function () {
+        $("#btnVoid").live("click", function (e) {
+            e.preventDefault();
+            $(" <div></div>")
+                .addClass("dialog")
+                .attr("id", $(this).attr("data-dialog-id"))
+                .appendTo("body").dialog({
+                    title: $(this).attr("Alasan Void"),
+                    close: function () {
+                        $(this).remove();
+                    },
+                    modal: true,
+                    height: 180,
+                    width: 700,
+                    left: 0
+                }).load(this.href);
+        });
+
+        $("#btnCloseVoidForm").live("click", function (e) {
+            e.preventDefault();
+            $(this).closest(".dialog").dialog("close");
+        });
+
+        addInvoiceUrl();
+    });
+
+    function addInvoiceUrl() {
+        var mode = $("#hdnMode").val();
+
+        if (mode == "Detail") {
+            var poID = $("#hdnPurchaseOrderID").val();
+            var poCode = $("#lblPurchaseOrderCode").text();
+
+            var poLink = "/PurchaseOrder/Detail?key=" + poID;
+            $("#lblPurchaseOrderCode").replaceWith('<a href="' + poLink + '">' + poCode + '</a>');
+
+        }
+    }
+</script>
+<input type="hidden" id="hdnMode" value="@ViewBag.Mode" />
+@Html.MasterForm(form, Model, mode, "PurchasePayment", "ID", delegate(MasterFormHelper<PurchasePaymentModel> helper)
+    {
+        if (mode == UIMode.Detail)
+        {
+            if (!Convert.ToBoolean(ViewBag.AllowCreate))
+            {
+                helper.CreateAnotherButton.Visible = false;
+            }
+
+            if (!Convert.ToBoolean(ViewBag.AllowEdit))
+            {
+                helper.EditButton.Visible = false;
+            }
+            else
+            {
+                helper.EditButton.Visible = mode == UIMode.Detail && Model.Status == (int)MPL.DocumentStatus.New;
+                //helper.Buttons.Add(approveButton);
+                //helper.Buttons.Add(voidButton);
+            }
+
+            if (Convert.ToBoolean(ViewBag.AllowVoid))
+            {
+                helper.Buttons.Add(voidButton);
+            }
+        }
+
+        helper.CreateAnotherButton.Href = Url.Content("~/UncreatedPurchasePayment");
+        helper.DeleteButton.Visible = false;
+    })

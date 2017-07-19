@@ -1,0 +1,29 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<PPh21ExpenseModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Year","Tahun","",delegate(GridColumn col){
+            col.SortField = "Date";
+        }),
+        Html.DecimalColumn("Amount","Jumlah Per Bulan", "150px")
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+}
+@Html.IndexGrid(grid, Model, "PPh21Expense", "ID", "ID", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    if (Convert.ToBoolean(ViewBag.AllowCreate))
+    {
+        helper.AddNewButton.Visible = true;
+    }
+    else
+    {
+        helper.AddNewButton.Visible = false;
+    }
+})

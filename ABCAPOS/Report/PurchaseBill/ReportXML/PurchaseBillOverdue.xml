@@ -1,0 +1,13 @@
+﻿<Report Title="REPORT PURCHASE BILL OVERDUE">
+  <Columns>
+    <Column Field="SupplierName" HeaderText="Vendor" Width="2.2"/>
+    <Column Field="Code" HeaderText="Bill No." Width="1.2"/>
+    <Column Field="Date" HeaderText="Date" Width=".6"/>
+    <Column Field="DueDate" HeaderText="Due Date" Width=".6"/>
+    <Column Field="Overdue" TextAlign="Right" HeaderText="Overdue" Width="0.6"/>
+    <Column Field="Amount" HeaderText="Amount" Width="0.9"/>
+    <Column Field="TaxAmount" HeaderText="Tax Amount" Width="0.9"/>
+    <Column Field="GrandTotal" HeaderText="Gross Amount" Width=".9"/>
+    <Column Field="StatusDescription" HeaderText="Status" Width=".5"/>
+  </Columns>
+</Report>

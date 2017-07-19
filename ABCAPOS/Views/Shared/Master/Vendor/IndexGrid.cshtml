@@ -1,0 +1,42 @@
+﻿@using MPL.MVC;
+@using ABCAPOS.Models;
+@model List<VendorModel>
+@{
+    var gridColumns = new List<GridColumn>()
+    {
+        Html.LabelColumn("Code","ID"),
+        Html.LabelColumn("Name","NAME"),
+        Html.LabelColumn("Duplicate", "DUPLICATE"),
+        Html.LabelColumn("Category", "CATEGORY"),
+        Html.LabelColumn("ContactPerson", "PRIMARY CONTACT"),
+        Html.LabelColumn("Phone", "PHONE")
+        
+        //Html.LabelColumn("IsActiveDescription","Status", "",delegate(GridColumn col){
+        //    col.SortField = "IsActive";
+        //})
+    };
+
+    var filterList = new List<GenericFilterField>()
+    {
+        Html.GenericFilterTextBoxField("VENDOR CODE","Code"),
+        Html.GenericFilterTextBoxField("VENDOR NAME","Name")
+    };
+
+    var grid = new Grid();
+    grid.Columns = gridColumns;
+}
+@Html.GenericFilter(filterList)
+@Html.IndexGrid(grid, Model, "Vendor", "ID", "Name", null, delegate(object obj, UIMode mode)
+{
+    return false;
+}, delegate(IndexGridHelper helper)
+{
+    if (Convert.ToBoolean(ViewBag.AllowCreate))
+    {
+        helper.AddNewButton.Visible = true;
+    }
+    else
+    {
+        helper.AddNewButton.Visible = false;
+    }
+})

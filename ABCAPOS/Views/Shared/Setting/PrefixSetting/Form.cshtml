@@ -1,0 +1,119 @@
+﻿@using ABCAPOS.Models
+@using MPL.MVC;
+@model PrefixSettingModel
+@{
+    var mode = (UIMode)ViewBag.Mode;
+
+    var formFields = new List<IFormField>()
+    {
+        Html.HiddenFieldFieldObjFor(p=>p.ID,"ID"),
+        
+        Html.DualColumnFormFieldObj(
+            Html.TextBoxFieldObjFor(p=>p.CustomerPrefix,"Kode Pelanggan", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            Html.TextBoxFieldObjFor(p=>p.SalesOrderPrefix,"Kode Sales Order", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            100
+            
+        ),
+            //Html.TextBoxFieldObjFor(p=>p.VendorPrefix,"Kode Vendor", delegate(FormField f){
+            //    f.Style = "width:200px";
+            //}),
+        
+        
+        Html.DualColumnFormFieldObj(
+            Html.TextBoxFieldObjFor(p=>p.SalesmanPrefix,"Kode Marketing", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            Html.TextBoxFieldObjFor(p=>p.DeliveryOrderPrefix,"Kode Delivery Order", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            100
+        ),
+        
+        Html.DualColumnFormFieldObj(
+            Html.TextBoxFieldObjFor(p=>p.ProductPrefix,"Kode Produk", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            Html.TextBoxFieldObjFor(p=>p.PurchasePrefix,"Kode Pembelian", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            100
+        ),
+        
+        Html.DualColumnFormFieldObj(
+            Html.TextBoxFieldObjFor(p=>p.WarehousePrefix,"Kode Gudang", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            Html.TextBoxFieldObjFor(p=>p.AdjustmentPrefix,"Kode Saldo Awal", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            100
+        ),
+        
+        Html.DualColumnFormFieldObj(
+            Html.TextBoxFieldObjFor(p=>p.AccountPrefix,"Kode Akun", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            Html.TextBoxFieldObjFor(p=>p.InvoicePrefix,"Kode Invoice", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            100
+        ),
+        
+        Html.DualColumnFormFieldObj(
+            Html.TextBoxFieldObjFor(p=>p.IncomePrefix,"Kode Pemasukkan", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            Html.TextBoxFieldObjFor(p=>p.PaymentPrefix,"Kode Pembayaran Invoice", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            100
+        ),
+            
+        Html.DualColumnFormFieldObj(
+            Html.TextBoxFieldObjFor(p=>p.ExpensePrefix,"Kode Pengeluaran", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            Html.TextBoxFieldObjFor(p=>p.VendorInvoicePrefix,"Kode Pembayaran Hutang", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            100
+        ),        
+        
+        Html.DualColumnFormFieldObj(
+            Html.TextBoxFieldObjFor(p=>p.AttendancePrefix,"Kode Absensi", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            Html.TextBoxFieldObjFor(p=>p.AllowancePrefix,"Kode Gaji", delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            100
+        ),
+        
+        Html.DualColumnFormFieldObj(
+            Html.TextBoxFieldObjFor(p=>p.WorkOrderPrefix,"Kode Work Order",delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            
+            Html.TextBoxFieldObjFor(p=>p.AssemblyBuildPrefix,"Kode Assembly Build",delegate(FormField f){
+                f.Style = "width:200px";
+            }),
+            100
+        
+        ),
+        Html.TextBoxFieldObjFor(p=>p.AssemblyUnBuildPrefix,"Kode Assembly UnBuild",delegate(FormField f){
+            f.Style = "width:200px";
+        }),
+    };
+
+    var form = new Form();
+    form.Fields = formFields;
+}
+@Html.MasterForm(form, Model, mode, "PrefixSetting", "ID", delegate(MasterFormHelper<PrefixSettingModel> helper)
+{
+    helper.CreateAnotherButton.Visible = helper.DeleteButton.Visible = false;
+    helper.BackToListButton.Href = Url.Content("~");
+})
